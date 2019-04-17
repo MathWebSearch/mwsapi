@@ -3,29 +3,39 @@ package query
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/MathWebSearch/mwsapi/elasticutils"
 	"github.com/MathWebSearch/mwsapi/tema"
 
-	"github.com/olivere/elastic"
+	"gopkg.in/olivere/elastic.v6"
 )
 
 // DocumentResult represents the result of a documentquery
 type DocumentResult struct {
 	ElasticID string
+	Element   *tema.HarvestElement
 
-	Math []*MathExcept
+	Math []*MathDocumentInfo
 }
 
-// MathExcept represents a single math excert within an element
-type MathExcept struct {
+// MathDocumentInfo represents a single math excert within an element
+type MathDocumentInfo struct {
 	MathID string
 	XPath  string
 }
 
+// RealMathID return the real math id
+func (info *MathDocumentInfo) RealMathID() string {
+	if _, err := strconv.Atoi(info.MathID); err == nil {
+		return "math" + info.MathID
+	}
+	return info.MathID
+}
+
 // RunDocumentQuery runs the document query phase of a query
-func RunDocumentQuery(connection *tema.Connection, query *Query, from int, size int) (results []*DocumentResult, err error) {
+func RunDocumentQuery(connection *tema.Connection, query *Query, from int64, size int64) (results []*DocumentResult, err error) {
 	// make the document query
 	q, err := query.asDocumentQuery()
 	if err != nil {
@@ -33,19 +43,19 @@ func RunDocumentQuery(connection *tema.Connection, query *Query, from int, size 
 	}
 
 	// grab the results
-	page, err := elasticutils.FetchObjectsPage(connection.Client, connection.Config.HarvestIndex, connection.Config.HarvestType, q, from, size)
+	page, err := elasticutils.FetchObjectsPage(connection.Client, connection.Config.HarvestIndex, connection.Config.HarvestType, q, nil, from, size)
 	if err != nil {
 		return
 	}
 
-	for _, hit := range page.Hits {
-		doc, err := NewHit(hit)
+	// make a document result slice
+	results = make([]*DocumentResult, len(page.Hits))
+
+	for i, hit := range page.Hits {
+		results[i], err = NewHit(hit)
 		if err != nil {
 			return nil, err
 		}
-
-		// and append the result
-		results = append(results, doc)
 	}
 
 	return
@@ -64,8 +74,14 @@ func (query *Query) asDocumentQuery() (elastic.Query, error) {
 	}
 
 	// and return the formula id
-	if len(query.FormulaID) > 0 {
-		formulae := elastic.NewTermQuery("mws_ids", query.FormulaID)
+	if len(query.MathWebSearchIDs) > 0 {
+		// need to convert []int64 to []interface{}
+		ids := make([]interface{}, len(query.MathWebSearchIDs))
+		for i, v := range query.MathWebSearchIDs {
+			ids[i] = v
+		}
+
+		formulae := elastic.NewTermsQuery("mws_ids", ids...)
 		q = q.Must(formulae)
 		nonEmptyQuery = true
 	}
@@ -89,17 +105,18 @@ func NewHit(obj *elasticutils.Object) (result *DocumentResult, err error) {
 	if err != nil {
 		return
 	}
+	result.Element = &raw
 
-	for _, mwsid := range raw.MWSNumbers {
+	for _, mwsid := range result.Element.MWSNumbers {
 		// load the data
-		data, ok := raw.MWSData[mwsid]
+		data, ok := result.Element.MWSPaths[mwsid]
 		if !ok {
-			return nil, fmt.Errorf("Result %q missing data for %d", result.ElasticID, mwsid)
+			return nil, fmt.Errorf("Result %q missing path info for %d", result.ElasticID, mwsid)
 		}
 
 		// and iterate over it
 		for key, value := range data {
-			result.Math = append(result.Math, &MathExcept{
+			result.Math = append(result.Math, &MathDocumentInfo{
 				MathID: simplifyMathID(key),
 				XPath:  value.XPath,
 			})

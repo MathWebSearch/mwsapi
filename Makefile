@@ -13,13 +13,13 @@ OUT_DIR=out
 
 all: test build
 
-build: $(OUT_DIR)/mwsapid $(OUT_DIR)/mwsquery $(OUT_DIR)/elasticsync
+build: $(OUT_DIR)/mwsapid $(OUT_DIR)/temaquery $(OUT_DIR)/elasticsync
 
 $(OUT_DIR)/mwsapid: deps
 	cd cmd/mwsapid && CGO_ENABLED=0 $(GOBUILD) $(GOFLAGS) -o ../../$(OUT_DIR)/mwsapid
 
-$(OUT_DIR)/mwsquery: deps
-	cd cmd/mwsquery && CGO_ENABLED=0 $(GOBUILD) $(GOFLAGS) -o ../../$(OUT_DIR)/mwsquery
+$(OUT_DIR)/temaquery: deps
+	cd cmd/temaquery && CGO_ENABLED=0 $(GOBUILD) $(GOFLAGS) -o ../../$(OUT_DIR)/temaquery
 
 $(OUT_DIR)/elasticsync: deps
 	cd cmd/elasticsync && CGO_ENABLED=0 $(GOBUILD) $(GOFLAGS) -o ../../$(OUT_DIR)/elasticsync

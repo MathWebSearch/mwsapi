@@ -85,17 +85,26 @@ type ResultsPage struct {
 	Hits  []*Object
 	Total int64
 
-	From int
-	Size int
+	From int64
+	Size int64
 }
 
 // FetchObjectsPage fetches a set of objects given a specific slicing
-func FetchObjectsPage(client *elastic.Client, index string, tp string, query elastic.Query, from int, size int) (page *ResultsPage, err error) {
+func FetchObjectsPage(client *elastic.Client, index string, tp string, query elastic.Query, highlight *elastic.Highlight, from int64, size int64) (page *ResultsPage, err error) {
 	ctx := context.Background()
-	results, err := client.Search(index).Type(tp).Query(query).From(from).Size(size).Do(ctx)
+	search := client.Search(index).Type(tp).Query(query).From(int(from)).Size(int(size))
+	if highlight != nil {
+		search = search.Highlight(highlight)
+	}
 
-	if err != nil && results.TimedOut {
+	results, err := search.Do(ctx)
+
+	if err == nil && results.TimedOut {
 		err = errors.New("Search() reported TimedOut=true")
+	}
+
+	if err != nil {
+		return
 	}
 
 	page = &ResultsPage{
@@ -121,10 +130,10 @@ func FetchObjectsPage(client *elastic.Client, index string, tp string, query ela
 }
 
 // FetchObject fetches a single object from the database or returns nil
-func FetchObject(client *elastic.Client, index string, tp string, query elastic.Query) (obj *Object, err error) {
+func FetchObject(client *elastic.Client, index string, tp string, query elastic.Query, highlight *elastic.Highlight) (obj *Object, err error) {
 
 	// fetch a page of objects
-	results, err := FetchObjectsPage(client, index, tp, query, 0, 1)
+	results, err := FetchObjectsPage(client, index, tp, query, highlight, 0, 1)
 	if err != nil {
 		return
 	}
@@ -142,7 +151,7 @@ func FetchObject(client *elastic.Client, index string, tp string, query elastic.
 // FetchOrCreateObject fetches the object returned from the query, or creates a new one if no result is retrieved
 func FetchOrCreateObject(client *elastic.Client, index string, tp string, query elastic.Query, NewFields map[string]interface{}) (obj *Object, created bool, err error) {
 	// first try and fetch the object
-	obj, err = FetchObject(client, index, tp, query)
+	obj, err = FetchObject(client, index, tp, query, nil)
 	if err != nil || obj != nil {
 		return
 	}

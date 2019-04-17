@@ -5,14 +5,14 @@ type HarvestElement struct {
 	Metadata interface{} `json:"metadata"`          // Arbitrary document metadata
 	Segment  string      `json:"segment,omitempty"` // Name of the segment this document belongs to
 
-	MWSData    map[int]map[string]SubTermInfo `json:"mws_id"`  // information about each identifier within this document
-	MWSNumbers []int                          `json:"mws_ids"` // list of identifiers within this document
+	MWSPaths   map[int64]map[string]PathInfo `json:"mws_id"`  // information about each identifier within this document
+	MWSNumbers []int64                       `json:"mws_ids"` // list of identifiers within this document
 
-	Math map[string]string `json:"math"` // Source of replaced math elements within this document
+	MathSource map[string]string `json:"math"` // Source of replaced math elements within this document
 }
 
-// SubTermInfo represents information about a subterm
-type SubTermInfo struct {
+// PathInfo represents information about a subterm
+type PathInfo struct {
 	XPath string `json:"xpath"`
 }
 

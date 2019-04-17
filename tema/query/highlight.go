@@ -2,10 +2,11 @@ package query
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/MathWebSearch/mwsapi/elasticutils"
 	"github.com/MathWebSearch/mwsapi/tema"
-	"github.com/olivere/elastic"
+	"gopkg.in/olivere/elastic.v6"
 )
 
 // HighlightResult represents the
@@ -23,21 +24,18 @@ type HighlightResult struct {
 	Highlights []string
 }
 
-// ReplacedMath represents a single replaced MathExcept
-type ReplacedMath struct {
-	Source string
-	ID     string
-	XPath  string
-}
-
 // RunHighlightQuery runs a highlight query for a given result
 func (res *DocumentResult) RunHighlightQuery(connection *tema.Connection, query *Query) (result *HighlightResult, err error) {
-	q, err := query.asHighlightQuery(res)
+	// build the highlight query
+	q, h, err := query.asHighlightQuery(res)
+	if err != nil {
+		return
+	}
 
 	// fetch the object and the highlights
-	obj, err := elasticutils.FetchObject(connection.Client, connection.Config.HarvestIndex, connection.Config.HarvestType, q)
-	if err == nil && result == nil {
-		err = errors.New("Unable to highlight result")
+	obj, err := elasticutils.FetchObject(connection.Client, connection.Config.HarvestIndex, connection.Config.HarvestType, q, h)
+	if err == nil && obj == nil {
+		err = errors.New("Can not find result")
 	}
 
 	if err != nil {
@@ -48,34 +46,66 @@ func (res *DocumentResult) RunHighlightQuery(connection *tema.Connection, query 
 	return
 }
 
-func (query *Query) asHighlightQuery(res *DocumentResult) (elastic.Query, error) {
-	q := elastic.NewBoolQuery()
+func (query *Query) asHighlightQuery(res *DocumentResult) (elastic.Query, *elastic.Highlight, error) {
+	q := elastic.NewBoolQuery().Must(elastic.NewIdsQuery().Ids(res.ElasticID))
 	nonEmptyQuery := false
 
-	// if we have some formulae
+	// text highlights first
 	if len(query.Text) > 0 {
-		text := elastic.NewMatchQuery("text", query.Text).MinimumShouldMatch("2").Operator("or")
+		text := elastic.NewMatchQuery("text", query.Text)
 		q = q.Must(text)
 		nonEmptyQuery = true
 	}
 
-	// and return the formula id
-	if len(query.FormulaID) > 0 {
-		formulae := elastic.NewTermQuery("mws_ids", query.FormulaID)
-		q = q.Must(formulae)
-		nonEmptyQuery = true
+	// formulae highlights next
+	for _, math := range res.Math {
+		matcher := elastic.NewMatchQuery("text", math.RealMathID()).MinimumShouldMatch("2").Operator("or")
+		q = q.Must(matcher)
 	}
 
 	if !nonEmptyQuery {
-		return nil, errors.New("Query had neither text nor mws_ids")
+		return nil, nil, errors.New("Query had neither text nor mws_ids")
 	}
 
+	// build the highlight itself
+	h := elastic.NewHighlight().Fields(elastic.NewHighlighterField("text")).PreTags("<span class=\"tema-highlight\">").PostTags("</span>")
+
 	// and return the query itself
-	return q, nil
+	return q, h, nil
 }
 
 // NewHighlightResult makes a new highlight result
 func NewHighlightResult(doc *DocumentResult, obj *elasticutils.Object) (res *HighlightResult, err error) {
-	err = errors.New("Not implemented")
+	if obj.Hit == nil || obj.Hit.Highlight == nil {
+		return nil, errors.New("No highlights returned")
+	}
+
+	res = &HighlightResult{
+		Document: doc,
+		Hit:      obj,
+	}
+
+	// load the highlights
+	var ok bool
+	res.Highlights, ok = (*obj.Hit.Highlight)["text"]
+	if !ok {
+		return nil, errors.New("No highlights returned")
+	}
+
+	// map() over doc.Math
+	res.Math = make([]*ReplacedMath, len(doc.Math))
+	for i, math := range doc.Math {
+		res.Math[i] = &ReplacedMath{
+			ID:    math.RealMathID(),
+			XPath: math.XPath,
+		}
+
+		var ok bool
+		res.Math[i].Source, ok = doc.Element.MathSource[math.MathID]
+		if !ok {
+			return nil, fmt.Errorf("Result %s has no source info for %s", doc.ElasticID, math.MathID)
+		}
+	}
+
 	return
 }
