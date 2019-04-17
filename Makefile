@@ -10,20 +10,16 @@ GOFLAGS=-a
 
 # Binary paths
 OUT_DIR=out
-BINARY_NAME=mwsapi
-BINARY_UNIX=$(BINARY_NAME)_unix
-BINARY_MACOS=$(BINARY_NAME)_mac
-BINARY_WINDOWS=$(BINARY_NAME)_windows.exe
 
 all: test build
 
-build: build-local build-linux build-macos
-build-local: deps
-	CGO_ENABLED=0 $(GOBUILD) $(GOFLAGS) -o $(OUT_DIR)/$(BINARY_NAME)
-build-linux: deps
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(OUT_DIR)/$(BINARY_UNIX)
-build-macos: deps
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GOBUILD) -o $(OUT_DIR)/$(BINARY_MACOS)
+build: $(OUT_DIR)/mwsquery $(OUT_DIR)/elasticsync
+
+$(OUT_DIR)/mwsquery: deps
+	cd cmd/mwsquery && CGO_ENABLED=0 $(GOBUILD) $(GOFLAGS) -o ../../$(OUT_DIR)/mwsquery
+
+$(OUT_DIR)/elasticsync: deps
+	cd cmd/elasticsync && CGO_ENABLED=0 $(GOBUILD) $(GOFLAGS) -o ../../$(OUT_DIR)/elasticsync
 
 test: testdeps
 	$(GOTEST) -v ./...

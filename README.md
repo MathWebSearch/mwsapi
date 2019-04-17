@@ -2,4 +2,4 @@
 
 [![Build Status](https://travis-ci.org/MathWebSearch/mwsapi.svg?branch=master)](https://travis-ci.org/MathWebSearch/mwsapi)
 
-An MWS Proxy that acts as a unified api
+An API and interface to the revamped MathWebSearch system. 
