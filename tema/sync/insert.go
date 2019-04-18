@@ -3,9 +3,9 @@ package sync
 import (
 	"encoding/json"
 
-	"github.com/MathWebSearch/mwsapi/tema"
-
 	"github.com/MathWebSearch/mwsapi/elasticutils"
+	"github.com/MathWebSearch/mwsapi/tema"
+	"github.com/MathWebSearch/mwsapi/utils"
 )
 
 // insertSegmentHarvests inserts a segment
@@ -15,7 +15,7 @@ func (proc *Process) insertSegmentHarvests(segment string) error {
 
 	// start processing async
 	go func() {
-		e := processLinePairs(segment, true, func(_, contentLine string) (err error) {
+		e := utils.ProcessLinePairs(segment, true, func(_, contentLine string) (err error) {
 			// unmarshal the content
 			var content *tema.HarvestElement
 			err = json.Unmarshal([]byte(contentLine), &content)

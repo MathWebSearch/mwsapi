@@ -1,4 +1,4 @@
-package sync
+package utils
 
 import (
 	"bufio"
@@ -9,8 +9,8 @@ import (
 
 const bufferCapcityInBytes = 128 * 1024 // 128 MB
 
-// processLinePair process lines from filename in pairs
-func processLinePairs(filename string, allowLeftover bool, parser func(string, string) error) (err error) {
+// ProcessLinePairs process lines from filename in pairs
+func ProcessLinePairs(filename string, allowLeftover bool, parser func(string, string) error) (err error) {
 	// load the file
 	file, err := os.Open(filename)
 	if err != nil {
@@ -52,7 +52,8 @@ func processLinePairs(filename string, allowLeftover bool, parser func(string, s
 	return scanner.Err()
 }
 
-func iterateFiles(dir string, extension string, callback func(string) error) (err error) {
+//IterateFiles iterates over files in a directory with a given extension
+func IterateFiles(dir string, extension string, callback func(string) error) (err error) {
 	return filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err

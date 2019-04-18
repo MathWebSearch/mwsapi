@@ -5,26 +5,26 @@ import (
 )
 
 func (proc *Process) refreshIndex() error {
-	proc.print("Refreshing elasticsearch ... ")
+	proc.print(nil, "Refreshing elasticsearch ... ")
 	err := elasticutils.RefreshIndex(proc.connection.Client, proc.connection.Config.SegmentIndex, proc.connection.Config.HarvestIndex)
 
 	if err == nil {
-		proc.printlnOK("OK")
+		proc.printlnOK(nil, "OK")
 	} else {
-		proc.printlnERROR("ERROR")
+		proc.printlnERROR(nil, "ERROR")
 	}
 
 	return err
 }
 
 func (proc *Process) flushIndex() error {
-	proc.print("Flushing elasticsearch ... ")
+	proc.print(nil, "Flushing elasticsearch ... ")
 	err := elasticutils.FlushIndex(proc.connection.Client, proc.connection.Config.SegmentIndex, proc.connection.Config.HarvestIndex)
 
 	if err == nil {
-		proc.printlnOK("OK")
+		proc.printlnOK(nil, "OK")
 	} else {
-		proc.printlnERROR("ERROR")
+		proc.printlnERROR(nil, "ERROR")
 	}
 
 	return err
