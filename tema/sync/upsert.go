@@ -57,6 +57,12 @@ func (proc *Process) upsertSegment(segment string) (err error) {
 	if seg.Hash != hash {
 		proc.printlnOK("DIFFERS")
 
+		if created {
+			proc.stats.NewSegments++
+		} else {
+			proc.stats.UpdatedSegments++
+		}
+
 		proc.print("  Clearing harvests belonging to segment ... ")
 		err = proc.clearSegmentHarvests(seg)
 		if err != nil {
@@ -75,6 +81,7 @@ func (proc *Process) upsertSegment(segment string) (err error) {
 		proc.printlnOK("OK")
 	} else {
 		proc.printlnOK("MATCHES")
+		proc.stats.UnchangedSegments++
 	}
 
 	proc.print("  Storing segment state ... ")

@@ -12,6 +12,8 @@ type Args struct {
 	ElasticPort int
 
 	IndexDir string
+
+	Quiet bool
 }
 
 // ElasticURL returns the url to elasticsearch
@@ -37,6 +39,8 @@ func ParseArgs(args []string) *Args {
 	defaultIndexDir := "/index/"
 	flagSet.StringVar(&flags.IndexDir, "index-dir", defaultIndexDir, "Directory to use for Indexes")
 
+	flagSet.BoolVar(&flags.Quiet, "quiet", false, "be quiet and only print stats and errors")
+
 	// parse and exit
 	flagSet.Parse(args[1:])
 	return &flags
@@ -45,21 +49,25 @@ func ParseArgs(args []string) *Args {
 // Validate validates the command-line arguments or panics
 func (args *Args) Validate() bool {
 
-	fmt.Printf("elastic-host: %q\n", args.ElasticHost)
-
 	if args.ElasticPort <= 0 || args.ElasticPort > 65535 {
 		fmt.Printf("elastic-port: %d is not a valid port number", args.ElasticPort)
 		return false
 	}
-	fmt.Printf("elastic-port: %d\n", args.ElasticPort)
 
 	if !ensureDirectory(args.IndexDir) {
 		fmt.Printf("index-dir: %q is not a directory\n", args.IndexDir)
 		return false
 	}
-	fmt.Printf("index-dir: %q\n", args.IndexDir)
 
-	fmt.Println("------------------------------------------")
+	if !args.Quiet {
+		fmt.Printf("quiet: %t\n", args.Quiet)
+		fmt.Printf("elastic-host: %q\n", args.ElasticHost)
+		fmt.Printf("elastic-port: %d\n", args.ElasticPort)
+		fmt.Printf("index-dir: %q\n", args.IndexDir)
+
+		fmt.Println("------------------------------------------")
+	}
+
 	return true
 }
 

@@ -15,6 +15,7 @@ func (proc *Process) clearSegments() (err error) {
 
 	old := elasticutils.FetchObjects(proc.connection.Client, proc.connection.Config.SegmentIndex, proc.connection.Config.SegmentType, q)
 	for so := range old {
+		proc.stats.RemovedSegments++
 		e := proc.clearSegment(so)
 		if e != nil {
 			err = e

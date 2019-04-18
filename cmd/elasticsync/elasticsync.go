@@ -23,9 +23,17 @@ func main() {
 	fmt.Println("Connected. ")
 
 	// make a sync process
-	process := sync.NewProcess(connection, a.IndexDir)
-	process.Run()
+	process := sync.NewProcess(connection, a.IndexDir, a.Quiet)
+	stats, err := process.Run()
 
+	// if there was an error, print it
+	if err != nil {
+		fmt.Printf(err.Error())
+		os.Exit(1)
+	}
+
+	// print the stats, and then exit
+	fmt.Printf("Segments: %s. \n", stats.String())
 	fmt.Println("Finished, exiting. ")
 }
 

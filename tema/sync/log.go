@@ -7,11 +7,11 @@ import (
 )
 
 func (proc *Process) printlnOK(text string) {
-	fmt.Printf("%s\n", aurora.Green(text))
+	proc.printf("%s\n", aurora.Green(text))
 }
 
 func (proc *Process) printlnERROR(text string) {
-	fmt.Printf("%s\n", aurora.Red(text))
+	proc.printf("%s\n", aurora.Red(text))
 }
 
 func (proc *Process) printf(template string, a ...interface{}) {
@@ -23,5 +23,7 @@ func (proc *Process) println(text string) {
 }
 
 func (proc *Process) print(text string) {
-	fmt.Print(text)
+	if !proc.quiet {
+		fmt.Print(text)
+	}
 }

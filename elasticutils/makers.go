@@ -8,8 +8,8 @@ import (
 	"gopkg.in/olivere/elastic.v6"
 )
 
-// GetObject fetches a new EC object from the server
-func GetObject(client *elastic.Client, index string, tp string, id string) (obj *Object, err error) {
+// NewObjectFromID fetches a new EC object from the server
+func NewObjectFromID(client *elastic.Client, index string, tp string, id string) (obj *Object, err error) {
 	// create an empty object
 	obj = &Object{client, index, tp, id, nil, nil}
 
@@ -21,20 +21,22 @@ func GetObject(client *elastic.Client, index string, tp string, id string) (obj 
 	return
 }
 
-// CreateObject creates a new ec object on the server
-func CreateObject(client *elastic.Client, index string, tp string, Fields map[string]interface{}) (obj *Object, err error) {
-	obj = &Object{client, index, tp, "", Fields, nil}
+// NewObjectFromFields creates a new ec object on the server
+func NewObjectFromFields(client *elastic.Client, index string, tp string, Data interface{}) (obj *Object, err error) {
+	obj = &Object{client, index, tp, "", nil, nil}
 
-	err = obj.Index()
+	// pack the fields into the object
+	err = obj.Pack(Data)
 	if err != nil {
-		obj = nil
+		return
 	}
 
+	err = obj.Index()
 	return
 }
 
-// ObjectFromHit creates a new object using a SearchHit
-func ObjectFromHit(client *elastic.Client, hit *elastic.SearchHit) (obj *Object, err error) {
+// NewObjectFromHit creates a new object using a SearchHit
+func NewObjectFromHit(client *elastic.Client, hit *elastic.SearchHit) (obj *Object, err error) {
 	// make a new object with index and types
 	obj = &Object{client, hit.Index, hit.Type, hit.Id, nil, nil}
 
@@ -68,7 +70,7 @@ func FetchObjects(client *elastic.Client, index string, tp string, query elastic
 			}
 
 			for _, hit := range results.Hits.Hits {
-				obj, err := ObjectFromHit(client, hit)
+				obj, err := NewObjectFromHit(client, hit)
 				if err == nil {
 					hits <- obj
 				}
@@ -114,7 +116,7 @@ func FetchObjectsPage(client *elastic.Client, index string, tp string, query ela
 
 	// iterate over the hits
 	for _, hit := range results.Hits.Hits {
-		obj, err := ObjectFromHit(client, hit)
+		obj, err := NewObjectFromHit(client, hit)
 		if err != nil {
 			return nil, err
 		}
@@ -149,7 +151,7 @@ func FetchObject(client *elastic.Client, index string, tp string, query elastic.
 }
 
 // FetchOrCreateObject fetches the object returned from the query, or creates a new one if no result is retrieved
-func FetchOrCreateObject(client *elastic.Client, index string, tp string, query elastic.Query, NewFields map[string]interface{}) (obj *Object, created bool, err error) {
+func FetchOrCreateObject(client *elastic.Client, index string, tp string, query elastic.Query, Data interface{}) (obj *Object, created bool, err error) {
 	// first try and fetch the object
 	obj, err = FetchObject(client, index, tp, query, nil)
 	if err != nil || obj != nil {
@@ -157,7 +159,7 @@ func FetchOrCreateObject(client *elastic.Client, index string, tp string, query 
 	}
 
 	// if that fails create it
-	obj, err = CreateObject(client, index, tp, NewFields)
+	obj, err = NewObjectFromFields(client, index, tp, Data)
 	if err != nil {
 		created = true
 	}

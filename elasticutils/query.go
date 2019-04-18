@@ -8,7 +8,7 @@ import (
 )
 
 // CreateBulk creates a lazily computed set of objects in bulk
-func CreateBulk(client *elastic.Client, index string, tp string, objects chan map[string]interface{}) (err error) {
+func CreateBulk(client *elastic.Client, index string, tp string, objects chan interface{}) (err error) {
 	// create a new bulk request
 	bulkRequest := client.Bulk()
 

@@ -10,7 +10,7 @@ import (
 
 // insertSegmentHarvests inserts a segment
 func (proc *Process) insertSegmentHarvests(segment string) error {
-	bulk := make(chan map[string]interface{})
+	bulk := make(chan interface{})
 	errChan := make(chan error)
 
 	// start processing async
@@ -25,11 +25,8 @@ func (proc *Process) insertSegmentHarvests(segment string) error {
 
 			content.Segment = segment
 
-			var raw map[string]interface{}
-			elasticutils.Repack(content, &raw)
-
 			// store the content and put it into the db
-			bulk <- raw
+			bulk <- content
 
 			return
 		})

@@ -20,15 +20,8 @@ func (proc *Process) checkSegmentIndex(segment string) (segobj *tema.Segment, ob
 		Touched: true,
 	}
 
-	// serialize the new fields
-	fields := make(map[string]interface{})
-	err = elasticutils.Repack(segFields, &fields)
-	if err != nil {
-		return
-	}
-
 	// fetch or create it
-	obj, created, err = elasticutils.FetchOrCreateObject(proc.connection.Client, proc.connection.Config.SegmentIndex, proc.connection.Config.SegmentType, q, fields)
+	obj, created, err = elasticutils.FetchOrCreateObject(proc.connection.Client, proc.connection.Config.SegmentIndex, proc.connection.Config.SegmentType, q, segFields)
 	if err != nil {
 		return
 	}
