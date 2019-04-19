@@ -1,60 +1,62 @@
 package utils
 
-import "sync"
-
-// SyncWorker represents a worker running syncronous code
+// SyncWorker is an object that allows a set of asyncronous jobs
+// to be run in a grouped fashion
 type SyncWorker struct {
 	done chan bool // channel that gets triggered when done
 
-	worker           *sync.Mutex
-	hasActiveChannel bool
-	activeChannel    int
+	hasActiveChannel bool // do we have an active channel
+	activeChannel    int  // number of active channel
 
-	messages chan *SyncMessage // for receiving new messages
-	backlog  []*SyncMessage    //backlog of messages
+	messages chan *syncMessage // for receiving new messages
+	backlog  []*syncMessage    // backlog of messages
 }
 
-// NewSyncWorker makes a new SyncWorker
+// NewSyncWorker makes a new SyncWorker with the given capacity
 func NewSyncWorker(capacity int) (worker *SyncWorker) {
 	worker = &SyncWorker{
 		done:     make(chan bool),
-		messages: make(chan *SyncMessage, capacity),
-
-		worker: &sync.Mutex{},
+		messages: make(chan *syncMessage, capacity),
 	}
 	go worker.workerThread()
 	return
 }
 
-// SyncMessage represents a single syncronized message
-type SyncMessage struct {
-	channel int
-	close   bool
-	code    *func()
+// sync message represents a message
+// passed from the main to the worker thread
+type syncMessage struct {
+	channel int     // channel this message should be sent on
+	close   bool    // if true, close the channel afterwards
+	code    *func() // code to run (if any)
 }
 
-// Work performs some syncronous work
+// Work instructs the SyncWorker to run the given code on the given channel
 func (worker *SyncWorker) Work(channel int, code func()) {
-	worker.messages <- &SyncMessage{
+	worker.messages <- &syncMessage{
 		channel: channel,
 		code:    &code,
 	}
 }
 
-// Close closes a channel and informs the caller that there are no more messages
+// Close closes a channel and informs the Worker
+// that it may not continue sending messages on different channels
 func (worker *SyncWorker) Close(channel int) {
-	worker.messages <- &SyncMessage{
+	worker.messages <- &syncMessage{
 		channel: channel,
 		close:   true,
 	}
 }
 
-// worker thread starts reading all messages
-func (worker *SyncWorker) workerThread() {
-	// aquire the lock
-	worker.worker.Lock()
-	defer worker.worker.Unlock()
+// Wait waits for processing to complete
+func (worker *SyncWorker) Wait() {
+	close(worker.messages)
+	<-worker.done
+	return
+}
 
+// workerThread performs the work
+// should only be called once
+func (worker *SyncWorker) workerThread() {
 	// grab the current backlog
 	backlog := worker.backlog
 	worker.backlog = nil
@@ -80,14 +82,8 @@ func (worker *SyncWorker) workerThread() {
 	close(worker.done)
 }
 
-// Wait waits for processing to complete
-func (worker *SyncWorker) Wait() {
-	close(worker.messages)
-	<-worker.done
-	return
-}
-
-func (worker *SyncWorker) processMessage(message *SyncMessage) bool {
+// processMessage processes a single message
+func (worker *SyncWorker) processMessage(message *syncMessage) bool {
 
 	// if we don't have an active channel set it to the message
 	if !(worker.hasActiveChannel) {

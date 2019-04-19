@@ -2,7 +2,10 @@ package utils
 
 import (
 	"bufio"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -63,4 +66,26 @@ func IterateFiles(dir string, extension string, callback func(string) error) (er
 		}
 		return nil
 	})
+}
+
+// HashFile computes the hash of a segment
+func HashFile(filename string) (hash string, err error) {
+	// the hasher implementation
+	hasher := sha256.New()
+
+	// open the segment
+	f, err := os.Open(filename)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
+	// start hashing the file
+	if _, err := io.Copy(hasher, f); err != nil {
+		return "", err
+	}
+
+	// turn it into a string
+	hash = hex.EncodeToString(hasher.Sum(nil))
+	return
 }

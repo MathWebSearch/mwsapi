@@ -3,7 +3,6 @@ package sync
 import (
 	"sync/atomic"
 
-	"github.com/MathWebSearch/mwsapi/tema"
 	"github.com/MathWebSearch/mwsapi/utils"
 )
 
@@ -36,7 +35,7 @@ func (proc *Process) upsertSegments() (err error) {
 func (proc *Process) upsertSegment(sync func(func()), segment string) (err error) {
 	// compute the hash
 	proc.print(sync, "  computing hash ... ")
-	hash, err := tema.HashSegment(segment)
+	hash, err := utils.HashFile(segment)
 
 	if err != nil {
 		proc.printlnERROR(sync, "ERROR")
