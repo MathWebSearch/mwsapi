@@ -13,6 +13,7 @@ type Args struct {
 	ElasticPort int
 
 	DocumentPhaseOnly bool
+	Count             bool
 
 	Text string
 
@@ -44,6 +45,7 @@ func ParseArgs(args []string) *Args {
 	flagSet.IntVar(&flags.ElasticPort, "elastic-port", 9200, "Port to use for elasticsearch")
 
 	flagSet.BoolVar(&flags.DocumentPhaseOnly, "document-phase-only", false, "When set, stop after the document query phase")
+	flagSet.BoolVar(&flags.Count, "count", false, "When set, only count number of results instead of actually running the query")
 
 	flagSet.StringVar(&flags.Text, "text", "", "Text to query for")
 	flagSet.StringVar(&flags.idStrings, "ids", "", "Comma-seperated MathWebSearch IDs to query for")
@@ -68,6 +70,7 @@ func (args *Args) Validate() bool {
 	//fmt.Printf("elastic-port: %d\n", args.ElasticPort)
 
 	//fmt.Printf("document-phase-only: %t\n", args.DocumentPhaseOnly)
+	// fmt.Printf("count: %t\n", args.Count)
 
 	//fmt.Printf("text: %q\n", args.Text)
 

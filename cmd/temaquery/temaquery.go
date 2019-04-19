@@ -25,7 +25,9 @@ func main() {
 	var res interface{}
 	var err error
 
-	if a.DocumentPhaseOnly {
+	if a.Count {
+		res, err = RunCountQuery(connection, a)
+	} else if a.DocumentPhaseOnly {
 		res, err = RunDocumentQuery(connection, a)
 	} else {
 		res, err = RunBothPhases(connection, a)
@@ -62,5 +64,14 @@ func RunBothPhases(connection *tema.Connection, a *args.Args) (res interface{}, 
 		Text:             a.Text,
 		MathWebSearchIDs: a.IDs,
 	}, a.From, a.Size)
+	return
+}
+
+// RunCountQuery runs a count query
+func RunCountQuery(connection *tema.Connection, a *args.Args) (res interface{}, err error) {
+	res, err = query.CountQuery(connection, &query.Query{
+		Text:             a.Text,
+		MathWebSearchIDs: a.IDs,
+	})
 	return
 }
