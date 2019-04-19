@@ -12,7 +12,7 @@ import (
 // HighlightResult represents the
 type HighlightResult struct {
 	// the document and the math this result came from
-	Document *DocumentResult
+	Document *DocumentHit
 
 	// the replaced math
 	Math []*ReplacedMath
@@ -25,7 +25,7 @@ type HighlightResult struct {
 }
 
 // RunHighlightQuery runs a highlight query for a given result
-func (res *DocumentResult) RunHighlightQuery(connection *tema.Connection, query *Query) (result *HighlightResult, err error) {
+func (res *DocumentHit) RunHighlightQuery(connection *tema.Connection, query *Query) (result *HighlightResult, err error) {
 	// build the highlight query
 	q, h, err := query.asHighlightQuery(res)
 	if err != nil {
@@ -46,8 +46,8 @@ func (res *DocumentResult) RunHighlightQuery(connection *tema.Connection, query 
 	return
 }
 
-func (query *Query) asHighlightQuery(res *DocumentResult) (elastic.Query, *elastic.Highlight, error) {
-	q := elastic.NewBoolQuery().Must(elastic.NewIdsQuery().Ids(res.ElasticID))
+func (query *Query) asHighlightQuery(res *DocumentHit) (elastic.Query, *elastic.Highlight, error) {
+	q := elastic.NewBoolQuery().Must(elastic.NewIdsQuery().Ids(res.ID))
 	nonEmptyQuery := false
 
 	// text highlights first
@@ -75,7 +75,7 @@ func (query *Query) asHighlightQuery(res *DocumentResult) (elastic.Query, *elast
 }
 
 // NewHighlightResult makes a new highlight result
-func NewHighlightResult(doc *DocumentResult, obj *elasticutils.Object) (res *HighlightResult, err error) {
+func NewHighlightResult(doc *DocumentHit, obj *elasticutils.Object) (res *HighlightResult, err error) {
 	if obj.Hit == nil || obj.Hit.Highlight == nil {
 		return nil, errors.New("No highlights returned")
 	}
@@ -103,7 +103,7 @@ func NewHighlightResult(doc *DocumentResult, obj *elasticutils.Object) (res *Hig
 		var ok bool
 		res.Math[i].Source, ok = doc.Element.MathSource[math.MathID]
 		if !ok {
-			return nil, fmt.Errorf("Result %s has no source info for %s", doc.ElasticID, math.MathID)
+			return nil, fmt.Errorf("Result %s has no source info for %s", doc.ID, math.MathID)
 		}
 	}
 

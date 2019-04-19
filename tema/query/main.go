@@ -32,10 +32,12 @@ type ReplacedMath struct {
 // RunQuery runs a complete TemaSearch Query
 func RunQuery(connection *tema.Connection, q *Query, from int64, size int64) (results []*Result, err error) {
 	// run the document query
-	docs, err := RunDocumentQuery(connection, q, from, size)
+	res, err := RunDocumentQuery(connection, q, from, size)
 	if err != nil {
 		return
 	}
+
+	docs := res.Hits
 
 	// run the highlight queries
 	highlights := make([]*HighlightResult, len(docs))
@@ -58,10 +60,15 @@ func RunQuery(connection *tema.Connection, q *Query, from int64, size int64) (re
 	return
 }
 
+// CountQuery counts results subject to a query
+func CountQuery(connection *tema.Connection, q *Query) (int64, error) {
+	return CountDocumentQuery(connection, q) // the second phase only maps each query 1:1
+}
+
 // NewResult generates a new result from a highlight result
 func NewResult(highlight *HighlightResult) (result *Result, err error) {
 	result = &Result{
-		ElasticID: highlight.Document.ElasticID,
+		ElasticID: highlight.Document.ID,
 		Metadata:  highlight.Document.Element.Metadata,
 
 		Score:    *highlight.Hit.Hit.Score,

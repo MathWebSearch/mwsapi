@@ -50,3 +50,9 @@ func DeleteBulk(client *elastic.Client, index string, tp string, query elastic.Q
 
 	return
 }
+
+// Count counts all objects subject to a query
+func Count(client *elastic.Client, index string, tp string, query elastic.Query) (int64, error) {
+	ctx := context.Background()
+	return client.Count(index).Type(tp).Query(query).Do(ctx)
+}

@@ -112,16 +112,17 @@ func FetchObjectsPage(client *elastic.Client, index string, tp string, query ela
 	page = &ResultsPage{
 		From: from,
 		Size: size,
+		Hits: make([]*Object, len(results.Hits.Hits)),
 	}
 
 	// iterate over the hits
-	for _, hit := range results.Hits.Hits {
+	for i, hit := range results.Hits.Hits {
 		obj, err := NewObjectFromHit(client, hit)
 		if err != nil {
 			return nil, err
 		}
 
-		page.Hits = append(page.Hits, obj)
+		page.Hits[i] = obj
 	}
 
 	// count the hits

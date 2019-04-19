@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/MathWebSearch/mwsapi/elasticutils"
 	"github.com/MathWebSearch/mwsapi/tema"
@@ -12,22 +13,33 @@ import (
 	"gopkg.in/olivere/elastic.v6"
 )
 
-// DocumentResult represents the result of a documentquery
+// DocumentResult represents a result of the Document phase
 type DocumentResult struct {
-	ElasticID string
-	Element   *tema.HarvestElement
+	Total int64 `json:"total"` // the total number of results
+	From  int64 `json:"from"`  // result number this page starts at
+	Size  int64 `json:"size"`  // (maximum) number of results in this page
 
-	Math []*MathDocumentInfo
+	Took time.Duration `json:"took"` // the amount of time the query took to execute, including network latency to elasticsearch
+
+	Hits []*DocumentHit `json:"hits"` // the current list of pages
 }
 
-// MathDocumentInfo represents a single math excert within an element
-type MathDocumentInfo struct {
-	MathID string
-	XPath  string
+// DocumentHit represents the result of a documentquery
+type DocumentHit struct {
+	ID      string               `json:"id"`     // id of the element being returned
+	Element *tema.HarvestElement `json:"source"` // source of the found element
+
+	Math []*FormulaeInfo `json:"math"` // the list of math elements within this hit
+}
+
+// FormulaeInfo represents a single math excert within an element
+type FormulaeInfo struct {
+	MathID string `json:"id"`    // id of this element
+	XPath  string `json:"xpath"` // path of this element
 }
 
 // RealMathID return the real math id
-func (info *MathDocumentInfo) RealMathID() string {
+func (info *FormulaeInfo) RealMathID() string {
 	if _, err := strconv.Atoi(info.MathID); err == nil {
 		return "math" + info.MathID
 	}
@@ -35,7 +47,19 @@ func (info *MathDocumentInfo) RealMathID() string {
 }
 
 // RunDocumentQuery runs the document query phase of a query
-func RunDocumentQuery(connection *tema.Connection, query *Query, from int64, size int64) (results []*DocumentResult, err error) {
+func RunDocumentQuery(connection *tema.Connection, query *Query, from int64, size int64) (result *DocumentResult, err error) {
+
+	// measure time for this query
+	start := time.Now()
+	defer func() {
+		result.Took = time.Since(start)
+	}()
+
+	result = &DocumentResult{
+		From: from,
+		Size: size,
+	}
+
 	// make the document query
 	q, err := query.asDocumentQuery()
 	if err != nil {
@@ -48,17 +72,31 @@ func RunDocumentQuery(connection *tema.Connection, query *Query, from int64, siz
 		return
 	}
 
-	// make a document result slice
-	results = make([]*DocumentResult, len(page.Hits))
+	// prepare result objejct
+	result.Total = page.Total
+	result.Hits = make([]*DocumentHit, len(page.Hits))
 
+	// and make the new hits
 	for i, hit := range page.Hits {
-		results[i], err = NewHit(hit)
+		result.Hits[i], err = NewDocumentHit(hit)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	return
+}
+
+// CountDocumentQuery counts all obects subject to a document query
+func CountDocumentQuery(connection *tema.Connection, query *Query) (count int64, err error) {
+	// make the document query
+	q, err := query.asDocumentQuery()
+	if err != nil {
+		return
+	}
+
+	// and run the count utility
+	return elasticutils.Count(connection.Client, connection.Config.HarvestIndex, connection.Config.HarvestType, q)
 }
 
 func (query *Query) asDocumentQuery() (elastic.Query, error) {
@@ -94,12 +132,13 @@ func (query *Query) asDocumentQuery() (elastic.Query, error) {
 	return q, nil
 }
 
-// NewHit generates a hit from an elasticsearch object
-func NewHit(obj *elasticutils.Object) (result *DocumentResult, err error) {
-	result = &DocumentResult{
-		ElasticID: obj.GetID(),
+// NewDocumentHit generates a hit from an elasticsearch object
+func NewDocumentHit(obj *elasticutils.Object) (result *DocumentHit, err error) {
+	result = &DocumentHit{
+		ID: obj.GetID(),
 	}
 
+	// store the source element
 	var raw tema.HarvestElement
 	err = obj.Unpack(&raw)
 	if err != nil {
@@ -107,16 +146,20 @@ func NewHit(obj *elasticutils.Object) (result *DocumentResult, err error) {
 	}
 	result.Element = &raw
 
+	// create the math elements
+	// we do not a-priori know the size of it
+	result.Math = []*FormulaeInfo{}
+
 	for _, mwsid := range result.Element.MWSNumbers {
 		// load the data
 		data, ok := result.Element.MWSPaths[mwsid]
 		if !ok {
-			return nil, fmt.Errorf("Result %q missing path info for %d", result.ElasticID, mwsid)
+			return nil, fmt.Errorf("Result %q missing path info for %d", result.ID, mwsid)
 		}
 
 		// and iterate over it
 		for key, value := range data {
-			result.Math = append(result.Math, &MathDocumentInfo{
+			result.Math = append(result.Math, &FormulaeInfo{
 				MathID: simplifyMathID(key),
 				XPath:  value.XPath,
 			})

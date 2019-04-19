@@ -2,6 +2,7 @@ package sync
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/MathWebSearch/mwsapi/tema"
 )
@@ -23,10 +24,12 @@ type Stats struct {
 	UpdatedSegments   int64 // Segments which were updated
 	NewSegments       int64 // Segments which were newly added
 	RemovedSegments   int64 // Segements which were removed
+
+	Duration time.Duration // how long it took
 }
 
 func (s *Stats) String() string {
-	return fmt.Sprintf("new %d, updated %d, unchanged %d, removed %d", s.NewSegments, s.UpdatedSegments, s.UnchangedSegments, s.RemovedSegments)
+	return fmt.Sprintf("took %s: new %d, updated %d, unchanged %d, removed %d", s.Duration, s.NewSegments, s.UpdatedSegments, s.UnchangedSegments, s.RemovedSegments)
 }
 
 // NewProcess creates a new Process
@@ -44,6 +47,12 @@ func NewProcess(connection *tema.Connection, folder string, quiet bool, force bo
 func (proc *Process) Run() (stats *Stats, err error) {
 	// reset stats
 	proc.stats = &Stats{}
+
+	// keep track of how long the process takes
+	start := time.Now()
+	defer func() {
+		stats.Duration = time.Since(start)
+	}()
 
 	// Create the index and mapping
 	err = proc.createIndex()
