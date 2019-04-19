@@ -1,6 +1,11 @@
 package query
 
-import "github.com/MathWebSearch/mwsapi/tema"
+import (
+	"time"
+
+	"github.com/MathWebSearch/mwsapi/tema"
+	"github.com/MathWebSearch/mwsapi/utils"
+)
 
 // Query represents a query sent to temasearch
 type Query struct {
@@ -11,8 +16,20 @@ type Query struct {
 	Text string
 }
 
-// Result represents the result of a temasearch query
+// Result represents the result of a Query
 type Result struct {
+	Total int64 `json:"total"` // the total number of results
+	From  int64 `json:"from"`  // result number this page starts at
+	Size  int64 `json:"size"`  // (maximum) number of results in this page
+
+	Took         *time.Duration `json:"took"`          // the amount of time the query took to execute, including network latency to elasticsearch
+	TookDocument *time.Duration `json:"took_document"` // the amount of time it took for the document query to execute, including it's latency
+
+	Hits []*Hit `json:"hits"` // the current page of hits
+}
+
+// Hit represents a single hit of a query
+type Hit struct {
 	ElasticID string      `json:"id"`       // the id of the document returned
 	Metadata  interface{} `json:"metadata"` // the metadata of the hit
 
@@ -30,28 +47,53 @@ type ReplacedMath struct {
 }
 
 // RunQuery runs a complete TemaSearch Query
-func RunQuery(connection *tema.Connection, q *Query, from int64, size int64) (results []*Result, err error) {
+func RunQuery(connection *tema.Connection, q *Query, from int64, size int64) (result *Result, err error) {
+	// measure time for this query
+	start := time.Now()
+	defer func() {
+		took := time.Since(start)
+		result.Took = &took
+	}()
+
+	result = &Result{
+		From: from,
+		Size: size,
+	}
+
 	// run the document query
 	res, err := RunDocumentQuery(connection, q, from, size)
 	if err != nil {
 		return
 	}
 
+	result.TookDocument = res.Took
+	result.Total = res.Total
+
 	docs := res.Hits
 
-	// run the highlight queries
+	// prepare running the highlight query in parallel
 	highlights := make([]*HighlightResult, len(docs))
+	group := utils.NewAsyncGroup()
+
 	for idx, doc := range docs {
-		highlights[idx], err = doc.RunHighlightQuery(connection, q)
-		if err != nil {
-			return nil, err
-		}
+		func(idx int, doc *DocumentHit) {
+			group.Add(func(_ func(func())) (err error) {
+				highlights[idx], err = doc.RunHighlightQuery(connection, q)
+				return err
+			})
+		}(idx, doc)
 	}
 
-	// and make proper results out of it
-	results = make([]*Result, len(highlights))
+	// wait for them all to come back
+	err = group.Wait()
+	if err != nil {
+		return
+	}
+
+	// and serialize getting the result set back
+	result.Hits = make([]*Hit, len(highlights))
 	for idx, highlight := range highlights {
-		results[idx], err = NewResult(highlight)
+		result.Hits[idx], err = NewResult(highlight)
 		if err != nil {
 			return nil, err
 		}
@@ -66,8 +108,8 @@ func CountQuery(connection *tema.Connection, q *Query) (int64, error) {
 }
 
 // NewResult generates a new result from a highlight result
-func NewResult(highlight *HighlightResult) (result *Result, err error) {
-	result = &Result{
+func NewResult(highlight *HighlightResult) (result *Hit, err error) {
+	result = &Hit{
 		ElasticID: highlight.Document.ID,
 		Metadata:  highlight.Document.Element.Metadata,
 

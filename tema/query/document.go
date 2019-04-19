@@ -19,9 +19,9 @@ type DocumentResult struct {
 	From  int64 `json:"from"`  // result number this page starts at
 	Size  int64 `json:"size"`  // (maximum) number of results in this page
 
-	Took time.Duration `json:"took"` // the amount of time the query took to execute, including network latency to elasticsearch
+	Took *time.Duration `json:"took"` // the amount of time the query took to execute, including network latency to elasticsearch
 
-	Hits []*DocumentHit `json:"hits"` // the current list of pages
+	Hits []*DocumentHit `json:"hits"` // the current page of results
 }
 
 // DocumentHit represents the result of a documentquery
@@ -52,7 +52,8 @@ func RunDocumentQuery(connection *tema.Connection, query *Query, from int64, siz
 	// measure time for this query
 	start := time.Now()
 	defer func() {
-		result.Took = time.Since(start)
+		took := time.Since(start)
+		result.Took = &took
 	}()
 
 	result = &DocumentResult{
