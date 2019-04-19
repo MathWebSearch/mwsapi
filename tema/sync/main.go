@@ -10,10 +10,11 @@ import (
 type Process struct {
 	connection *tema.Connection
 
+	force         bool
+	harvestFolder string
+
 	quiet bool
 	stats *Stats
-
-	harvestFolder string
 }
 
 // Stats represents the stats of a process
@@ -29,11 +30,13 @@ func (s *Stats) String() string {
 }
 
 // NewProcess creates a new Process
-func NewProcess(connection *tema.Connection, folder string, quiet bool) *Process {
+func NewProcess(connection *tema.Connection, folder string, quiet bool, force bool) *Process {
 	return &Process{
 		connection:    connection,
 		harvestFolder: folder,
-		quiet:         quiet,
+
+		force: force,
+		quiet: quiet,
 	}
 }
 

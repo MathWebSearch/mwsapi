@@ -60,9 +60,18 @@ func (proc *Process) upsertSegment(sync func(func()), segment string) (err error
 
 	proc.print(sync, "  Comparing segment hash ... ")
 
-	// if the hash matches, we don't need to update
-	if seg.Hash != hash {
+	hashMatch := seg.Hash == hash
+	if hashMatch {
+		proc.printlnOK(sync, "MATCHES")
+	} else {
 		proc.printlnSKIP(sync, "DIFFERS")
+	}
+
+	// if the hash matches, we don't need to update
+	if !hashMatch || proc.force {
+		if hashMatch && proc.force {
+			proc.println(sync, "  Hash matches, but --force was given. Forcing update. ")
+		}
 
 		if created {
 			atomic.AddInt64(&proc.stats.NewSegments, 1)
@@ -87,7 +96,6 @@ func (proc *Process) upsertSegment(sync func(func()), segment string) (err error
 		}
 		proc.printlnOK(sync, "OK")
 	} else {
-		proc.printlnOK(sync, "MATCHES")
 		atomic.AddInt64(&proc.stats.UnchangedSegments, 1)
 	}
 

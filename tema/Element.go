@@ -5,6 +5,8 @@ type HarvestElement struct {
 	Metadata interface{} `json:"metadata"`          // Arbitrary document metadata
 	Segment  string      `json:"segment,omitempty"` // Name of the segment this document belongs to
 
+	Text string `json:"text"` // Text of this element
+
 	MWSPaths   map[int64]map[string]PathInfo `json:"mws_id"`  // information about each identifier within this document
 	MWSNumbers []int64                       `json:"mws_ids"` // list of identifiers within this document
 

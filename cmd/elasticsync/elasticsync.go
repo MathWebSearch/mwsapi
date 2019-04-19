@@ -23,7 +23,7 @@ func main() {
 	fmt.Println("Connected. ")
 
 	// make a sync process
-	process := sync.NewProcess(connection, a.IndexDir, a.Quiet)
+	process := sync.NewProcess(connection, a.IndexDir, a.Quiet, a.Force)
 	stats, err := process.Run()
 
 	// if there was an error, print it

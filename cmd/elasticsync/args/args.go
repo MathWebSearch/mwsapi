@@ -14,6 +14,7 @@ type Args struct {
 	IndexDir string
 
 	Quiet bool
+	Force bool
 }
 
 // ElasticURL returns the url to elasticsearch
@@ -40,6 +41,7 @@ func ParseArgs(args []string) *Args {
 	flagSet.StringVar(&flags.IndexDir, "index-dir", defaultIndexDir, "Directory to use for Indexes")
 
 	flagSet.BoolVar(&flags.Quiet, "quiet", false, "be quiet and only print stats and errors")
+	flagSet.BoolVar(&flags.Force, "force", false, "force updating segments even if their hash has not changed")
 
 	// parse and exit
 	flagSet.Parse(args[1:])
@@ -63,6 +65,7 @@ func (args *Args) Validate() bool {
 		fmt.Printf("quiet: %t\n", args.Quiet)
 		fmt.Printf("elastic-host: %q\n", args.ElasticHost)
 		fmt.Printf("elastic-port: %d\n", args.ElasticPort)
+		fmt.Printf("force: %t\n", args.Force)
 		fmt.Printf("index-dir: %q\n", args.IndexDir)
 
 		fmt.Println("------------------------------------------")
