@@ -10,6 +10,10 @@ func (proc *Process) printlnOK(sync func(func()), text string) {
 	proc.printf(sync, "%s\n", aurora.Green(text))
 }
 
+func (proc *Process) printlnSKIP(sync func(func()), text string) {
+	proc.printf(sync, "%s\n", aurora.Yellow(text))
+}
+
 func (proc *Process) printlnERROR(sync func(func()), text string) {
 	proc.printf(sync, "%s\n", aurora.Red(text))
 }

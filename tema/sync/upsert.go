@@ -53,7 +53,7 @@ func (proc *Process) upsertSegment(sync func(func()), segment string) (err error
 	}
 
 	if created {
-		proc.printlnOK(sync, "NOT FOUND")
+		proc.printlnSKIP(sync, "NOT FOUND")
 	} else {
 		proc.printlnOK(sync, "FOUND")
 	}
@@ -62,7 +62,7 @@ func (proc *Process) upsertSegment(sync func(func()), segment string) (err error
 
 	// if the hash matches, we don't need to update
 	if seg.Hash != hash {
-		proc.printlnOK(sync, "DIFFERS")
+		proc.printlnSKIP(sync, "DIFFERS")
 
 		if created {
 			atomic.AddInt64(&proc.stats.NewSegments, 1)

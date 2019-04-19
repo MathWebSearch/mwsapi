@@ -13,7 +13,7 @@ func (proc *Process) createIndex() (err error) {
 	if created {
 		proc.printlnOK(nil, "OK")
 	} else {
-		proc.printlnOK(nil, "SKIP")
+		proc.printlnSKIP(nil, "SKIP")
 	}
 
 	proc.printf(nil, "Creating Segment Index %s ... ", proc.connection.Config.SegmentIndex)
@@ -25,7 +25,7 @@ func (proc *Process) createIndex() (err error) {
 	if created {
 		proc.printlnOK(nil, "OK")
 	} else {
-		proc.printlnOK(nil, "SKIP")
+		proc.printlnSKIP(nil, "SKIP")
 	}
 
 	return
