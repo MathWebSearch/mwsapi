@@ -8,18 +8,17 @@ A [golang](https://golang.org) library and set of tools to setup, query and main
 
 - `cmd`: Implementation of commands
     - `cmd/mwsapid`: HTTP Daemon serving a unified MathWebSearch + TemaSearch interface
-    - `cmd/mwsquery`: Queries a MathWebSearch instance from command line
-    - `cmd/elasticsearch`: Creates and maintains an Elasticsearch instance for use with Temasearch
-- `elasticutils`: Utility wrappers around Elasticsearch objects
-- `tema`: Code interacting with TemaSearch
+    - `cmd/mwsquery`
+    - `cmd/temaquery`: Queries an Elasticsearch instance for Tema Queries
+    - `cmd/elasticsync`: Creates and maintains an Elasticsearch instance for use with Temasearch
+- `mws`: Code interacting with MathWebSearch
+- `tema`: Code interacting with Elasticsearch / TemaSearch
     - `tema/sync`: Code to synchronize a TemaSearch index with Elasticsearch
     - `tema/query`: Code to query TemaSearch
+- `elasticutils`: Utility wrappers around Elasticsearch objects
+- `utils`: General utility functions
 
 ## Processes
-
-### TemaSearch Query
-
-(to be documented)
 
 ### Elasticsearch Syncronization
 
@@ -60,6 +59,36 @@ The first index -- called tema by convention -- contains the TemaSearch Index Do
 The second index is called tema-segments and contains a list of known segments as well as their hashes. 
 As a hash implementation we use SHA256.
 
+### TemaSearch Query
+
+The program in `cmd/temaquery` can run queries against the elasticsearch part of Temasearch. 
+Queries are defined by the [Query Struct](tema/query/main.go) and consist of two parameters:
+
+- Some text to search the index for
+- A list of mathwebsearch ids that were found by normal MathWebSearch
+
+A query may have both text and ids to search for, but it must not be empty. 
+These can be provided to `temaquery` using the `text` and `ids` parameters. 
+For example:
+
+`out/temaquery -text "Hello" -ids 1,2,3`
+
+Normal results are returned as JSON to STDOUT. 
+The results are defined by the [Result Struct](tema/query/main.go). 
+
+All queries are paginated -- by default they return the first 10 results.
+The parameters `-from` and `-size` can be used to customize the result set. 
+
+Sometimes it is only important how many results are returned, not the results themselves.
+For this purpose the `-count` flag can be provided. 
+
+Internally, each query consists of two phases:
+
+- The Document Phase. This intially queries elasticsearch to find all matching documents. 
+- The Highlight Phase. For each returned document, elasticsearch is queried again to highlight matching segments. 
+
+A normal query runs both phases. 
+For debugging, it is possible to only run the document phase by running the `-document-phase-only` flag. 
 
 ## Docker
 

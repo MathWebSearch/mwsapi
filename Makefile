@@ -8,21 +8,16 @@ GOGET=$(GOCMD) get
 # Flags for local go
 GOFLAGS=-a
 
-# Binary paths
-OUT_DIR=out
+# The Executables
+EXECUTABLES=mwsapid mwsquery temaquery elasticsync
 
 all: test build
+.PHONY : all
 
-build: $(OUT_DIR)/mwsapid $(OUT_DIR)/temaquery $(OUT_DIR)/elasticsync
+build: $(EXECUTABLES)
 
-$(OUT_DIR)/mwsapid: deps
-	cd cmd/mwsapid && CGO_ENABLED=0 $(GOBUILD) $(GOFLAGS) -o ../../$(OUT_DIR)/mwsapid
-
-$(OUT_DIR)/temaquery: deps
-	cd cmd/temaquery && CGO_ENABLED=0 $(GOBUILD) $(GOFLAGS) -o ../../$(OUT_DIR)/temaquery
-
-$(OUT_DIR)/elasticsync: deps
-	cd cmd/elasticsync && CGO_ENABLED=0 $(GOBUILD) $(GOFLAGS) -o ../../$(OUT_DIR)/elasticsync
+$(EXECUTABLES): %: deps
+	CGO_ENABLED=0 $(GOBUILD) $(GOFLAGS) ./cmd/$@
 
 test: testdeps
 	CGO_ENABLED=0 $(GOTEST) -v ./...
