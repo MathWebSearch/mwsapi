@@ -30,7 +30,7 @@ func TestQuery_ToXML(t *testing.T) {
 			for i, s := range tt.fields.Expressions {
 				e[i] = &Expression{Term: s}
 			}
-			q := &Query{
+			q := &RawQuery{
 				From:         tt.fields.From,
 				Size:         tt.fields.Size,
 				ReturnTotal:  tt.fields.ReturnTotal,

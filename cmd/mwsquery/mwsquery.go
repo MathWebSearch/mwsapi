@@ -7,7 +7,18 @@ import (
 )
 
 func main() {
-	thing := &mws.Query{}
-	bytes, _ := thing.ToXML()
-	fmt.Println(string(bytes))
+	connection := mws.NewConnection("localhost", 8080)
+	query := &mws.Query{
+		Expressions: []string{"<mws:qvar>x</mws:qvar>"},
+	}
+
+	res, err := mws.RunQuery(connection, query, 0, 10)
+
+	if res != nil {
+		fmt.Printf("res = %#v\n", res)
+	}
+	fmt.Printf("err = %#v\n", err)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 }

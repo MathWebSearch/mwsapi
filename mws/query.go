@@ -6,8 +6,8 @@ import (
 	"github.com/MathWebSearch/mwsapi/utils"
 )
 
-// Query represents a MathWebSearch Query
-type Query struct {
+// RawQuery represents a MathWebSearch RawQuery
+type RawQuery struct {
 	From int64 `xml:"limitmin,attr"` // offset within the set of results
 	Size int64 `xml:"answsize,attr"` // maximum number of results returned
 
@@ -28,16 +28,16 @@ type Expression struct {
 
 // a supertype of Query that can be marshalled
 type xQuery struct {
-	*Query
+	*RawQuery
 
 	NamespaceMWS string `xml:"xmlns:mws,attr"`
 	NamespaceM   string `xml:"xmlns:m,attr"`
 }
 
 // ToXML turns a query into valid XML
-func (q *Query) ToXML() ([]byte, error) {
+func (q *RawQuery) ToXML() ([]byte, error) {
 	return xml.Marshal(&xQuery{
-		Query:        q,
+		RawQuery:     q,
 		NamespaceMWS: "http://www.mathweb.org/mws/ns",
 		NamespaceM:   "http://www.w3.org/1998/Math/MathML",
 	})
