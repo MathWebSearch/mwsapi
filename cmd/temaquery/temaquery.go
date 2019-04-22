@@ -20,10 +20,13 @@ func main() {
 	}
 
 	// connect to tema-search
-	connection := tema.Connect(a.ElasticHost, a.ElasticPort)
+	connection, err := tema.Connect(a.ElasticHost, a.ElasticPort)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 
 	var res interface{}
-	var err error
 
 	if a.Count {
 		res, err = RunCountQuery(connection, a)

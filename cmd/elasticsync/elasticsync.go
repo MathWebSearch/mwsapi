@@ -19,7 +19,7 @@ func main() {
 
 	// connect to elasticsearch
 	fmt.Printf("Connecting to %q ...\n", a.ElasticURL())
-	connection := tema.Connect(a.ElasticHost, a.ElasticPort)
+	connection := tema.WaitConnect(a.ElasticHost, a.ElasticPort)
 	fmt.Println("Connected. ")
 
 	// make a sync process

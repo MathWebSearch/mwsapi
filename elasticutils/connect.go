@@ -6,9 +6,9 @@ import (
 	"gopkg.in/olivere/elastic.v6"
 )
 
-// Connect connects to the server
-func Connect(retryInterval time.Duration, onRetry func(error), funcs ...elastic.ClientOptionFunc) (cli *elastic.Client) {
-	var err error
+// TryConnect connects to the server
+func TryConnect(retryInterval time.Duration, maxRetries int, onRetry func(error), funcs ...elastic.ClientOptionFunc) (cli *elastic.Client, err error) {
+	counter := 0
 	for {
 		cli, err = elastic.NewClient(funcs...)
 
@@ -16,9 +16,18 @@ func Connect(retryInterval time.Duration, onRetry func(error), funcs ...elastic.
 			break
 		}
 
+		// if the counter has been reached, break
+		counter++
+		if maxRetries >= 0 && counter > maxRetries {
+			break
+		}
+
 		// and wait for next time
-		onRetry(err)
+		if onRetry != nil {
+			onRetry(err)
+		}
 		time.Sleep(retryInterval)
+
 	}
 	return
 }

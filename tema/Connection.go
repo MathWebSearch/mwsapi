@@ -25,12 +25,8 @@ type Configuration struct {
 
 type j map[string]interface{}
 
-// Connect connects to a temasearch instance until it is connected
-func Connect(Host string, Port int) *Connection {
-	client := elasticutils.Connect(5*time.Second, func(e error) {
-		fmt.Printf("  Unable to connect: %s. Trying again in 5 seconds. \n", e)
-	}, elastic.SetURL(fmt.Sprintf("http://%s:%d", Host, Port)), elastic.SetSniff(false))
-
+// ConnectionFromClient creates a new connection from an existing elastic client
+func ConnectionFromClient(client *elastic.Client) *Connection {
 	return &Connection{
 		Config: &Configuration{
 			HarvestIndex: "tema",
@@ -41,4 +37,24 @@ func Connect(Host string, Port int) *Connection {
 		},
 		Client: client,
 	}
+}
+
+// WaitConnect repeatetly connects to a TemaSearch instance until the connection succeeds
+func WaitConnect(Host string, Port int) *Connection {
+	client, _ := elasticutils.TryConnect(5*time.Second, -1, func(e error) {
+		fmt.Printf("  Unable to connect: %s. Trying again in 5 seconds. \n", e)
+	}, elastic.SetURL(fmt.Sprintf("http://%s:%d", Host, Port)), elastic.SetSniff(false))
+
+	return ConnectionFromClient(client)
+}
+
+// Connect connects to a TemaSearch instance or returns an error
+func Connect(Host string, Port int) (conn *Connection, err error) {
+	cli, err := elasticutils.TryConnect(0, 0, nil, elastic.SetSniff(false))
+	if err != nil {
+		return
+	}
+
+	conn = ConnectionFromClient(cli)
+	return
 }
