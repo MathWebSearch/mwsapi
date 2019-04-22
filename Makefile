@@ -12,7 +12,7 @@ GOFLAGS=-a
 EXECUTABLES=mwsapid mwsquery temaquery elasticsync
 
 all: test build
-.PHONY : all
+.PHONY : all build test clean run deps testdeps
 
 build: $(EXECUTABLES)
 

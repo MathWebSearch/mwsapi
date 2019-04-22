@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/MathWebSearch/mwsapi/mws"
+)
 
 func main() {
-	fmt.Println("Not implemented")
+	thing := &mws.Query{}
+	bytes, _ := thing.ToXML()
+	fmt.Println(string(bytes))
 }
