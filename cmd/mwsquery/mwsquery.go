@@ -10,6 +10,7 @@ func main() {
 	connection := mws.NewConnection("localhost", 8080)
 	query := &mws.Query{
 		Expressions: []string{"<mws:qvar>x</mws:qvar>"},
+		MwsIdsOnly:  false,
 	}
 
 	res, err := mws.RunQuery(connection, query, 0, 10)

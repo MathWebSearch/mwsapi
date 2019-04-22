@@ -15,7 +15,9 @@ type Result struct {
 	Took int64 `json:"time"` // how long the query took, in ms
 
 	Variables []*QueryVariable `json:"qvars"` // list of query variables in the original query
-	Hits      []*Hit           `json:"hits"`  // the actual hits of this element
+
+	MathWebSearchIDs []int64 `json:"ids,omitempty"`  // MathWebSearchIds
+	Hits             []*Hit  `json:"hits,omitempty"` // the actual hits of this element
 }
 
 // QueryVariable represents a query variable
@@ -37,9 +39,6 @@ type FormulaeInfo struct {
 
 // RunRawQuery runs a query
 func (conn *Connection) runRawQuery(query *RawQuery) (res *Result, err error) {
-	// ensure the query format is json
-	query.OutputFormat = "json"
-
 	// turn the query into xml
 	b, err := query.ToXML()
 	if err != nil {
