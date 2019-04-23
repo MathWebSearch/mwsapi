@@ -36,13 +36,13 @@ type Hit struct {
 	Score    float64  `json:"score"`    // the score this hit achieved
 	Snippets []string `json:"snippets"` // the generted snippets
 
-	Math []*ReplacedMath `json:"maths"` // the replaced math elements within this snippet
+	Math []*ReplacedFormulaInfo `json:"maths"` // the replaced math elements within this snippet
 }
 
-// ReplacedMath represents a single replaced MathExcept
-type ReplacedMath struct {
+// ReplacedFormulaInfo represents a single replaced MathExcept
+type ReplacedFormulaInfo struct {
 	Source string `json:"source"` // html source code
-	ID     string `json:"id"`     // (internal) id
+	URL    string `json:"url"`    // url of the replaced formula
 	XPath  string `json:"xpath"`  // the path to the element
 }
 

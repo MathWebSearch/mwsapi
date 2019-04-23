@@ -33,7 +33,7 @@ type Hit struct {
 
 // FormulaeInfo represents a single math excert within an element
 type FormulaeInfo struct {
-	URL   string `json:"url"`   // url of this element
+	URL   string `json:"url"`   // url of this math element
 	XPath string `json:"xpath"` // path of this element
 }
 

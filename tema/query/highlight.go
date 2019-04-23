@@ -15,7 +15,7 @@ type HighlightResult struct {
 	Document *DocumentHit
 
 	// the replaced math
-	Math []*ReplacedMath
+	Math []*ReplacedFormulaInfo
 
 	// The element that was being 'hit'
 	Hit *elasticutils.Object
@@ -93,17 +93,17 @@ func NewHighlightResult(doc *DocumentHit, obj *elasticutils.Object) (res *Highli
 	}
 
 	// map() over doc.Math
-	res.Math = make([]*ReplacedMath, len(doc.Math))
+	res.Math = make([]*ReplacedFormulaInfo, len(doc.Math))
 	for i, math := range doc.Math {
-		res.Math[i] = &ReplacedMath{
-			ID:    math.RealMathID(),
+		res.Math[i] = &ReplacedFormulaInfo{
+			URL:   math.URL,
 			XPath: math.XPath,
 		}
 
 		var ok bool
-		res.Math[i].Source, ok = doc.Element.MathSource[math.MathID]
+		res.Math[i].Source, ok = doc.Element.MathSource[math.RealMathID()]
 		if !ok {
-			return nil, fmt.Errorf("Result %s has no source info for %s", doc.ID, math.MathID)
+			return nil, fmt.Errorf("Result %s has no source info for %s", doc.ID, math.URL)
 		}
 	}
 

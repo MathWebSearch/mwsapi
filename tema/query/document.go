@@ -34,16 +34,18 @@ type DocumentHit struct {
 
 // FormulaeInfo represents a single math excert within an element
 type FormulaeInfo struct {
-	MathID string `json:"id"`    // id of this element
-	XPath  string `json:"xpath"` // path of this element
+	URL   string `json:"id"`    // complete url of this element
+	XPath string `json:"xpath"` // path of this element
 }
 
 // RealMathID return the real math id
 func (info *FormulaeInfo) RealMathID() string {
-	if _, err := strconv.Atoi(info.MathID); err == nil {
-		return "math" + info.MathID
+	parts := strings.Split(info.URL, "#")
+	mathid := parts[len(parts)-1]
+	if _, err := strconv.Atoi(mathid); err == nil {
+		return "math" + mathid
 	}
-	return info.MathID
+	return mathid
 }
 
 // RunDocumentQuery runs the document query phase of a query
@@ -161,16 +163,11 @@ func NewDocumentHit(obj *elasticutils.Object) (result *DocumentHit, err error) {
 		// and iterate over it
 		for key, value := range data {
 			result.Math = append(result.Math, &FormulaeInfo{
-				MathID: simplifyMathID(key),
-				XPath:  value.XPath,
+				URL:   key,
+				XPath: value.XPath,
 			})
 		}
 	}
 
 	return
-}
-
-func simplifyMathID(id string) string {
-	parts := strings.Split(id, "#")
-	return parts[len(parts)-1]
 }
