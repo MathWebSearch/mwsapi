@@ -3,6 +3,7 @@
 /mwsquery
 /temaquery
 /elasticsync
+/temasearchquery
 
 # Binaries for programs and plugins
 *.exe

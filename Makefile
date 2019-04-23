@@ -9,7 +9,7 @@ GOGET=$(GOCMD) get
 GOFLAGS=-a
 
 # The Executables
-EXECUTABLES=mwsapid mwsquery temaquery elasticsync
+EXECUTABLES=mwsapid mwsquery temaquery elasticsync temasearchquery
 
 all: test build
 .PHONY : all build test clean run deps testdeps

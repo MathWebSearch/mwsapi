@@ -15,5 +15,6 @@ COPY --from=builder /go/src/github.com/MathWebSearch/mwsapi/mwsapid /mwsapid
 COPY --from=builder /go/src/github.com/MathWebSearch/mwsapi/mwsquery /mwsquery
 COPY --from=builder /go/src/github.com/MathWebSearch/mwsapi/temaquery /temaquery
 COPY --from=builder /go/src/github.com/MathWebSearch/mwsapi/elasticsync /elasticsync
+COPY --from=builder /go/src/github.com/MathWebSearch/mwsapi/temasearchquery /temasearchquery
 
 ENTRYPOINT [ "/mwsapid" ]
