@@ -16,8 +16,10 @@ type Connection struct {
 
 // Configuration represents a Configuration of a TemaSearch Connection
 type Configuration struct {
-	MWSPageSize  int64
-	TemaPageSize int64
+	MWSPageSize  int64 // page size for MathWebSearch pages
+	TemaPageSize int64 // page zie for TemaSearch pages
+
+	PoolSize int64 // maximum number of parallel queries
 }
 
 // NewConnection makes a new TemaSearch Connection
@@ -26,6 +28,7 @@ func NewConnection(mws *mws.Connection, tema *tema.Connection) *Connection {
 		config: &Configuration{
 			MWSPageSize:  1,
 			TemaPageSize: 10,
+			PoolSize:     10,
 		},
 		mws:  mws,
 		tema: tema,

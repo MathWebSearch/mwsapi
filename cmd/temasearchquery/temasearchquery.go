@@ -19,22 +19,32 @@ func main() {
 		return
 	}
 
-	// connect to mws + temasearch
-	mwsconnection := mws.NewConnection(a.MWSHost, a.MWSPort)
-	temaconnection, err := tema.Connect(a.ElasticHost, a.ElasticPort)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	// make the final connection
-	connection := temasearch.NewConnection(mwsconnection, temaconnection)
-
 	// build the query
 	query := &temasearch.Query{
 		Expressions: a.Expressions,
 		Text:        a.Text,
 	}
+
+	// setup mws connection (if needed)
+	var mwsConnection *mws.Connection
+	if query.NeedsMWS() {
+		mwsConnection = mws.NewConnection(a.MWSHost, a.MWSPort)
+	}
+
+	// setup tema connection (if needed)
+	var temaConnection *tema.Connection
+	var err error
+	if query.NeedsElastic() {
+		// connect to mws + temasearch
+		temaConnection, err = tema.Connect(a.ElasticHost, a.ElasticPort)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+	}
+
+	// make the final connection
+	connection := temasearch.NewConnection(mwsConnection, temaConnection)
 
 	// and run it
 	var res interface{}
