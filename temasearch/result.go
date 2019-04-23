@@ -60,6 +60,7 @@ func (res *Result) fromMathWebSearch(mws *mws.Result) {
 	}
 
 }
+
 func (res *Result) fromElastic(elastic *query.Result) {
 	// transform the results
 	res.Total = elastic.Total
@@ -72,6 +73,23 @@ func (res *Result) fromElastic(elastic *query.Result) {
 	}
 
 	return
+}
+
+func (res *Result) fromTema(variables []*mws.QueryVariable, hits []*query.Hit) {
+	res.Total = -1              // no information available
+	res.Size = int64(len(hits)) // the hits we found
+
+	// copy over variables
+	res.Variables = make([]*QueryVariable, len(variables))
+	for i, e := range variables {
+		res.Variables[i] = &QueryVariable{e}
+	}
+
+	// copy over the hits
+	res.Hits = make([]*Hit, len(hits))
+	for i, e := range hits {
+		res.Hits[i] = newHitFromElastic(e)
+	}
 }
 
 func newHitFromMWS(mws *mws.Hit) (hit *Hit) {

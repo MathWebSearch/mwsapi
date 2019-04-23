@@ -12,6 +12,7 @@ A [golang](https://golang.org) library and set of tools to setup, query and main
     - `cmd/mwsquery`: Queries a (plain) MathWebSearch instance for MathWebSeach Queries
     - `cmd/temaquery`: Queries a (plain) Elasticsearch instance for Tema Queries
     - `cmd/elasticsync`: Creates and maintains an Elasticsearch instance for use with Temasearch
+- `temasearch`: Code implementing joined (mws, tema) queries
 - `mws`: Code interacting with MathWebSearch
 - `tema`: Code interacting with Elasticsearch / TemaSearch
     - `tema/sync`: Code to synchronize a TemaSearch index with Elasticsearch
