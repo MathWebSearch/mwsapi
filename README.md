@@ -7,9 +7,10 @@ A [golang](https://golang.org) library and set of tools to setup, query and main
 ## Overview
 
 - `cmd`: Implementation of commands
-    - `cmd/mwsapid`: HTTP Daemon serving a unified MathWebSearch + TemaSearch interface
-    - `cmd/mwsquery`
-    - `cmd/temaquery`: Queries an Elasticsearch instance for Tema Queries
+    - `cmd/temasearchquery`: Queries A joined MathWebSearch + ElasticSearch Setu
+    - `cmd/mwsapid`: HTTP Daemon serving temasearch queries (not yet implemented)
+    - `cmd/mwsquery`: Queries a (plain) MathWebSearch instance for MathWebSeach Queries
+    - `cmd/temaquery`: Queries a (plain) Elasticsearch instance for Tema Queries
     - `cmd/elasticsync`: Creates and maintains an Elasticsearch instance for use with Temasearch
 - `mws`: Code interacting with MathWebSearch
 - `tema`: Code interacting with Elasticsearch / TemaSearch
@@ -19,6 +20,42 @@ A [golang](https://golang.org) library and set of tools to setup, query and main
 - `utils`: General utility functions
 
 ## Processes
+
+In the following we describe the basic functionality between all programs within this repository. 
+This documentation is intended to serve as an entry point, and thus does not describe all implementation details. 
+The most detailed reference is always the source code. 
+
+In principle, the source code for all commands is found in the appropriate `cmd/` subdirectory. 
+Executables can be built by either using thhe standard `go build ./cmd/$CMD` or by simply using `make $CMD`. 
+The binaries will be placed in the root directory. 
+
+### MathWebSearch Query
+
+The program in `cmd/mwsquery` can run plain MathWebSearch Queries. 
+Queries are defined by the [Query Struct](mws/wrapper.go). 
+
+Each Query consists of a list of MathWebSearch Expressions.
+A MathWebSearch Expression is a ContentMathML expression in XML Syntax with additional support for Query variables. 
+For this one can use `<mws:qvar>` tags to specify universal variables. 
+The text content of a `<mws:qvar>` is considered its name and qvars with the same name will match to the same expressions. 
+
+Each Expression can be given as an argument to the `mwsquery` executable.
+For example:
+
+`./mwsquery '<mws:qvar>x</mws:qvar>'`
+
+Normal results are returned as JSON to STDOUT. 
+The results are defined by the [Result Struct](mws/result.go). 
+
+All queries are paginated -- by default they return the first 10 results.
+The parameters `-from` and `-size` can be used to customize the result set. 
+
+Sometimes it is only important how many results are returned, not the results themselves.
+For this purpose the `-count` flag can be provided. 
+
+Additionally, instead of returning the full results, sometimes it is also desired to only return the ids of each found formulae. 
+This can be useful for debugging and use inside a full TemaSearch scenario.
+To achieve this, the `-ids` flag can be provided. 
 
 ### Elasticsearch Syncronization
 
@@ -71,7 +108,7 @@ A query may have both text and ids to search for, but it must not be empty.
 These can be provided to `temaquery` using the `text` and `ids` parameters. 
 For example:
 
-`out/temaquery -text "Hello" -ids 1,2,3`
+`./temaquery -text "Hello" -ids 1,2,3`
 
 Normal results are returned as JSON to STDOUT. 
 The results are defined by the [Result Struct](tema/query/main.go). 
