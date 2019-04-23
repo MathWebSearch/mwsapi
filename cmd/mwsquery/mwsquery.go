@@ -1,12 +1,11 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"os"
 
 	"github.com/MathWebSearch/mwsapi/cmd/mwsquery/args"
 	"github.com/MathWebSearch/mwsapi/mws"
+	"github.com/MathWebSearch/mwsapi/utils"
 )
 
 func main() {
@@ -32,17 +31,6 @@ func main() {
 		res, err = mws.RunQuery(connection, query, a.From, a.Size)
 	}
 
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	// stdout the json
-	bytes, _ := json.MarshalIndent(res, "", "  ")
-	if err != nil {
-		fmt.Printf("%#v\n", err)
-		os.Exit(1)
-	}
-	os.Stdout.Write(bytes)
-	fmt.Println("")
+	// and output
+	utils.OutputJSONOrErr(&res, err)
 }

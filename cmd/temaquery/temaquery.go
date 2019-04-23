@@ -1,12 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/MathWebSearch/mwsapi/cmd/temaquery/args"
 	"github.com/MathWebSearch/mwsapi/tema/query"
+	"github.com/MathWebSearch/mwsapi/utils"
 
 	"github.com/MathWebSearch/mwsapi/tema"
 )
@@ -36,20 +36,8 @@ func main() {
 		res, err = RunBothPhases(connection, a)
 	}
 
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	// stdout the json
-	bytes, _ := json.MarshalIndent(res, "", "  ")
-	if err != nil {
-		fmt.Printf("%#v\n", err)
-		os.Exit(1)
-	}
-	os.Stdout.Write(bytes)
-	fmt.Println("")
-
+	// and output
+	utils.OutputJSONOrErr(&res, err)
 }
 
 // RunDocumentQuery runs only the document query
