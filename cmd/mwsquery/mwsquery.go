@@ -1,25 +1,48 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 
+	"github.com/MathWebSearch/mwsapi/cmd/mwsquery/args"
 	"github.com/MathWebSearch/mwsapi/mws"
 )
 
 func main() {
-	connection := mws.NewConnection("localhost", 8080)
+	// parse and validate arguments
+	a := args.ParseArgs(os.Args)
+	if !a.Validate() {
+		os.Exit(1)
+		return
+	}
+
+	connection := mws.NewConnection(a.MWSHost, a.MWSPort)
 	query := &mws.Query{
-		Expressions: []string{"<mws:qvar>x</mws:qvar>"},
-		MwsIdsOnly:  false,
+		Expressions: a.Expressions,
+		MwsIdsOnly:  a.MWSIdsOnly,
 	}
 
-	res, err := mws.RunQuery(connection, query, 0, 10)
+	var res interface{}
+	var err error
 
-	if res != nil {
-		fmt.Printf("res = %#v\n", res)
+	if a.Count {
+		res, err = mws.CountQuery(connection, query)
+	} else {
+		res, err = mws.RunQuery(connection, query, a.From, a.Size)
 	}
-	fmt.Printf("err = %#v\n", err)
+
 	if err != nil {
 		fmt.Println(err.Error())
+		os.Exit(1)
 	}
+
+	// stdout the json
+	bytes, _ := json.MarshalIndent(res, "", "  ")
+	if err != nil {
+		fmt.Printf("%#v\n", err)
+		os.Exit(1)
+	}
+	os.Stdout.Write(bytes)
+	fmt.Println("")
 }
