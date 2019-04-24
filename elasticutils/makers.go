@@ -5,7 +5,7 @@ import (
 	"errors"
 	"io"
 
-	"gopkg.in/olivere/elastic.v6"
+	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 // NewObjectFromID fetches a new EC object from the server
@@ -161,7 +161,7 @@ func FetchOrCreateObject(client *elastic.Client, index string, tp string, query 
 
 	// if that fails create it
 	obj, err = NewObjectFromFields(client, index, tp, Data)
-	if err != nil {
+	if err == nil {
 		created = true
 	}
 
