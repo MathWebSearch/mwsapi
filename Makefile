@@ -23,7 +23,7 @@ test: testdeps
 	CGO_ENABLED=0 $(GOTEST) -v ./...
 clean: 
 	$(GOCLEAN)
-	rm -rf $(OUT_DIR)
+	rm -f $(EXECUTABLES)
 run: build-local
 	./$(BINARY_NAME)
 deps:
