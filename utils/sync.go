@@ -5,8 +5,8 @@ package utils
 type SyncWorker struct {
 	done chan bool // channel that gets triggered when done
 
-	hasActiveChannel bool // do we have an active channel
-	activeChannel    int  // number of active channel
+	hasActiveChannel bool  // do we have an active channel
+	activeChannel    int64 // number of active channel
 
 	messages chan *syncMessage // for receiving new messages
 	backlog  []*syncMessage    // backlog of messages
@@ -25,13 +25,13 @@ func NewSyncWorker(capacity int) (worker *SyncWorker) {
 // sync message represents a message
 // passed from the main to the worker thread
 type syncMessage struct {
-	channel int     // channel this message should be sent on
+	channel int64   // channel this message should be sent on
 	close   bool    // if true, close the channel afterwards
 	code    *func() // code to run (if any)
 }
 
 // Work instructs the SyncWorker to run the given code on the given channel
-func (worker *SyncWorker) Work(channel int, code func()) {
+func (worker *SyncWorker) Work(channel int64, code func()) {
 	worker.messages <- &syncMessage{
 		channel: channel,
 		code:    &code,
@@ -40,7 +40,7 @@ func (worker *SyncWorker) Work(channel int, code func()) {
 
 // Close closes a channel and informs the Worker
 // that it may not continue sending messages on different channels
-func (worker *SyncWorker) Close(channel int) {
+func (worker *SyncWorker) Close(channel int64) {
 	worker.messages <- &syncMessage{
 		channel: channel,
 		close:   true,

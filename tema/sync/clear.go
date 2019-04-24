@@ -3,10 +3,11 @@ package sync
 import (
 	"sync/atomic"
 
+	"github.com/MathWebSearch/mwsapi/utils/gogroup"
+
 	"github.com/MathWebSearch/mwsapi/elasticutils"
 	"github.com/MathWebSearch/mwsapi/tema"
-	"github.com/MathWebSearch/mwsapi/utils"
-	"gopkg.in/olivere/elastic.v6"
+	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 // clearSegments clears untouched (old) segments from the index
@@ -16,15 +17,16 @@ func (proc *Process) clearSegments() (err error) {
 	q := elastic.NewBoolQuery()
 	q = q.Must(elastic.NewTermQuery("touched", false))
 
-	group := utils.NewAsyncGroup()
+	group := gogroup.NewWorkGroup(proc.connection.Config.PoolSize, true)
 
 	old := elasticutils.FetchObjects(proc.connection.Client, proc.connection.Config.SegmentIndex, proc.connection.Config.SegmentType, q)
 	for so := range old {
 		func(so *elasticutils.Object) {
-			group.Add(func(sync func(func())) error {
+			job := gogroup.GroupJob(func(sync func(func())) error {
 				atomic.AddInt64(&proc.stats.RemovedSegments, 1)
 				return proc.clearSegment(sync, so)
 			})
+			group.Add(&job)
 		}(so)
 	}
 

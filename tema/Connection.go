@@ -21,6 +21,8 @@ type Configuration struct {
 
 	SegmentIndex string
 	SegmentType  string
+
+	PoolSize int
 }
 
 type j map[string]interface{}
@@ -34,6 +36,8 @@ func ConnectionFromClient(client *elastic.Client) *Connection {
 
 			SegmentIndex: "tema-segments",
 			SegmentType:  "_doc",
+
+			PoolSize: 10,
 		},
 		Client: client,
 	}

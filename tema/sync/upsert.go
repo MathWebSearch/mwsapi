@@ -3,6 +3,8 @@ package sync
 import (
 	"sync/atomic"
 
+	"github.com/MathWebSearch/mwsapi/utils/gogroup"
+
 	"github.com/MathWebSearch/mwsapi/utils"
 )
 
@@ -10,13 +12,14 @@ import (
 func (proc *Process) upsertSegments() (err error) {
 	proc.println(nil, "Upserting harvest segments ...")
 
-	group := utils.NewAsyncGroup()
+	group := gogroup.NewWorkGroup(proc.connection.Config.PoolSize, true)
 
 	err = utils.IterateFiles(proc.harvestFolder, ".json", func(path string) error {
-		group.Add(func(sync func(func())) error {
+		job := gogroup.GroupJob(func(sync func(func())) error {
 			proc.printf(sync, "=> %s\n", path)
 			return proc.upsertSegment(sync, path)
 		})
+		group.Add(&job)
 		return nil
 	})
 

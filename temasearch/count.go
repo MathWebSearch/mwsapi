@@ -1,20 +1,18 @@
 package temasearch
 
 import (
-	"fmt"
 	"sync/atomic"
+
+	"github.com/MathWebSearch/mwsapi/utils/gogroup"
 
 	"github.com/MathWebSearch/mwsapi/mws"
 	"github.com/MathWebSearch/mwsapi/tema/query"
-	"github.com/MathWebSearch/mwsapi/utils"
 )
 
 // CountQuery counts the results of a query
 func CountQuery(connection *Connection, q *Query) (count int64, err error) {
 	// get the query type
 	tp := q.Type()
-
-	fmt.Printf("type = %#v query = %#v\n", tp, *q)
 
 	// empty queries have 0 results
 	if tp == EmptyQuery {
@@ -53,31 +51,35 @@ func countTemaSearchQuery(connection *Connection, q *Query) (count int64, err er
 		return
 	}
 
-	// run at most size parallel operations
+	// create a group for at most (PoolSize) parallel operations
+	group := gogroup.NewWorkGroup(int(connection.config.PoolSize), false)
+
+	// and add the jobs
 	size := connection.config.MWSPageSize
-	err = utils.MaxParallel(int(connection.config.PoolSize), func(ch chan int64) {
-		var i int64
-		for i = 0; i <= outerTotal; i += size {
-			ch <- i
-		}
-		close(ch)
-	}, func(from int64) (e error) {
-		// run the outer query and exit if it has an empty result
-		outer, e := mws.RunQuery(connection.mws, qq, from, connection.config.MWSPageSize)
-		if e != nil || len(outer.MathWebSearchIDs) == 0 {
-			return
-		}
+	for i := int64(0); i <= outerTotal; i += size {
+		(func(from int64) {
+			job := gogroup.GroupJob(func(sync func(func())) (e error) {
+				// run the outer query and exit if it has an empty result
+				outer, e := mws.RunQuery(connection.mws, qq, from, connection.config.MWSPageSize)
+				if e != nil || len(outer.MathWebSearchIDs) == 0 {
+					return
+				}
 
-		// get the total number of inner results
-		innertotal, e := query.CountQuery(connection.tema, q.asElasticQuery(outer.MathWebSearchIDs))
-		if e != nil {
-			return
-		}
+				// get the total number of inner results
+				innertotal, e := query.CountQuery(connection.tema, q.asElasticQuery(outer.MathWebSearchIDs))
+				if e != nil {
+					return
+				}
 
-		// add them and return
-		atomic.AddInt64(&count, innertotal)
-		return
-	})
+				// add them and return
+				atomic.AddInt64(&count, innertotal)
+				return
+			})
+			group.Add(&job)
+		})(i)
+	}
 
+	// then wait
+	err = group.Wait()
 	return
 }

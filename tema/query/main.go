@@ -3,8 +3,9 @@ package query
 import (
 	"time"
 
+	"github.com/MathWebSearch/mwsapi/utils/gogroup"
+
 	"github.com/MathWebSearch/mwsapi/tema"
-	"github.com/MathWebSearch/mwsapi/utils"
 )
 
 // Query represents a query sent to temasearch
@@ -73,14 +74,15 @@ func RunQuery(connection *tema.Connection, q *Query, from int64, size int64) (re
 
 	// prepare running the highlight query in parallel
 	highlights := make([]*HighlightResult, len(docs))
-	group := utils.NewAsyncGroup()
+	group := gogroup.NewWorkGroup(connection.Config.PoolSize, false)
 
 	for idx, doc := range docs {
 		func(idx int, doc *DocumentHit) {
-			group.Add(func(_ func(func())) (err error) {
+			job := gogroup.GroupJob(func(_ func(func())) (err error) {
 				highlights[idx], err = doc.RunHighlightQuery(connection, q)
-				return err
+				return
 			})
+			group.Add(&job)
 		}(idx, doc)
 	}
 
