@@ -2,8 +2,6 @@ package gogroup
 
 import (
 	"sync"
-
-	"github.com/MathWebSearch/mwsapi/utils"
 )
 
 // parallelGroup represents a group that can run an unlimited number of groups in parallel
@@ -11,8 +9,8 @@ type parallelGroup struct {
 	group    *sync.WaitGroup // internal wait group for quenued jobs
 	xthreads int             // maximum number of parallel threads
 
-	worker    *utils.SyncWorker // sync worker
-	needsSync bool              // do we need the worker?
+	worker    *syncWorker // sync worker
+	needsSync bool        // do we need the worker?
 
 	ch chan *GroupJob // the channel to jobs
 
@@ -41,7 +39,7 @@ func newParallelGroup(xthreads int, needsSync bool) (group *parallelGroup) {
 
 	// create a worker if we need it
 	if needsSync {
-		group.worker = utils.NewSyncWorker(1)
+		group.worker = newSyncWorker(1)
 	}
 
 	// and start the group

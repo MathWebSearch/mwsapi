@@ -2,16 +2,14 @@ package gogroup
 
 import (
 	"sync"
-
-	"github.com/MathWebSearch/mwsapi/utils"
 )
 
 // asyncGroup represents a group that can run an unlimited number of groups in parallel
 type asyncGroup struct {
 	group *sync.WaitGroup // internal wait group for quenued jobs
 
-	worker    *utils.SyncWorker // sync worker
-	needsSync bool              // do we need the worker?
+	worker    *syncWorker // sync worker
+	needsSync bool        // do we need the worker?
 
 	indexMutex *sync.Mutex // for protecting the index
 	index      int64       // counter for the index
@@ -34,7 +32,7 @@ func newAsyncGroup(needsSync bool) (group *asyncGroup) {
 
 	// create a worker if we need it
 	if needsSync {
-		group.worker = utils.NewSyncWorker(1)
+		group.worker = newSyncWorker(1)
 	}
 
 	return
