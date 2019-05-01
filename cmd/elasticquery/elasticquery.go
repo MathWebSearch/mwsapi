@@ -3,14 +3,17 @@ package main
 import (
 	"os"
 
-	"github.com/MathWebSearch/mwsapi/cmd/temaquery/args"
+	"github.com/MathWebSearch/mwsapi/result"
+
+	"github.com/MathWebSearch/mwsapi/cmd/elasticquery/args"
 	"github.com/MathWebSearch/mwsapi/connection"
-	"github.com/MathWebSearch/mwsapi/engine/temaengine"
+	"github.com/MathWebSearch/mwsapi/engine/elasticengine"
 	"github.com/MathWebSearch/mwsapi/query"
 	"github.com/MathWebSearch/mwsapi/utils"
 )
 
 func main() {
+
 	// parse and validate arguments
 	a := args.ParseArgs(os.Args)
 	if !a.Validate() {
@@ -19,7 +22,7 @@ func main() {
 	}
 
 	// make a new connection
-	c, err := connection.NewApplianceConnection(a.MWSPort, a.MWSHost, a.ElasticPort, a.ElasticHost)
+	c, err := connection.NewTemaConnection(a.ElasticPort, a.ElasticHost)
 	if err != nil {
 		panic(err)
 	}
@@ -31,16 +34,24 @@ func main() {
 	}
 
 	// make a query
-	q := &query.Query{
-		Expressions: a.Expressions,
-		Text:        a.Text,
+	q := &query.ElasticQuery{
+		MathWebSearchIDs: a.IDs,
+		Text:             a.Text,
 	}
 
-	// run
+	// keep the results
 	var res interface{}
 
 	if !a.Count {
-		r, e := temaengine.Run(c, q, a.From, a.Size)
+
+		// run either the entire thing or the document query
+		var r *result.Result
+		var e error
+		if !a.DocumentPhaseOnly {
+			r, e = elasticengine.Run(c, q, a.From, a.Size)
+		} else {
+			r, e = elasticengine.RunDocument(c, q, a.From, a.Size)
+		}
 
 		// normalize if requested
 		if e == nil && a.Normalize {
@@ -50,8 +61,10 @@ func main() {
 		// and store the results
 		res = r
 		err = e
+
+		// count
 	} else {
-		res, err = temaengine.Count(c, q)
+		res, err = elasticengine.Count(c, q)
 	}
 
 	// and output

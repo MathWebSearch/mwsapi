@@ -7,10 +7,10 @@ A [golang](https://golang.org) library and set of tools to setup, query and main
 ## Overview
 
 - `cmd`: Implementation of commands
-    - `cmd/temasearchquery`: Queries A joined MathWebSearch + ElasticSearch Setu
+    - `cmd/temaquery`: Queries A joined MathWebSearch + ElasticSearch Setu
     - `cmd/mwsapid`: HTTP Daemon serving temasearch queries (not yet implemented)
     - `cmd/mwsquery`: Queries a (plain) MathWebSearch instance for MathWebSeach Queries
-    - `cmd/temaquery`: Queries a (plain) Elasticsearch instance for Tema Queries
+    - `cmd/elasticquery`: Queries a (plain) Elasticsearch instance for Tema Queries
     - `cmd/elasticsync`: Creates and maintains an Elasticsearch instance for use with Temasearch
 - `temasearch`: Code implementing joined (mws, tema) queries
 - `mws`: Code interacting with MathWebSearch
@@ -97,19 +97,19 @@ The first index -- called tema by convention -- contains the TemaSearch Index Do
 The second index is called tema-segments and contains a list of known segments as well as their hashes. 
 As a hash implementation we use SHA256.
 
-### TemaSearch Query
+### Elasticsearch Query
 
-The program in `cmd/temaquery` can run queries against the elasticsearch part of Temasearch. 
+The program in `cmd/elasticquery` can run queries against the elasticsearch part of Temasearch. 
 Queries are defined by the [Query Struct](tema/query/main.go) and consist of two parameters:
 
 - Some text to search the index for
 - A list of mathwebsearch ids that were found by normal MathWebSearch
 
 A query may have both text and ids to search for, but it must not be empty. 
-These can be provided to `temaquery` using the `text` and `ids` parameters. 
+These can be provided to `elasticquery` using the `text` and `ids` parameters. 
 For example:
 
-`./temaquery -text "Hello" -ids 1,2,3`
+`./elasticquery -text "Hello" -ids 1,2,3`
 
 Normal results are returned as JSON to STDOUT. 
 The results are defined by the [Result Struct](tema/query/main.go). 

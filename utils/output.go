@@ -7,7 +7,7 @@ import (
 )
 
 // OutputJSONOrErr outputs res as json if no error message is provided
-func OutputJSONOrErr(res *interface{}, err error) {
+func OutputJSONOrErr(res interface{}, err error) {
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)

@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"os"
+	"time"
 
 	"github.com/MathWebSearch/mwsapi/cmd/elasticsync/args"
-	"github.com/MathWebSearch/mwsapi/tema"
-	"github.com/MathWebSearch/mwsapi/tema/sync"
+	"github.com/MathWebSearch/mwsapi/connection"
+	"github.com/MathWebSearch/mwsapi/engine/elasticsync"
+	"github.com/MathWebSearch/mwsapi/utils"
 )
 
 func main() {
@@ -17,24 +18,30 @@ func main() {
 		return
 	}
 
-	// connect to elasticsearch
-	fmt.Printf("Connecting to %q ...\n", a.ElasticURL())
-	connection := tema.WaitConnect(a.ElasticHost, a.ElasticPort)
-	fmt.Println("Connected. ")
-
-	// make a sync process
-	process := sync.NewProcess(connection, a.IndexDir, a.Quiet, a.Force)
-	stats, err := process.Run()
-
-	// if there was an error, print it
+	// make a new connection
+	c, err := connection.NewTemaConnection(a.ElasticPort, a.ElasticHost)
 	if err != nil {
-		fmt.Printf(err.Error())
-		os.Exit(1)
+		panic(err)
 	}
 
-	// print the stats, and then exit
-	fmt.Printf("Segments: %s. \n", stats.String())
-	fmt.Println("Finished, exiting. ")
+	// make a new process
+	process := elasticsync.NewProcess(c, a.IndexDir, a.Quiet, a.Force)
+
+	// connect to elasticsearch
+	process.Printf(nil, "Connecting to %q ...\n", a.ElasticURL())
+	err = connection.AwaitConnect(c, 5*time.Second, -1, func(e error) {
+		process.Printf(nil, "  Connection failed: %q, trying again in 5 seconds.\n", e.Error())
+	})
+	process.PrintlnOK(nil, "Connected. ")
+
+	// make a sync process
+	stats, err := process.Run()
+	if err == nil && a.Normalize {
+		stats.Normalize()
+	}
+
+	// and output
+	utils.OutputJSONOrErr(stats, err)
 }
 
 func die(err error) {

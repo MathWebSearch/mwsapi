@@ -6,8 +6,9 @@ import (
 
 // parallelGroup represents a group that can run an unlimited number of groups in parallel
 type parallelGroup struct {
-	group    *sync.WaitGroup // internal wait group for quenued jobs
-	xthreads int             // maximum number of parallel threads
+	group     *sync.WaitGroup // internal wait group for quenued jobs
+	workGroup *sync.WaitGroup // group for adding
+	xthreads  int             // maximum number of parallel threads
 
 	worker    *syncWorker // sync worker
 	needsSync bool        // do we need the worker?
@@ -25,8 +26,9 @@ type parallelGroup struct {
 func newParallelGroup(xthreads int, needsSync bool) (group *parallelGroup) {
 	// create a new group
 	group = &parallelGroup{
-		group:    &sync.WaitGroup{},
-		xthreads: xthreads,
+		group:     &sync.WaitGroup{},
+		workGroup: &sync.WaitGroup{},
+		xthreads:  xthreads,
 
 		needsSync: needsSync,
 
@@ -39,7 +41,7 @@ func newParallelGroup(xthreads int, needsSync bool) (group *parallelGroup) {
 
 	// create a worker if we need it
 	if needsSync {
-		group.worker = newSyncWorker(1)
+		group.worker = newSyncWorker()
 	}
 
 	// and start the group
@@ -54,11 +56,11 @@ func (group *parallelGroup) start() {
 	// add all the threads
 	for i := 0; i < group.xthreads; i++ {
 		go func() {
+			defer group.group.Done()
 			for {
 				// get work or finish
 				job, ok := <-group.ch
 				if !ok {
-					group.group.Done()
 					return
 				}
 
@@ -85,7 +87,7 @@ func (group *parallelGroup) start() {
 					if group.err == nil {
 						group.err = e
 					}
-					defer group.errMutex.Unlock()
+					group.errMutex.Unlock()
 				}
 			}
 		}()
@@ -93,14 +95,24 @@ func (group *parallelGroup) start() {
 
 }
 
+// Engine returns the name of the engine for debugging
+func (group *parallelGroup) Engine() string {
+	return "parallel"
+}
+
 // Add schedules an extra job to run
-func (group *parallelGroup) Add(job *GroupJob) WorkGroup {
-	group.ch <- job
-	return group
+func (group *parallelGroup) Add(job *GroupJob) {
+	group.workGroup.Add(1)
+	go func() {
+		defer group.workGroup.Done()
+		group.ch <- job
+	}()
 }
 
 // Wait waits for this group to finish
 func (group *parallelGroup) Wait() (err error) {
+	group.workGroup.Wait()
+	close(group.ch)
 	group.group.Wait()
 	if group.needsSync {
 		group.worker.Wait()

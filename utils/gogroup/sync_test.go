@@ -11,7 +11,7 @@ func TestSyncWorker(t *testing.T) {
 	t.Run("linear two-group output", func(t *testing.T) {
 		buffer := []int{}
 
-		worker := newSyncWorker(1)
+		worker := newSyncWorker()
 		worker.Work(0, func() { buffer = append(buffer, 1) })
 		worker.Close(0)
 		worker.Work(1, func() { buffer = append(buffer, 2) })
@@ -26,7 +26,7 @@ func TestSyncWorker(t *testing.T) {
 	t.Run("non-linear with pause", func(t *testing.T) {
 		buffer := []int{}
 
-		worker := newSyncWorker(1)
+		worker := newSyncWorker()
 		worker.Work(0, func() { buffer = append(buffer, 1) })
 		worker.Work(1, func() { buffer = append(buffer, 3) })
 		worker.Work(0, func() { buffer = append(buffer, 2) })
@@ -43,7 +43,7 @@ func TestSyncWorker(t *testing.T) {
 	t.Run("long non-linear with pause", func(t *testing.T) {
 		buffer := []int{}
 
-		worker := newSyncWorker(1)
+		worker := newSyncWorker()
 		worker.Work(0, func() { buffer = append(buffer, 1) })
 		worker.Work(0, func() { buffer = append(buffer, 2) })
 		worker.Close(0)

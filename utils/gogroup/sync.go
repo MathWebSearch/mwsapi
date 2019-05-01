@@ -1,9 +1,13 @@
 package gogroup
 
+import "sync"
+
 // syncWorker is an object that allows a set of asyncronous jobs
 // to be run in a grouped fashion
 type syncWorker struct {
 	done chan bool // channel that gets triggered when done
+
+	workGroup *sync.WaitGroup // group for adding
 
 	hasActiveChannel bool  // do we have an active channel
 	activeChannel    int64 // number of active channel
@@ -13,10 +17,10 @@ type syncWorker struct {
 }
 
 // newSyncWorker makes a new SyncWorker with the given capacity
-func newSyncWorker(capacity int) (worker *syncWorker) {
+func newSyncWorker() (worker *syncWorker) {
 	worker = &syncWorker{
 		done:     make(chan bool),
-		messages: make(chan *syncMessage, capacity),
+		messages: make(chan *syncMessage, 1),
 	}
 	go worker.workerThread()
 	return

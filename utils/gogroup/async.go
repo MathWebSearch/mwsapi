@@ -32,14 +32,19 @@ func newAsyncGroup(needsSync bool) (group *asyncGroup) {
 
 	// create a worker if we need it
 	if needsSync {
-		group.worker = newSyncWorker(1)
+		group.worker = newSyncWorker()
 	}
 
 	return
 }
 
+// Engine returns the name of the engine for debugging
+func (group *asyncGroup) Engine() string {
+	return "async"
+}
+
 // Add adds a job to this group
-func (group *asyncGroup) Add(job *GroupJob) WorkGroup {
+func (group *asyncGroup) Add(job *GroupJob) {
 	group.indexMutex.Lock()
 	defer group.indexMutex.Unlock()
 
@@ -68,7 +73,6 @@ func (group *asyncGroup) Add(job *GroupJob) WorkGroup {
 	}(group.index)
 
 	group.index++
-	return group
 }
 
 // Wait waits for this group to finish

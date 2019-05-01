@@ -14,6 +14,7 @@ type Args struct {
 
 	MWSIdsOnly bool
 	Count      bool
+	Normalize  bool
 
 	From int64
 	Size int64
@@ -35,7 +36,9 @@ func ParseArgs(args []string) *Args {
 	flagSet.IntVar(&flags.MWSPort, "mws-port", 8080, "Port to use for mathwebsearch")
 
 	flagSet.BoolVar(&flags.MWSIdsOnly, "ids", false, "When set, indicate for mathwebsearch to return only ids instead of full results")
+
 	flagSet.BoolVar(&flags.Count, "count", false, "When set, only count number of results instead of actually running the query")
+	flagSet.BoolVar(&flags.Normalize, "normalize", false, "When set, normalize results for use with integration testing")
 
 	flagSet.Int64Var(&flags.From, "from", 0, "Slice to start results at")
 	flagSet.Int64Var(&flags.Size, "size", 10, "Maximum number of results to return")

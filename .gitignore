@@ -1,9 +1,9 @@
 # Our binaries
 /mwsapid
 /mwsquery
-/temaquery
+/elasticquery
 /elasticsync
-/temasearchquery
+/temaquery
 
 # Binaries for programs and plugins
 *.exe
