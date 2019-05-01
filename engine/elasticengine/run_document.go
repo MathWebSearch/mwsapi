@@ -10,7 +10,7 @@ import (
 )
 
 // RunDocument runs the document query
-func RunDocument(conn *connection.TemaConnection, q *query.ElasticQuery, from int64, size int64) (res *result.Result, err error) {
+func RunDocument(conn *connection.ElasticConnection, q *query.ElasticQuery, from int64, size int64) (res *result.Result, err error) {
 	// measure time for this query
 	start := time.Now()
 	defer func() {

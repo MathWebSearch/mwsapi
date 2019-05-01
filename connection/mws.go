@@ -1,9 +1,8 @@
 package connection
 
 import (
-	"net"
+	"errors"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -50,31 +49,36 @@ func (conn *MWSConnection) URL() string {
 
 // connect connects to this connection
 func (conn *MWSConnection) connect() (err error) {
-	// ping the connection
+	// create a new http client
+	conn.Client = &http.Client{}
+
+	// ping and make sure the connection actually works
 	err = conn.ping()
 	if err != nil {
-		return
+		conn.Client = nil
 	}
 
-	conn.Client = &http.Client{}
 	return
 }
 
 func (conn *MWSConnection) ping() (err error) {
-	// connect via tcp
-	c, err := net.DialTimeout("tcp", net.JoinHostPort(conn.hostname, strconv.Itoa(conn.port)), conn.Config.Timeout)
+	res, err := conn.Client.Get(conn.URL())
 	if err != nil {
 		return
 	}
 
-	// and close the connection immediatly
-	c.Close()
+	// check that the status code is 200
+	if res.StatusCode != 200 {
+		err = errors.New("MathWebSearch did not respond with code HTTP 200")
+	}
+
 	return
 }
 
-// closes the connection to MathWebSearch
-func (conn *MWSConnection) close() {
+// Close closes the connection to MathWebSearch
+func (conn *MWSConnection) Close() error {
 	conn.Client = nil
+	return nil
 }
 
 func init() {

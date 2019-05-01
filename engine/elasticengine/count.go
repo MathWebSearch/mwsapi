@@ -7,7 +7,7 @@ import (
 )
 
 // Count counts the number of results for an elastic query
-func Count(conn *connection.TemaConnection, q *query.ElasticQuery) (count int64, err error) {
+func Count(conn *connection.ElasticConnection, q *query.ElasticQuery) (count int64, err error) {
 	qq, err := q.RawDocumentQuery()
 	return elasticutils.Count(conn.Client, conn.Config.HarvestIndex, conn.Config.HarvestType, qq)
 }

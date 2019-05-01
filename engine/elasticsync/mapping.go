@@ -7,7 +7,7 @@ import (
 type j map[string]interface{}
 
 // harvestMapping returns the mapping for the harvest index
-func harvestMapping(config *connection.TemaConfiguration) interface{} {
+func harvestMapping(config *connection.ElasticConfiguration) interface{} {
 	return j{
 		"settings": j{
 			"index": j{
@@ -49,7 +49,7 @@ func harvestMapping(config *connection.TemaConfiguration) interface{} {
 }
 
 // segmentMapping returns the mapping for the segments index
-func segmentMapping(config *connection.TemaConfiguration) interface{} {
+func segmentMapping(config *connection.ElasticConfiguration) interface{} {
 	return j{
 		"settings": j{
 			"index": j{

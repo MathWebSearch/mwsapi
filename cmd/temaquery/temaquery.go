@@ -19,7 +19,7 @@ func main() {
 	}
 
 	// make a new connection
-	c, err := connection.NewApplianceConnection(a.MWSPort, a.MWSHost, a.ElasticPort, a.ElasticHost)
+	c, err := connection.NewTemaConnection(a.MWSPort, a.MWSHost, a.ElasticPort, a.ElasticHost)
 	if err != nil {
 		panic(err)
 	}

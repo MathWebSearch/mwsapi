@@ -2,13 +2,14 @@ package connection
 
 import (
 	"fmt"
+	"io"
 	"time"
 )
 
 // Connection represents the connection to a given daemon
 type Connection interface {
+	io.Closer       // to close connections
 	connect() error // Attempt to connect to the server
-	close()         // Close the connection (if open)
 }
 
 // Validate validates details to a connection

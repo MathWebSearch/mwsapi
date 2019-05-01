@@ -12,7 +12,7 @@ import (
 )
 
 // Count counts the results of a tema query
-func Count(conn *connection.ApplianceConnection, q *query.Query) (count int64, err error) {
+func Count(conn *connection.TemaConnection, q *query.Query) (count int64, err error) {
 	// get the query type
 	tp := q.Kind()
 
@@ -35,15 +35,15 @@ func Count(conn *connection.ApplianceConnection, q *query.Query) (count int64, e
 	return countTemaSearchQuery(conn, q)
 }
 
-func countMWSQuery(conn *connection.ApplianceConnection, q *query.Query) (int64, error) {
+func countMWSQuery(conn *connection.TemaConnection, q *query.Query) (int64, error) {
 	return mwsengine.Count(conn.MWS, q.MWSQuery())
 }
 
-func countElasticQuery(conn *connection.ApplianceConnection, q *query.Query, mwsIds []int64) (int64, error) {
-	return elasticengine.Count(conn.Tema, q.ElasticQuery(mwsIds))
+func countElasticQuery(conn *connection.TemaConnection, q *query.Query, mwsIds []int64) (int64, error) {
+	return elasticengine.Count(conn.Elastic, q.ElasticQuery(mwsIds))
 }
 
-func countTemaSearchQuery(conn *connection.ApplianceConnection, q *query.Query) (count int64, err error) {
+func countTemaSearchQuery(conn *connection.TemaConnection, q *query.Query) (count int64, err error) {
 	// build the outer query
 	qq := q.MWSQuery()
 
@@ -69,7 +69,7 @@ func countTemaSearchQuery(conn *connection.ApplianceConnection, q *query.Query) 
 				}
 
 				// get the total number of inner results
-				innertotal, e := elasticengine.Count(conn.Tema, q.ElasticQuery(outer.HitIDs))
+				innertotal, e := elasticengine.Count(conn.Elastic, q.ElasticQuery(outer.HitIDs))
 				if e != nil {
 					return
 				}

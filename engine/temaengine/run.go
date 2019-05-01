@@ -13,7 +13,7 @@ import (
 )
 
 // Run runs a query against elasticsearch + mws
-func Run(conn *connection.ApplianceConnection, q *query.Query, from int64, size int64) (res *result.Result, err error) {
+func Run(conn *connection.TemaConnection, q *query.Query, from int64, size int64) (res *result.Result, err error) {
 	res = &result.Result{From: from}
 
 	// keep track of how long we took
@@ -50,7 +50,7 @@ func Run(conn *connection.ApplianceConnection, q *query.Query, from int64, size 
 	return
 }
 
-func runTemaSearchQuery(conn *connection.ApplianceConnection, q *query.Query, res *result.Result, from int64, size int64) (err error) {
+func runTemaSearchQuery(conn *connection.TemaConnection, q *query.Query, res *result.Result, from int64, size int64) (err error) {
 	// build outer results
 	qq := q.MWSQuery()
 	outerTotal, err := mwsengine.Count(conn.MWS, qq)
@@ -70,9 +70,9 @@ func runTemaSearchQuery(conn *connection.ApplianceConnection, q *query.Query, re
 	res.Variables = []*result.Variable{}
 	setvariables := false
 
-	maxHits := int(size)                               // the maximum number of hits
-	outerPageSize := conn.MWS.Config.MaxPageSize       // the page size for the outer pages
-	innerPageSize := int(conn.Tema.Config.MaxPageSize) // the page size for the inner pages
+	maxHits := int(size)                                  // the maximum number of hits
+	outerPageSize := conn.MWS.Config.MaxPageSize          // the page size for the outer pages
+	innerPageSize := int(conn.Elastic.Config.MaxPageSize) // the page size for the inner pages
 
 outer:
 	for len(res.Hits) <= maxHits {
@@ -104,8 +104,8 @@ outer:
 		for {
 			// run the inner query
 			// TODO: Re-do pagination
-			inner, err := elasticengine.Run(conn.Tema, qqq, innerfrom, conn.Tema.Config.MaxPageSize)
-			innerfrom += conn.Tema.Config.MaxPageSize
+			inner, err := elasticengine.Run(conn.Elastic, qqq, innerfrom, conn.Elastic.Config.MaxPageSize)
+			innerfrom += conn.Elastic.Config.MaxPageSize
 			if err != nil {
 				return err
 			}
@@ -139,7 +139,7 @@ outer:
 	return
 }
 
-func runMWSQuery(conn *connection.ApplianceConnection, q *query.Query, res *result.Result, from int64, size int64) (err error) {
+func runMWSQuery(conn *connection.TemaConnection, q *query.Query, res *result.Result, from int64, size int64) (err error) {
 	// run the query
 	result, err := mwsengine.Run(conn.MWS, q.MWSQuery(), from, size)
 	if err != nil {
@@ -152,9 +152,9 @@ func runMWSQuery(conn *connection.ApplianceConnection, q *query.Query, res *resu
 	return
 }
 
-func runElasticQuery(conn *connection.ApplianceConnection, q *query.Query, res *result.Result, from int64, size int64) (err error) {
+func runElasticQuery(conn *connection.TemaConnection, q *query.Query, res *result.Result, from int64, size int64) (err error) {
 	// run the query
-	result, err := elasticengine.Run(conn.Tema, q.ElasticQuery(nil), from, size)
+	result, err := elasticengine.Run(conn.Elastic, q.ElasticQuery(nil), from, size)
 	if err != nil {
 		return
 	}

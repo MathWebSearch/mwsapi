@@ -1,77 +1,70 @@
 package connection
 
 import (
-	"time"
-
-	"gopkg.in/olivere/elastic.v6"
+	"github.com/MathWebSearch/mwsapi/utils/gogroup"
 )
 
-// TemaConnection represents a connection to TemaSearch
+// TemaConnection represents a connection to a TemaSearch instance, that is a joined (MathWebSearch, ElasticSearch) instance
 type TemaConnection struct {
-	port     int    // port number used
-	hostname string // hostnameused
-
-	Client *elastic.Client    // underlying http client
-	Config *TemaConfiguration // tema configuration
+	MWS     *MWSConnection     // connection to MathWebSearch
+	Elastic *ElasticConnection // connection to ElasticSearch
 }
 
-// TemaConfiguration represents a TemaSearch Configuration
-type TemaConfiguration struct {
-	HarvestIndex string
-	HarvestType  string
+// NewTemaConnection makes a new connection to TemaSearch
+func NewTemaConnection(MWSPort int, MWSHost string, ElasticPort int, ElasticHost string) (conn *TemaConnection, err error) {
+	conn = &TemaConnection{}
 
-	SegmentIndex string
-	SegmentType  string
-
-	Timeout time.Duration
-
-	PoolSize    int
-	MaxPageSize int64
-}
-
-// NewTemaConnection initializes a new Tema connection
-func NewTemaConnection(port int, hostname string) (conn *TemaConnection, err error) {
-	conn = &TemaConnection{
-		port:     port,
-		hostname: hostname,
-
-		Config: &TemaConfiguration{
-			HarvestIndex: "tema",
-			HarvestType:  "_doc",
-
-			SegmentIndex: "tema-segments",
-			SegmentType:  "_doc",
-
-			Timeout: 5 * time.Second,
-
-			PoolSize:    10,
-			MaxPageSize: 10,
-		},
-	}
-
-	// and validate the connection
-	err = Validate(conn.port, conn.hostname)
-	return
-}
-
-// connect connects to this connection
-func (conn *TemaConnection) connect() (err error) {
-	// create a new elasticsearch server
-	client, err := elastic.NewClient(elastic.SetURL(MakeURL(conn.port, conn.hostname, "")), elastic.SetSniff(false), elastic.SetHealthcheckTimeoutStartup(conn.Config.Timeout))
+	// create the MWS Connection
+	conn.MWS, err = NewMWSConnection(MWSPort, MWSHost)
 	if err != nil {
 		return
 	}
 
-	conn.Client = client
+	// create the tema connection
+	conn.Elastic, err = NewElasticConnection(ElasticPort, ElasticHost)
 	return
 }
 
-// close closes this connection
-func (conn *TemaConnection) close() {
-	if conn.Client != nil {
-		conn.Client.Stop()
-		conn.Client = nil
+func (conn *TemaConnection) connect() (err error) {
+	group := gogroup.NewWorkGroup(-1, false)
+
+	// connect to mws
+	mws := gogroup.GroupJob(func(_ func(func())) error {
+		return conn.MWS.connect()
+	})
+	group.Add(&mws)
+
+	// connect to tema
+	tema := gogroup.GroupJob(func(_ func(func())) error {
+		return conn.Elastic.connect()
+	})
+	group.Add(&tema)
+
+	// wait for both to finish
+	err = group.Wait()
+
+	// if either of the connections failed
+	// then we need to disconnect the other
+	if err != nil {
+		conn.Close()
 	}
+
+	return
+}
+
+// Close closes this connection
+func (conn *TemaConnection) Close() error {
+	// close mws
+	if conn.MWS != nil {
+		conn.MWS.Close()
+	}
+
+	// close tema
+	if conn.Elastic != nil {
+		conn.Elastic.Close()
+	}
+
+	return nil
 }
 
 func init() {

@@ -9,7 +9,7 @@ import (
 
 // Process represent args to the syncronisation process
 type Process struct {
-	conn *connection.TemaConnection
+	conn *connection.ElasticConnection
 
 	force         bool
 	harvestFolder string
@@ -38,7 +38,7 @@ func (s *Stats) Normalize() {
 }
 
 // NewProcess creates a new Process
-func NewProcess(conn *connection.TemaConnection, folder string, quiet bool, force bool) *Process {
+func NewProcess(conn *connection.ElasticConnection, folder string, quiet bool, force bool) *Process {
 	return &Process{
 		conn:          conn,
 		harvestFolder: folder,
