@@ -43,6 +43,8 @@ func (q *MWSQuery) Raw(from int64, size int64) *RawMWSQuery {
 
 // RawMWSQuery represents a (raw) MathWebSearch Query that is sent directly to MathWebSearch
 type RawMWSQuery struct {
+	XMLName xml.Name `xml:"mws:query"`
+
 	From int64 `xml:"limitmin,attr"` // offset within the set of results
 	Size int64 `xml:"answsize,attr"` // maximum number of results returned
 
@@ -50,8 +52,45 @@ type RawMWSQuery struct {
 	OutputFormat string             `xml:"output,attr"`   // output format, "xml" or "json"
 
 	Expressions []*MWSExpression // the expressions that we are searching for
+}
 
+// a supertype of MWSQuery that can be used for marshalling
+type xQuery struct {
 	XMLName xml.Name `xml:"mws:query"`
+
+	From int64 `xml:"limitmin,attr"`
+	Size int64 `xml:"answsize,attr"`
+
+	ReturnTotal  utils.BooleanYesNo `xml:"totalreq,attr"`
+	OutputFormat string             `xml:"output,attr"`
+
+	Expressions []*MWSExpression
+
+	NamespaceMWS string `xml:"xmlns:mws,attr"`
+	NamespaceM   string `xml:"xmlns:m,attr"`
+}
+
+// wrapForXML wraps an element for use with xml decoding
+func (raw RawMWSQuery) wrapForXML() *xQuery {
+	return &xQuery{
+		XMLName: xml.Name{Local: "mws:query", Space: ""},
+		From:    raw.From,
+		Size:    raw.Size,
+
+		ReturnTotal:  raw.ReturnTotal,
+		OutputFormat: raw.OutputFormat,
+
+		Expressions: raw.Expressions,
+
+		NamespaceMWS: "http://www.mathweb.org/mws/ns",
+		NamespaceM:   "http://www.w3.org/1998/Math/MathML",
+	}
+}
+
+// MarshalXML marshales a raw query as XML
+func (raw RawMWSQuery) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	start.Name.Local = "mws:query"
+	return e.EncodeElement(raw.wrapForXML(), start)
 }
 
 // MWSExpression represents a single expression that is being searched for
@@ -60,19 +99,6 @@ type MWSExpression struct {
 	XMLName xml.Name `xml:"mws:expr"`
 }
 
-// a supertype of MWSQuery that can be marshalled
-type xQuery struct {
-	*RawMWSQuery
-
-	NamespaceMWS string `xml:"xmlns:mws,attr"`
-	NamespaceM   string `xml:"xmlns:m,attr"`
-}
-
-// ToXML turns a query into valid XML
-func (q *RawMWSQuery) ToXML() ([]byte, error) {
-	return xml.Marshal(&xQuery{
-		RawMWSQuery:  q,
-		NamespaceMWS: "http://www.mathweb.org/mws/ns",
-		NamespaceM:   "http://www.w3.org/1998/Math/MathML",
-	})
+func init() {
+	var _ xml.Marshaler = (*(new(RawMWSQuery)))
 }

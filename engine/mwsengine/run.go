@@ -2,6 +2,7 @@ package mwsengine
 
 import (
 	"bytes"
+	"encoding/xml"
 	"net/http"
 	"time"
 
@@ -31,7 +32,7 @@ func runRaw(conn *connection.MWSConnection, q *query.RawMWSQuery) (res *result.R
 	// and then join all of them together
 
 	// turn the query into xml
-	b, err := q.ToXML()
+	b, err := xml.Marshal(q)
 	if err != nil {
 		return
 	}

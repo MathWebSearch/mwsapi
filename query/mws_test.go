@@ -86,7 +86,7 @@ func TestRawMWSQuery_ToXML(t *testing.T) {
 				OutputFormat: tt.fields.OutputFormat,
 				Expressions:  e,
 			}
-			got, err := q.ToXML()
+			got, err := xml.Marshal(q)
 			gotString := string(got)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Query.ToXML() error = %v, wantErr %v", err, tt.wantErr)
