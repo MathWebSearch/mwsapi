@@ -11,8 +11,7 @@ import (
 
 // rawResult represents a raw MWS Result
 type rawResult struct {
-	Size  int64 `json:"size"` // total size of the resultset (if requested)
-	Total int64 `json:"total,omitempty"`
+	Total int64 `json:"total"` // total size of the resultset (if requested)
 
 	TookInMS int `json:"time"` // how long the query took, in ms
 
@@ -38,7 +37,7 @@ func newMWSResult(res *result.Result, response *http.Response) (err error) {
 	res.Took = &took
 
 	res.Kind = "mwsd"
-	res.Size = raw.Size
+	res.Size = int64(len(raw.Hits))
 	res.Total = raw.Total
 
 	res.TookComponents = map[string]*time.Duration{

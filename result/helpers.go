@@ -7,9 +7,9 @@ import (
 
 // MathInfo represents information about a math element within a result
 type MathInfo struct {
-	Source string `json:"source"` // html source code of this formula (if any)
-	URL    string `json:"url"`    // URL of the replaced formula
-	XPath  string `json:"xpath"`  // xpath of the term within the formula
+	Source string `json:"source,omitempty"` // html source code of this formula (if any)
+	URL    string `json:"url"`              // URL of the replaced formula
+	XPath  string `json:"xpath"`            // xpath of the term within the formula
 }
 
 // ID returns the (local) id for this MathInfo Element

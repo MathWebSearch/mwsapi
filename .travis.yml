@@ -8,6 +8,11 @@ go:
   - "1.10.x"
   - "1.11.x"
 
-install: make deps integrationdeps
+install:
+  - make deps
+  - integrationdeps
 
-script: make all integrationtest
+script:
+  - make build
+  - make test
+  - make integrationtest
