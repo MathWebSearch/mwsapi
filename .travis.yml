@@ -1,8 +1,13 @@
 language: go
 
+services:
+  - docker
+
 go:
   - "1.x"
   - "1.10.x"
   - "1.11.x"
 
-script: make all
+install: make deps integrationdeps
+
+script: make all integrationtest

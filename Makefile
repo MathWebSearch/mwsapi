@@ -12,7 +12,7 @@ GOFLAGS=-a
 EXECUTABLES=mwsapid mwsquery elasticquery elasticsync temaquery
 
 all: test build
-.PHONY : all build test clean run deps testdeps
+.PHONY : all build test integrationtest integrationpull clean run deps testdeps
 
 build: $(EXECUTABLES)
 
@@ -30,3 +30,9 @@ deps:
 	$(GOGET) -v ./...
 testdeps:
 	$(GOGET) -v -t ./...
+
+# Integration Tests
+integrationdeps:
+	cd test && docker-compose pull
+integrationtest: testdeps
+	CGO_ENABLED=0 $(GOTEST) -tags integration -v ./...
