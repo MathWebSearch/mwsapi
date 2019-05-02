@@ -73,12 +73,12 @@ func (group *parallelGroup) start() {
 				// do the work
 				e := (*job)(func(sync func()) {
 					if group.needsSync {
-						group.worker.Work(index, sync)
+						group.worker.SendWork(index, sync)
 					}
 				})
 
 				if group.needsSync {
-					group.worker.Close(index)
+					group.worker.SendClose(index)
 				}
 
 				// update the error if needed
@@ -127,4 +127,10 @@ func (group *parallelGroup) UWait(err error) error {
 		err = e
 	}
 	return err
+}
+
+// Close closes this parallel group
+func (group *parallelGroup) Close() error {
+	close(group.ch)
+	return nil
 }

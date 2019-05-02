@@ -1,11 +1,14 @@
 package gogroup
 
-import "sync"
+import (
+	"sync"
+)
 
 // syncWorker is an object that allows a set of asyncronous jobs
 // to be run in a grouped fashion
 type syncWorker struct {
-	done chan bool // channel that gets triggered when done
+	closed bool      // boolean indiciating if we are done
+	done   chan bool // channel that gets triggered when done
 
 	workGroup *sync.WaitGroup // group for adding
 
@@ -19,6 +22,7 @@ type syncWorker struct {
 // newSyncWorker makes a new SyncWorker with the given capacity
 func newSyncWorker() (worker *syncWorker) {
 	worker = &syncWorker{
+		closed:   false,
 		done:     make(chan bool),
 		messages: make(chan *syncMessage, 1),
 	}
@@ -34,26 +38,32 @@ type syncMessage struct {
 	code    *func() // code to run (if any)
 }
 
-// Work instructs the SyncWorker to run the given code on the given channel
-func (worker *syncWorker) Work(channel int64, code func()) {
+// SendWork instructs the SyncWorker to run the given code on the given channel
+func (worker *syncWorker) SendWork(channel int64, code func()) {
 	worker.messages <- &syncMessage{
 		channel: channel,
 		code:    &code,
 	}
 }
 
-// Close closes a channel and informs the Worker
+// SendClose closes a channel and informs the Worker
 // that it may not continue sending messages on different channels
-func (worker *syncWorker) Close(channel int64) {
+func (worker *syncWorker) SendClose(channel int64) {
 	worker.messages <- &syncMessage{
 		channel: channel,
 		close:   true,
 	}
 }
 
+// Close closes this worker
+func (worker *syncWorker) Close() error {
+	close(worker.messages)
+	return nil
+}
+
 // Wait waits for processing to complete
 func (worker *syncWorker) Wait() {
-	close(worker.messages)
+	worker.Close()
 	<-worker.done
 	return
 }

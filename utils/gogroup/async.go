@@ -55,7 +55,7 @@ func (group *asyncGroup) Add(job *GroupJob) {
 
 		err := (*job)(func(sync func()) {
 			if group.needsSync {
-				group.worker.Work(i, sync)
+				group.worker.SendWork(i, sync)
 			}
 		})
 
@@ -68,7 +68,7 @@ func (group *asyncGroup) Add(job *GroupJob) {
 		}
 
 		if group.needsSync {
-			group.worker.Close(int64(i))
+			group.worker.SendClose(int64(i))
 		}
 	}(group.index)
 
@@ -82,6 +82,14 @@ func (group *asyncGroup) Wait() (err error) {
 		group.worker.Wait()
 	}
 	return group.err
+}
+
+// Close closes this asyncGroup
+func (group *asyncGroup) Close() (err error) {
+	if group.needsSync {
+		group.worker.Close()
+	}
+	return
 }
 
 // UWait is the same as wait, but only updates error if it isn't nil

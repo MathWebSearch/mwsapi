@@ -1,8 +1,15 @@
 package gogroup
 
+import (
+	"io"
+)
+
 // WorkGroup represents a group that performs parallel work
 type WorkGroup interface {
-	Engine() string        // the engine being used
+	io.Closer
+
+	Engine() string // the engine being used
+
 	Add(job *GroupJob)     // Adds a job to this group
 	Wait() error           // Waits for this group to finish, returning any errors
 	UWait(err error) error // Same as wait, but only returns an error iff the given one is not nil
