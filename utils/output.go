@@ -15,10 +15,6 @@ func OutputJSONOrErr(res interface{}, err error) {
 
 	// stdout the json
 	bytes, _ := json.MarshalIndent(res, "", "  ")
-	if err != nil {
-		fmt.Printf("%#v\n", err)
-		os.Exit(1)
-	}
 	os.Stdout.Write(bytes)
 	fmt.Println("")
 }
