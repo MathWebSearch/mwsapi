@@ -1,0 +1,21 @@
+### docker-compose file for mwsapi integration tests
+
+version: '3'
+services:
+
+  # The MathWebSearch service
+  mws:
+    image: mathwebsearch/mathwebsearch
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data/harvests:/data/
+  
+  # The ElasticSearch instance
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
+    environment:
+      - "discovery.type=single-node"
+    ports:
+      - "9200:9200"
+
