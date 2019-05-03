@@ -12,10 +12,11 @@ services:
       - ./data/harvests:/data/
   
   # The ElasticSearch instance
-  elastic:
+  elasticsync_elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
     environment:
       - "discovery.type=single-node"
+    volumes:
+      - "/usr/share/elasticsearch/data"
     ports:
       - "9200:9200"
-

@@ -20,7 +20,7 @@ $(EXECUTABLES): %: deps
 	CGO_ENABLED=0 $(GOBUILD) $(GOFLAGS) ./cmd/$@
 
 test: testdeps
-	CGO_ENABLED=0 $(GOTEST) -v ./...
+	CGO_ENABLED=0 $(GOTEST) -short -v ./...
 clean: 
 	$(GOCLEAN)
 	rm -f $(EXECUTABLES)
@@ -35,4 +35,4 @@ testdeps:
 integrationdeps:
 	cd test && docker-compose pull
 integrationtest: testdeps
-	CGO_ENABLED=0 $(GOTEST) -tags integration -p 1 -v ./cmd/...
+	CGO_ENABLED=0 $(GOTEST) -v ./cmd/...

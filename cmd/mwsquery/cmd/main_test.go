@@ -1,27 +1,18 @@
-// +build integration
-
 package cmd
 
 import (
-	"os"
 	"testing"
 
-	"github.com/MathWebSearch/mwsapi/utils"
+	"github.com/MathWebSearch/mwsapi/integrationtest"
 )
 
 func TestMain(m *testing.M) {
-	if utils.StartIntegrationTest(m, "mwsquery") != 0 {
-		os.Exit(1)
-	}
-
-	code := m.Run()
-
-	utils.StopIntegrationTest(m, "mwsquery")
-
-	os.Exit(code)
+	integrationtest.Main(m, "mwsquery_mws", "http://localhost:8080/")
 }
 
 func TestMWSQuery(t *testing.T) {
+	integrationtest.MarkSkippable(t)
+
 	tests := []struct {
 		name      string
 		args      *Args
@@ -49,7 +40,7 @@ func TestMWSQuery(t *testing.T) {
 				t.Errorf("mwsquery() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			utils.TestJSONAsset(t, "mwsquery()", gotRes, tt.assetName)
+			integrationtest.TestJSONAsset(t, "mwsquery()", gotRes, tt.assetName)
 		})
 	}
 }

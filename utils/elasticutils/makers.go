@@ -167,9 +167,7 @@ func FetchOrCreateObject(client *elastic.Client, index string, tp string, query 
 
 	// if that fails create it
 	obj, err = NewObjectFromFields(client, index, tp, Data)
-	if err == nil {
-		created = true
-	}
+	created = true
 
 	return
 }

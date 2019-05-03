@@ -5,6 +5,8 @@
 /elasticsync
 /temaquery
 
+testdata/tmp
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
