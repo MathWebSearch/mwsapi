@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/MathWebSearch/mwsapi/result"
+	"github.com/MathWebSearch/mwsapi/utils"
 )
 
 // rawResult represents a raw MWS Result
@@ -37,12 +38,13 @@ func newMWSResult(res *result.Result, response *http.Response) (err error) {
 	res.Took = &took
 
 	res.Kind = "mwsd"
-	res.Size = int64(len(raw.Hits))
 	res.Total = raw.Total
 
 	res.TookComponents = map[string]*time.Duration{
 		"mwsd": &took,
 	}
+
+	res.Size = utils.MaxInt64(int64(len(raw.Hits)), int64(len(raw.MathWebSearchIDs)))
 
 	res.Variables = raw.Variables
 	res.HitIDs = raw.MathWebSearchIDs

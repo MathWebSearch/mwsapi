@@ -1,5 +1,7 @@
 package utils
 
+// This file contains code used during integration tests
+
 import (
 	"encoding/json"
 	"fmt"
@@ -12,8 +14,8 @@ import (
 	"testing"
 )
 
-// CompareJSONAsset compares a result with a json file
-func CompareJSONAsset(t *testing.T, name string, res interface{}, filename string) bool {
+// TestJSONAsset compares a result with a json file
+func TestJSONAsset(t *testing.T, name string, res interface{}, filename string) bool {
 	// marshal the first file into json
 	gbytes, err := json.Marshal(res)
 	if err != nil {
@@ -45,7 +47,8 @@ func CompareJSONAsset(t *testing.T, name string, res interface{}, filename strin
 	}
 
 	if got != expected {
-		t.Errorf("%s json differs", name)
+		fn := outputDebugJSON(t, res, filename)
+		t.Errorf("%s json differs, wrote output in %q", name, fn)
 		return false
 	}
 
@@ -70,6 +73,27 @@ func normalizeJSON(in string) (out string, err error) {
 
 	// and return
 	out = string(outB)
+	return
+}
+
+// Outputs json into {$asset}.out for debugging purposes
+// returns the filename
+func outputDebugJSON(t *testing.T, res interface{}, asset string) (filename string) {
+	// filename to place broken output into
+	filename = fmt.Sprintf("%s.out", asset)
+
+	// Remarshal it
+	outB, err := json.MarshalIndent(res, "", "  ")
+	if err != nil {
+		return
+	}
+
+	// write the file
+	err = ioutil.WriteFile(filename, outB, 0755)
+	if err != nil {
+		return
+	}
+
 	return
 }
 
