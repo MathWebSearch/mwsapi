@@ -10,7 +10,7 @@ go:
 
 install:
   - make deps
-  - integrationdeps
+  - make integrationdeps
 
 script:
   - make build
