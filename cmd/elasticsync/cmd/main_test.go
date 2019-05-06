@@ -7,7 +7,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	integrationtest.Main(m, "elasticsync_elastic", "http://localhost:9200/")
+	integrationtest.Main(m, "elasticsync_elastic", nil, "http://localhost:9200/")
 }
 
 func TestMWSQuery(t *testing.T) {

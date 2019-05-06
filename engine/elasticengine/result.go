@@ -3,6 +3,7 @@ package elasticengine
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/MathWebSearch/mwsapi/result"
@@ -18,6 +19,7 @@ func newDocumentResult(res *result.Result, page *elasticutils.ResultsPage) (err 
 	// prepare result objejct
 	res.Total = page.Total
 	res.Hits = make([]*result.Hit, len(page.Hits))
+	res.Size = int64(len(page.Hits))
 
 	// and make the new hits
 	for i, hit := range page.Hits {
@@ -58,8 +60,16 @@ func newDocumentHit(obj *elasticutils.Object) (hit *result.Hit, err error) {
 			return nil, fmt.Errorf("Result %q missing path info for %d", hit.ID, mwsid)
 		}
 
+		// sort the keys in alphabetical order
+		keys := make([]string, len(data))
+		for key := range data {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+
 		// and iterate over it
-		for key, value := range data {
+		for _, key := range keys {
+			value := data[key]
 			hit.Math = append(hit.Math, &result.MathInfo{
 				URL:   key,
 				XPath: value.XPath,

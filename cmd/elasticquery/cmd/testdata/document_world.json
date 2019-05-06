@@ -1,0 +1,257 @@
+{
+  "kind": "elastic-document",
+  "total": 8,
+  "from": 0,
+  "size": 8,
+  "hits": [
+    {
+      "id": "cnR6jWoBetFwNTV0IOAQ",
+      "source": {
+        "metadata": {},
+        "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_pvT6yP.harvest.json",
+        "text": "html{border: 0px #006699 solid;border-left-width: 15px} body {margin: 15px;padding: 0px;background-color:#ffffff;color:black; font-family:helvetica;font-size: 14px;line-height: 1.4em} div.volume-title {font-size:24pt;text-align:center;font-weight:bold} div.title {font-style:italic;font-weight:bold} div.mathics {font-size:larger;font-weight:bold} span.mathics-zbl {float:right} div.matverw {font-size:smaller} div.review {margin:5mm 5mm 5mm 5mm} div.aunot {font-weight:bold} div.published {font-weight:bold} .number {font-style: italic; text-align:right} div.reviewer{font-style:italic;text-align:right} EN 39B52 39-01 39B99 43A62 book Székelyhidi, László Number: 6110093 Functional equations on hypergroups. 2013 Preliminary review / Publisher’s description: The theory of hypergroups is a rapidly developing area of mathematics due to its diverse applications in different areas like probability, harmonic analysis, etc. This book exhibits the use of functional equations and spectral synthesis in the theory of hypergroups. It also presents the fruitful consequences of this delicate “marriage” where the methods of spectral analysis and synthesis can provide an efficient tool in characterization problems of function classes on hypergroups. This book is written for the interested reader who has open eyes for both functional equations and hypergroups, and who dares to enter a new world of ideas, a new world of methods – and, sometimes, a new world of unexpected difficulties.",
+        "mws_id": {},
+        "mws_ids": [],
+        "math": {}
+      },
+      "math_ids": []
+    },
+    {
+      "id": "_3R6jWoBetFwNTV0G9-o",
+      "source": {
+        "metadata": {},
+        "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_6Haon6.harvest.json",
+        "text": "html{border: 0px #006699 solid;border-left-width: 15px} body {margin: 15px;padding: 0px;background-color:#ffffff;color:black; font-family:helvetica;font-size: 14px;line-height: 1.4em} div.volume-title {font-size:24pt;text-align:center;font-weight:bold} div.title {font-style:italic;font-weight:bold} div.mathics {font-size:larger;font-weight:bold} span.mathics-zbl {float:right} div.matverw {font-size:smaller} div.review {margin:5mm 5mm 5mm 5mm} div.aunot {font-weight:bold} div.published {font-weight:bold} .number {font-style: italic; text-align:right} div.reviewer{font-style:italic;text-align:right} EN 91-00 91Gxx book Fabozzi, Frank J. (ed.) Number: 6110097 Encyclopedia of financial models. 3 Volumes. (to appear). 2013 Publisher’s description: An essential reference dedicated to a wide array of financial models, issues in financial modeling, and mathematical and statistical tools for financial modeling The need for serious coverage of financial modeling has never been greater, especially with the size, diversity, and efficiency of modern capital markets. With this in mind, the Encyclopedia of Financial Models, 3 Volume Set has been created to help a broad spectrum of individuals–ranging from finance professionals to academics and students–understand financial modeling and make use of the various models currently available. Incorporating timely research and in-depth analysis, the Encyclopedia of Financial Models is an informative 3-Volume Set that covers both established and cutting-edge models and discusses their real-world applications. Edited by Frank Fabozzi, this set includes contributions from global financial experts as well as academics with extensive consulting experience in this field. Organized alphabetically by category, this reliable resource consists of three separate volumes and 127 entries–touching on everything from asset pricing and bond valuation models to trading cost models and volatility–and provides readers with a balanced understanding of today’s dynamic world of financial modeling. math1 This 3-Volume Set contains coverage of the fundamentals and advances in financial modeling and provides the mathematical and statistical techniques needed to develop and test financial models. math2 Emphasizes both technical and implementation issues, providing researchers, educators, students, and practitioners with the necessary background to deal with issues related to financial modeling. math3 Each volume includes a complete table of contents and index for easy access to various parts of the encyclopedia. Financial models have become increasingly commonplace, as well as complex. They are essential in a wide range of financial endeavors, and this 3-Volume Set will help put them in perspective.",
+        "mws_id": {
+          "54": {
+            "1": {
+              "url": "",
+              "xpath": "/*[1]"
+            },
+            "2": {
+              "url": "",
+              "xpath": "/*[1]"
+            },
+            "3": {
+              "url": "",
+              "xpath": "/*[1]"
+            }
+          }
+        },
+        "mws_ids": [
+          54
+        ],
+        "math": {
+          "1": "\u003cm:math xmlns=\"http://zentralblatt.org\" alttext=\"\\bullet\" xml:id=\"m1.1\" display=\"inline\" xref=\"m1.1.cmml\"\u003e\u003cm:semantics xml:id=\"m1.1a\" xref=\"m1.1.cmml\"\u003e\u003cm:mo xml:id=\"m1.1.1\" xref=\"m1.1.1.cmml\"\u003e∙\u003c/m:mo\u003e\u003cm:annotation-xml xml:id=\"m1.1.cmml\" encoding=\"MathML-Content\" xref=\"m1.1\"\u003e\u003cm:ci xml:id=\"m1.1.1.cmml\" xref=\"m1.1.1\"\u003enormal-∙\u003c/m:ci\u003e\u003c/m:annotation-xml\u003e\u003cm:annotation xml:id=\"m1.1b\" encoding=\"application/x-tex\" xref=\"m1.1.cmml\"\u003e\\bullet\u003c/m:annotation\u003e\u003c/m:semantics\u003e\u003c/m:math\u003e",
+          "2": "\u003cm:math xmlns=\"http://zentralblatt.org\" alttext=\"\\bullet\" xml:id=\"m2.1\" display=\"inline\" xref=\"m2.1.cmml\"\u003e\u003cm:semantics xml:id=\"m2.1a\" xref=\"m2.1.cmml\"\u003e\u003cm:mo xml:id=\"m2.1.1\" xref=\"m2.1.1.cmml\"\u003e∙\u003c/m:mo\u003e\u003cm:annotation-xml xml:id=\"m2.1.cmml\" encoding=\"MathML-Content\" xref=\"m2.1\"\u003e\u003cm:ci xml:id=\"m2.1.1.cmml\" xref=\"m2.1.1\"\u003enormal-∙\u003c/m:ci\u003e\u003c/m:annotation-xml\u003e\u003cm:annotation xml:id=\"m2.1b\" encoding=\"application/x-tex\" xref=\"m2.1.cmml\"\u003e\\bullet\u003c/m:annotation\u003e\u003c/m:semantics\u003e\u003c/m:math\u003e",
+          "3": "\u003cm:math xmlns=\"http://zentralblatt.org\" alttext=\"\\bullet\" xml:id=\"m3.1\" display=\"inline\" xref=\"m3.1.cmml\"\u003e\u003cm:semantics xml:id=\"m3.1a\" xref=\"m3.1.cmml\"\u003e\u003cm:mo xml:id=\"m3.1.1\" xref=\"m3.1.1.cmml\"\u003e∙\u003c/m:mo\u003e\u003cm:annotation-xml xml:id=\"m3.1.cmml\" encoding=\"MathML-Content\" xref=\"m3.1\"\u003e\u003cm:ci xml:id=\"m3.1.1.cmml\" xref=\"m3.1.1\"\u003enormal-∙\u003c/m:ci\u003e\u003c/m:annotation-xml\u003e\u003cm:annotation xml:id=\"m3.1b\" encoding=\"application/x-tex\" xref=\"m3.1.cmml\"\u003e\\bullet\u003c/m:annotation\u003e\u003c/m:semantics\u003e\u003c/m:math\u003e"
+        }
+      },
+      "math_ids": [
+        {
+          "url": "",
+          "xpath": ""
+        },
+        {
+          "url": "",
+          "xpath": ""
+        },
+        {
+          "url": "",
+          "xpath": ""
+        },
+        {
+          "url": "1",
+          "xpath": "/*[1]"
+        },
+        {
+          "url": "2",
+          "xpath": "/*[1]"
+        },
+        {
+          "url": "3",
+          "xpath": "/*[1]"
+        }
+      ]
+    },
+    {
+      "id": "i3R6jWoBetFwNTV0IOAu",
+      "source": {
+        "metadata": {},
+        "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_sr1f6y.harvest.json",
+        "text": "html{border: 0px #006699 solid;border-left-width: 15px} body {margin: 15px;padding: 0px;background-color:#ffffff;color:black; font-family:helvetica;font-size: 14px;line-height: 1.4em} div.volume-title {font-size:24pt;text-align:center;font-weight:bold} div.title {font-style:italic;font-weight:bold} div.mathics {font-size:larger;font-weight:bold} span.mathics-zbl {float:right} div.matverw {font-size:smaller} div.review {margin:5mm 5mm 5mm 5mm} div.aunot {font-weight:bold} div.published {font-weight:bold} .number {font-style: italic; text-align:right} div.reviewer{font-style:italic;text-align:right} EN 62-01 62A01 62P20 book Yitzhaki, Shlomo; Schechtman, Edna Number: 6110087 The Gini methodology. A primer on a statistical methodology. 2013 Preliminary review / Publisher’s description: Gini’s mean difference (GMD) was first introduced by Corrado Gini in 1912 as an alternative measure of variability. GMD and the parameters which are derived from it (such as the Gini coefficient or the concentration ratio) have been in use in the area of income distribution for almost a century. In practice, the use of GMD as a measure of variability is justified whenever the investigator is not ready to impose, without questioning, the convenient world of normality. This makes the GMD of critical importance in the complex research of statisticians, economists, econometricians, and policy makers. This book focuses on imitating analyses that are based on variance by replacing variance with the GMD and its variants. In this way, the text showcases how almost everything that can be done with the variance as a measure of variability, can be replicated by using Gini. Beyond this, there are marked benefits to utilizing Gini as opposed to other methods. One of the advantages of using Gini methodology is that it provides a unified system that enables the user to learn about various aspects of the underlying distribution. It also provides a systematic method and a unified terminology. Using Gini methodology can reduce the risk of imposing assumptions that are not supported by the data on the model. With these benefits in mind the text uses the covariance-based approach, though applications to other approaches are mentioned as well.",
+        "mws_id": {},
+        "mws_ids": [],
+        "math": {}
+      },
+      "math_ids": []
+    },
+    {
+      "id": "63R6jWoBetFwNTV0G99z",
+      "source": {
+        "metadata": {},
+        "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_CVCRZU.harvest.json",
+        "text": "html{border: 0px #006699 solid;border-left-width: 15px} body {margin: 15px;padding: 0px;background-color:#ffffff;color:black; font-family:helvetica;font-size: 14px;line-height: 1.4em} div.volume-title {font-size:24pt;text-align:center;font-weight:bold} div.title {font-style:italic;font-weight:bold} div.mathics {font-size:larger;font-weight:bold} span.mathics-zbl {float:right} div.matverw {font-size:smaller} div.review {margin:5mm 5mm 5mm 5mm} div.aunot {font-weight:bold} div.published {font-weight:bold} .number {font-style: italic; text-align:right} div.reviewer{font-style:italic;text-align:right} EN 00A30 00A06 book Bindner, Donald; Erickson, Martin J.; Hemmeter, Joe Number: 6109138 Mathematics for the liberal arts. 2013 Preliminary review / Publisher’s description: Mathematics for the Liberal Arts provides a comprehensible and precise introduction to modern mathematics intertwined with the history of mathematical discoveries. The book discusses mathematical ideas in the context of the unfolding story of human thought and highlights the application of mathematics in everyday life. Divided into two parts, Mathematics for the Liberal Arts first traces the history of mathematics from the ancient world to the Middle Ages, then moves on to the Renaissance and finishes with the development of modern mathematics. In the second part, the book explores major topics of calculus and number theory, including problem-solving techniques and real-world applications. This book emphasizes learning through doing, presents a practical approach, and features. Mathematics for the Liberal Arts is an excellent introduction to the history and concepts of mathematics for undergraduate liberal arts students and readers in non-scientific fields wishing to gain a better understanding of mathematics and mathematical problem-solving skills.",
+        "mws_id": {},
+        "mws_ids": [],
+        "math": {}
+      },
+      "math_ids": []
+    },
+    {
+      "id": "1nR6jWoBetFwNTV0G99Z",
+      "source": {
+        "metadata": {},
+        "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_Uc0cZN.harvest.json",
+        "text": "html{border: 0px #006699 solid;border-left-width: 15px} body {margin: 15px;padding: 0px;background-color:#ffffff;color:black; font-family:helvetica;font-size: 14px;line-height: 1.4em} div.volume-title {font-size:24pt;text-align:center;font-weight:bold} div.title {font-style:italic;font-weight:bold} div.mathics {font-size:larger;font-weight:bold} span.mathics-zbl {float:right} div.matverw {font-size:smaller} div.review {margin:5mm 5mm 5mm 5mm} div.aunot {font-weight:bold} div.published {font-weight:bold} .number {font-style: italic; text-align:right} div.reviewer{font-style:italic;text-align:right} EN 62-07 00A71 62P99 book von Eye, Alexander; Mun, Eun-Young Number: 6108248 Log-linear modeling. Concepts, interpretation and application. 2013 Preliminary review / Publisher’s description: Highlighting advances that have lent to the topic’s distinct, coherent methodology over the past decade, Log-Linear Modeling: Concepts, Interpretation, and Application provides an essential, introductory treatment of the subject, featuring many new and advanced log-linear methods, models, and applications. The book begins with basic coverage of categorical data, and goes on to describe the basics of hierarchical log-linear models as well as decomposing effects in cross-classifications and goodness-of-fit tests. Additional topics include: – The generalized linear model (GLM) along with popular methods of coding such as effect coding and dummy coding – Parameter interpretation and how to ensure that the parameters reflect the hypotheses being studied – Symmetry, rater agreement, homogeneity of association, logistic regression, and reduced designs models Throughout the book, real-world data illustrate the application of models and understanding of the related results. In addition, each chapter utilizes R, SYSTAT, and âEM software, providing readers with an understanding of these programs in the context of hierarchical log-linear modeling. Log-Linear Modeling is an excellent book for courses on categorical data analysis at the upper-undergraduate and graduate levels. It also serves as an excellent reference for applied researchers in virtually any area of study, from medicine and statistics to the social sciences, who analyze empirical data in their everyday work.",
+        "mws_id": {},
+        "mws_ids": [],
+        "math": {}
+      },
+      "math_ids": []
+    },
+    {
+      "id": "8XR6jWoBetFwNTV0G99z",
+      "source": {
+        "metadata": {},
+        "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_CVCRZU.harvest.json",
+        "text": "html{border: 0px #006699 solid;border-left-width: 15px} body {margin: 15px;padding: 0px;background-color:#ffffff;color:black; font-family:helvetica;font-size: 14px;line-height: 1.4em} div.volume-title {font-size:24pt;text-align:center;font-weight:bold} div.title {font-style:italic;font-weight:bold} div.mathics {font-size:larger;font-weight:bold} span.mathics-zbl {float:right} div.matverw {font-size:smaller} div.review {margin:5mm 5mm 5mm 5mm} div.aunot {font-weight:bold} div.published {font-weight:bold} .number {font-style: italic; text-align:right} div.reviewer{font-style:italic;text-align:right} EN 90C29 65K05 book article Schütze, Oliver; Witting, Katrin; Ober-Blöbaum, Sina; Dellnitz, Michael Number: 1251.90356 Set oriented methods for the numerical treatment of multiobjective optimization problems. 2013 Summary: In many applications it is required to optimize several conflicting objectives concurrently leading to a multobjective optimization problem (MOP). The solution set of a MOP, the Pareto set, typically forms a math1 -dimensional object, where math2 is the number of objectives involved in the optimization problem. The purpose of this chapter is to give an overview of recently developed set oriented techniques – subdivision and continuation methods – for the computation of Pareto sets math3 of a given MOP. All these methods have in common that they create sequences of box collections which aim for a tight covering of math4 . Further, we present a class of multiobjective optimal control problems which can be efficiently handled by the set oriented continuation methods using a transformation into high-dimensional MOPs. We illustrate all the methods on both academic and real world examples.",
+        "mws_id": {
+          "15": {
+            "1": {
+              "url": "",
+              "xpath": "/*[1]/*[1]"
+            }
+          },
+          "173": {
+            "1": {
+              "url": "",
+              "xpath": "/*[1]"
+            }
+          },
+          "174": {
+            "3": {
+              "url": "",
+              "xpath": "/*[1]"
+            },
+            "4": {
+              "url": "",
+              "xpath": "/*[1]"
+            }
+          },
+          "53": {
+            "1": {
+              "url": "",
+              "xpath": "/*[1]/*[3]"
+            }
+          },
+          "6": {
+            "1": {
+              "url": "",
+              "xpath": "/*[1]/*[2]"
+            },
+            "2": {
+              "url": "",
+              "xpath": "/*[1]"
+            }
+          }
+        },
+        "mws_ids": [
+          6,
+          15,
+          53,
+          173,
+          174
+        ],
+        "math": {
+          "1": "\u003cm:math xmlns=\"http://zentralblatt.org\" alttext=\"(k-1)\" xml:id=\"m1.1\" display=\"inline\" xref=\"m1.1.cmml\"\u003e\u003cm:semantics xml:id=\"m1.1a\" xref=\"m1.1.cmml\"\u003e\u003cm:mrow xml:id=\"m1.1.6\" xref=\"m1.1.6.cmml\"\u003e\u003cm:mo xml:id=\"m1.1.6a\" xref=\"m1.1.6.cmml\"\u003e(\u003c/m:mo\u003e\u003cm:mrow xml:id=\"m1.1.6b\" xref=\"m1.1.6.cmml\"\u003e\u003cm:mi xml:id=\"m1.1.2\" xref=\"m1.1.2.cmml\"\u003ek\u003c/m:mi\u003e\u003cm:mo xml:id=\"m1.1.3\" xref=\"m1.1.3.cmml\"\u003e-\u003c/m:mo\u003e\u003cm:mn xml:id=\"m1.1.4\" xref=\"m1.1.4.cmml\"\u003e1\u003c/m:mn\u003e\u003c/m:mrow\u003e\u003cm:mo xml:id=\"m1.1.6c\" xref=\"m1.1.6.cmml\"\u003e)\u003c/m:mo\u003e\u003c/m:mrow\u003e\u003cm:annotation-xml xml:id=\"m1.1.cmml\" encoding=\"MathML-Content\" xref=\"m1.1\"\u003e\u003cm:apply xml:id=\"m1.1.6.cmml\" xref=\"m1.1.6\"\u003e\u003cm:minus xml:id=\"m1.1.3.cmml\" xref=\"m1.1.3\"/\u003e\u003cm:ci xml:id=\"m1.1.2.cmml\" xref=\"m1.1.2\"\u003ek\u003c/m:ci\u003e\u003cm:cn type=\"integer\" xml:id=\"m1.1.4.cmml\" xref=\"m1.1.4\"\u003e1\u003c/m:cn\u003e\u003c/m:apply\u003e\u003c/m:annotation-xml\u003e\u003cm:annotation xml:id=\"m1.1b\" encoding=\"application/x-tex\" xref=\"m1.1.cmml\"\u003e(k-1)\u003c/m:annotation\u003e\u003c/m:semantics\u003e\u003c/m:math\u003e",
+          "2": "\u003cm:math xmlns=\"http://zentralblatt.org\" alttext=\"k\" xml:id=\"m2.1\" display=\"inline\" xref=\"m2.1.cmml\"\u003e\u003cm:semantics xml:id=\"m2.1a\" xref=\"m2.1.cmml\"\u003e\u003cm:mi xml:id=\"m2.1.1\" xref=\"m2.1.1.cmml\"\u003ek\u003c/m:mi\u003e\u003cm:annotation-xml xml:id=\"m2.1.cmml\" encoding=\"MathML-Content\" xref=\"m2.1\"\u003e\u003cm:ci xml:id=\"m2.1.1.cmml\" xref=\"m2.1.1\"\u003ek\u003c/m:ci\u003e\u003c/m:annotation-xml\u003e\u003cm:annotation xml:id=\"m2.1b\" encoding=\"application/x-tex\" xref=\"m2.1.cmml\"\u003ek\u003c/m:annotation\u003e\u003c/m:semantics\u003e\u003c/m:math\u003e",
+          "3": "\u003cm:math xmlns=\"http://zentralblatt.org\" alttext=\"\\mathcal{P}\" xml:id=\"m3.1\" display=\"inline\" xref=\"m3.1.cmml\"\u003e\u003cm:semantics xml:id=\"m3.1a\" xref=\"m3.1.cmml\"\u003e\u003cm:mi xml:id=\"m3.1.1\" xref=\"m3.1.1.cmml\"\u003e𝒫\u003c/m:mi\u003e\u003cm:annotation-xml xml:id=\"m3.1.cmml\" encoding=\"MathML-Content\" xref=\"m3.1\"\u003e\u003cm:ci xml:id=\"m3.1.1.cmml\" xref=\"m3.1.1\"\u003e𝒫\u003c/m:ci\u003e\u003c/m:annotation-xml\u003e\u003cm:annotation xml:id=\"m3.1b\" encoding=\"application/x-tex\" xref=\"m3.1.cmml\"\u003e\\mathcal{P}\u003c/m:annotation\u003e\u003c/m:semantics\u003e\u003c/m:math\u003e",
+          "4": "\u003cm:math xmlns=\"http://zentralblatt.org\" alttext=\"\\mathcal{P}\" xml:id=\"m4.1\" display=\"inline\" xref=\"m4.1.cmml\"\u003e\u003cm:semantics xml:id=\"m4.1a\" xref=\"m4.1.cmml\"\u003e\u003cm:mi xml:id=\"m4.1.1\" xref=\"m4.1.1.cmml\"\u003e𝒫\u003c/m:mi\u003e\u003cm:annotation-xml xml:id=\"m4.1.cmml\" encoding=\"MathML-Content\" xref=\"m4.1\"\u003e\u003cm:ci xml:id=\"m4.1.1.cmml\" xref=\"m4.1.1\"\u003e𝒫\u003c/m:ci\u003e\u003c/m:annotation-xml\u003e\u003cm:annotation xml:id=\"m4.1b\" encoding=\"application/x-tex\" xref=\"m4.1.cmml\"\u003e\\mathcal{P}\u003c/m:annotation\u003e\u003c/m:semantics\u003e\u003c/m:math\u003e"
+        }
+      },
+      "math_ids": [
+        {
+          "url": "",
+          "xpath": ""
+        },
+        {
+          "url": "",
+          "xpath": ""
+        },
+        {
+          "url": "1",
+          "xpath": "/*[1]/*[2]"
+        },
+        {
+          "url": "2",
+          "xpath": "/*[1]"
+        },
+        {
+          "url": "",
+          "xpath": ""
+        },
+        {
+          "url": "1",
+          "xpath": "/*[1]/*[1]"
+        },
+        {
+          "url": "",
+          "xpath": ""
+        },
+        {
+          "url": "1",
+          "xpath": "/*[1]/*[3]"
+        },
+        {
+          "url": "",
+          "xpath": ""
+        },
+        {
+          "url": "1",
+          "xpath": "/*[1]"
+        },
+        {
+          "url": "",
+          "xpath": ""
+        },
+        {
+          "url": "",
+          "xpath": ""
+        },
+        {
+          "url": "3",
+          "xpath": "/*[1]"
+        },
+        {
+          "url": "4",
+          "xpath": "/*[1]"
+        }
+      ]
+    },
+    {
+      "id": "GnR6jWoBetFwNTV0HOAI",
+      "source": {
+        "metadata": {},
+        "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_Tlx8py.harvest.json",
+        "text": "html{border: 0px #006699 solid;border-left-width: 15px} body {margin: 15px;padding: 0px;background-color:#ffffff;color:black; font-family:helvetica;font-size: 14px;line-height: 1.4em} div.volume-title {font-size:24pt;text-align:center;font-weight:bold} div.title {font-style:italic;font-weight:bold} div.mathics {font-size:larger;font-weight:bold} span.mathics-zbl {float:right} div.matverw {font-size:smaller} div.review {margin:5mm 5mm 5mm 5mm} div.aunot {font-weight:bold} div.published {font-weight:bold} .number {font-style: italic; text-align:right} div.reviewer{font-style:italic;text-align:right} EN 65-02 65F15 65F10 book Liesen, Jörg; Strakoš, Zdeněk Number: 6110080 Krylov subspace methods. Principle and analysis. 2013 Preliminary review / Publisher’s description: The mathematical theory of Krylov subspace methods with a focus on solving systems of linear algebraic equations is given a detailed treatment in this principles-based book. Starting from the idea of projections, Krylov subspace methods are characterised by their orthogonality and minimisation properties. Projections onto highly nonlinear Krylov subspaces can be linked with the underlying problem of moments, and therefore Krylov subspace methods can be viewed as matching moments model reduction. This allows enlightening reformulations of questions from matrix computations into the language of orthogonal polynomials, Gauss-Christoffel quadrature, continued fractions, and, more generally, of Vorobyev’s method of moments. Using the concept of cyclic invariant subspaces, conditions are studied that allow the generation of orthogonal Krylov subspace bases via short recurrences. The results motivate the important practical distinction between Hermitian and non-Hermitian problems. Finally, the book thoroughly addresses the computational cost while using Krylov subspace methods. The investigation includes effects of finite precision arithmetic and focuses on the method of conjugate gradients (CG) and generalised minimal residuals (GMRES) as major examples. There is an emphasis on the way algebraic computations must always be considered in the context of solving real-world problems, where the mathematical modelling, discretisation and computation cannot be separated from each other. The book also underlines the importance of the historical context and demonstrates that knowledge of early developments can play an important role in understanding and resolving very recent computational problems. Many extensive historical notes are included as an inherent part of the text as well as the formulation of some omitted issues and challenges which need to be addressed in future work. This book is applicable to a wide variety of graduate courses on Krylov subspace methods and related subjects, as well as benefiting those interested in the history of mathematics. Readership: Researchers and graduate students in numerical methods, matrix algebra, approximation theory, and engineering. Researchers in the area of Krylov subspace methods and in related areas, including the history of mathematics.",
+        "mws_id": {},
+        "mws_ids": [],
+        "math": {}
+      },
+      "math_ids": []
+    },
+    {
+      "id": "w3R6jWoBetFwNTV0Gt_O",
+      "source": {
+        "metadata": {},
+        "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_JpJaMR.harvest.json",
+        "text": "html{border: 0px #006699 solid;border-left-width: 15px} body {margin: 15px;padding: 0px;background-color:#ffffff;color:black; font-family:helvetica;font-size: 14px;line-height: 1.4em} div.volume-title {font-size:24pt;text-align:center;font-weight:bold} div.title {font-style:italic;font-weight:bold} div.mathics {font-size:larger;font-weight:bold} span.mathics-zbl {float:right} div.matverw {font-size:smaller} div.review {margin:5mm 5mm 5mm 5mm} div.aunot {font-weight:bold} div.published {font-weight:bold} .number {font-style: italic; text-align:right} div.reviewer{font-style:italic;text-align:right} EN 35L variational principle; semi-inverse method serial article He, Ji-Huan Number: 6107015 Lagrangian for nonlinear perturbed heat and wave equations. 2013 Summary: The perturbed heat and wave equations [A.H. Bokhari, A.G. Johnpillai, F.M. Mahomed, F.D. Zaman, Approximate conservation laws of nonlinear perturbed heat and wave equations, Nonlinear Analysis. Real World Applications 13 (2012) 2823 – 2829] are studied, which were considered to admit no standard Lagrangian. By the semi-inverse method, however, an exact Lagrangian is obtained and its proof is given.",
+        "mws_id": {},
+        "mws_ids": [],
+        "math": {}
+      },
+      "math_ids": []
+    }
+  ]
+}

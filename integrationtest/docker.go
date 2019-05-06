@@ -12,7 +12,7 @@ import (
 
 // StartDockerService starts a docker-compose configured service if the short tests are not set
 // and then blocks until a url returns http status code 200
-func StartDockerService(service string, urls ...string) (err error) {
+func StartDockerService(service string, urls ...string) (client *http.Client, err error) {
 	if testing.Short() {
 		return
 	}
@@ -23,7 +23,7 @@ func StartDockerService(service string, urls ...string) (err error) {
 	}
 
 	// create a new client and wait group
-	client := &http.Client{}
+	client = &http.Client{}
 
 	group := &sync.WaitGroup{}
 	group.Add(len(urls))
@@ -31,15 +31,22 @@ func StartDockerService(service string, urls ...string) (err error) {
 	for _, url := range urls {
 		go func(url string) {
 			defer group.Done()
+
+			fmt.Printf("Waiting for %q to return HTTP 200 ", url)
+
 			for {
 				if testing.Verbose() {
-					fmt.Printf("Checking if %q returns HTTP 200 ...\n", url)
+					fmt.Print(".")
 				}
 				res, err := client.Get(url)
 				if err == nil && res.StatusCode == 200 {
 					break
 				}
 				time.Sleep(1 * time.Second) // wait for the next one
+			}
+
+			if testing.Verbose() {
+				fmt.Println(" ok")
 			}
 		}(url)
 	}
