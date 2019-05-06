@@ -33,6 +33,6 @@ testdeps:
 
 # Integration Tests
 integrationdeps:
-	cd test && docker-compose pull
+	cd integrationtest/testdata && docker-compose pull
 integrationtest: testdeps
-	CGO_ENABLED=0 $(GOTEST) -v ./cmd/...
+	CGO_ENABLED=0 $(GOTEST) -v -p 1 ./cmd/...
