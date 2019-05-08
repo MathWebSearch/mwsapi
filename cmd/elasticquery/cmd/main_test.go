@@ -8,7 +8,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	integrationtest.Main(m, "elasticquery_elastic", func(client *http.Client) error {
+	integrationtest.Main(m, "docker-compose-elasticquery.yml", func(client *http.Client) error {
 		return integrationtest.LoadElasticSnapshot(client, "http://localhost:9300", "/snapshots/")
 	}, "http://localhost:9300/")
 }

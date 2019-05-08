@@ -5,16 +5,17 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"sync"
 	"testing"
 	"time"
+
+	"github.com/MathWebSearch/mwsapi/utils/gogroup"
 )
 
-// StartDockerService starts a docker-compose configured service
+// StartDockerService starts docker-compose configured services from the given servicefile
 // and then blocks until a url returns http status code 200
 func StartDockerService(service string, urls ...string) (client *http.Client, err error) {
 
-	err = runExternalCommand("docker-compose", "up", "--force-recreate", "-d", service)
+	err = runExternalCommand("docker-compose", "-f", service, "up", "--remove-orphans", "--force-recreate", "-d")
 	if err != nil {
 		return
 	}
@@ -22,29 +23,38 @@ func StartDockerService(service string, urls ...string) (client *http.Client, er
 	// create a new client and wait group
 	client = &http.Client{}
 
-	group := &sync.WaitGroup{}
-	group.Add(len(urls))
+	group := gogroup.NewWorkGroup(0, true)
 
 	for _, url := range urls {
-		go func(url string) {
-			defer group.Done()
-
-			fmt.Printf("Waiting for %q to return HTTP 200 ", url)
-
-			for {
+		func(url string) {
+			job := gogroup.GroupJob(func(sync func(func())) error {
 				if testing.Verbose() {
-					fmt.Print(".")
+					sync(func() {
+						fmt.Printf("Waiting for %q to return HTTP 200 ", url)
+					})
 				}
-				res, err := client.Get(url)
-				if err == nil && res.StatusCode == 200 {
-					break
-				}
-				time.Sleep(1 * time.Second) // wait for the next one
-			}
 
-			if testing.Verbose() {
-				fmt.Println(" ok")
-			}
+				for {
+					if testing.Verbose() {
+						sync(func() {
+							fmt.Print(".")
+						})
+					}
+					res, err := client.Get(url)
+					if err == nil && res.StatusCode == 200 {
+						break
+					}
+					time.Sleep(1 * time.Second) // wait for the next one
+				}
+
+				if testing.Verbose() {
+					sync(func() { fmt.Println(" ok") })
+				}
+
+				return nil
+			})
+
+			group.Add(&job)
 		}(url)
 	}
 
@@ -53,18 +63,12 @@ func StartDockerService(service string, urls ...string) (client *http.Client, er
 	return
 }
 
-// StopDockerService gracefully stops and then removes a docker-compose configured service if the short flag is not set
-// and all of it's associated volumes
-func StopDockerService(service string) (err error) {
+// StopDockerService gracefully stops and removes the docker-compose configured services from servicefile
+// including all volumes
+func StopDockerService(servicefile string) (err error) {
 
 	// stop the service
-	err = runExternalCommand("docker-compose", "stop", service)
-	if err != nil {
-		return
-	}
-
-	// remove it and its (anonymous volumes)
-	return runExternalCommand("docker-compose", "rm", "-f", "-v", service)
+	return runExternalCommand("docker-compose", "-f", servicefile, "down", "-v")
 }
 
 // runExternalCommand runs an external command in the TestDataPath directory

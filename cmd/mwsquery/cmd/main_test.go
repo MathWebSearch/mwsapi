@@ -7,7 +7,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	integrationtest.Main(m, "mwsquery_mws", nil, "http://localhost:8080/")
+	integrationtest.Main(m, "docker-compose-mwsquery.yml", nil, "http://localhost:8080/")
 }
 
 func TestMWSQuery(t *testing.T) {

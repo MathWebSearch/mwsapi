@@ -1,0 +1,19 @@
+version: '3'
+services:
+  mws:
+    image: mathwebsearch/mathwebsearch
+    ports:
+      - "8181:8080"
+    volumes:
+      - ./data/harvests:/data/
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
+    environment:
+      - "discovery.type=single-node"
+      - "path.repo=/snapshots/"
+    volumes:
+      - "./data/snapshot:/snapshots/:ro"
+      - "/usr/share/elasticsearch/data"
+    ports:
+      - "9400:9200"
+  
