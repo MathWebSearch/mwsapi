@@ -10,12 +10,9 @@ import (
 	"time"
 )
 
-// StartDockerService starts a docker-compose configured service if the short tests are not set
+// StartDockerService starts a docker-compose configured service
 // and then blocks until a url returns http status code 200
 func StartDockerService(service string, urls ...string) (client *http.Client, err error) {
-	if testing.Short() {
-		return
-	}
 
 	err = runExternalCommand("docker-compose", "up", "--force-recreate", "-d", service)
 	if err != nil {
@@ -59,9 +56,6 @@ func StartDockerService(service string, urls ...string) (client *http.Client, er
 // StopDockerService gracefully stops and then removes a docker-compose configured service if the short flag is not set
 // and all of it's associated volumes
 func StopDockerService(service string) (err error) {
-	if testing.Short() {
-		return
-	}
 
 	// stop the service
 	err = runExternalCommand("docker-compose", "stop", service)

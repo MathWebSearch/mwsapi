@@ -66,10 +66,11 @@ func (q *ElasticQuery) RawHighlightQuery(res *result.Hit) (RawElasticQuery, *ela
 	for _, math := range res.Math {
 		matcher := elastic.NewMatchQuery("text", math.RealMathID()).MinimumShouldMatch("2").Operator("or")
 		q2 = q2.Must(matcher)
+		nonEmptyQuery = true
 	}
 
 	if !nonEmptyQuery {
-		return nil, nil, errors.New("Query had neither text nor mws_ids")
+		return nil, nil, errors.New("elastic-highlight: Neither text nor ids provided")
 	}
 
 	// build the highlight itself

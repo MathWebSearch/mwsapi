@@ -2,7 +2,6 @@ package integrationtest
 
 import (
 	"flag"
-	"fmt"
 	"net/http"
 	"os"
 	"testing"
@@ -15,21 +14,25 @@ func Main(m *testing.M, service string, init func(client *http.Client) error, ur
 	flag.Parse()
 
 	var code int
-	defer os.Exit(code)
+	defer func() {
+		os.Exit(code)
+	}()
 
-	// start the docker service
-	client, err := StartDockerService(service, urls...)
-	if err != nil {
-		panic(err)
-	}
-	defer StopDockerService(service)
-
-	// run init code
-	if init != nil {
-		if err := init(client); err != nil {
-			fmt.Println(err.Error())
+	if !testing.Short() {
+		// start the docker service
+		client, err := StartDockerService(service, urls...)
+		if err != nil {
 			code = 1
-			return
+			panic(err)
+		}
+		defer StopDockerService(service)
+
+		// run init code
+		if init != nil {
+			if err := init(client); err != nil {
+				code = 1
+				panic(err)
+			}
 		}
 	}
 

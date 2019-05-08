@@ -62,8 +62,10 @@ func newDocumentHit(obj *elasticutils.Object) (hit *result.Hit, err error) {
 
 		// sort the keys in alphabetical order
 		keys := make([]string, len(data))
+		count := 0
 		for key := range data {
-			keys = append(keys, key)
+			keys[count] = key
+			count++
 		}
 		sort.Strings(keys)
 
