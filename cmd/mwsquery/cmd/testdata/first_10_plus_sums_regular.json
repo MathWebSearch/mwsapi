@@ -5,10 +5,12 @@
   "size": 10,
   "qvars": [
     {
-      "name": "x"
+      "name": "x",
+      "xpath": "/*[2]"
     },
     {
-      "name": "y"
+      "name": "y",
+      "xpath": "/*[3]"
     }
   ],
   "hits": [

@@ -5,7 +5,8 @@
     "size": 10,
     "qvars": [
       {
-        "name": "x"
+        "name": "x",
+        "xpath": ""
       }
     ],
     "ids": [

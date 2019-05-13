@@ -5,22 +5,42 @@ import (
 	"strings"
 )
 
-// MathInfo represents information about a math element within a result
-type MathInfo struct {
-	Source string `json:"source,omitempty"` // html source code of this formula (if any)
-	URL    string `json:"url"`              // URL of the replaced formula
-	XPath  string `json:"xpath"`            // xpath of the term within the formula
+// MathFormula represents information about a single located math formula
+// It supports JSON Marshal + Unmarshal (for reading it from mws results and sending it to the user)
+// And XML Un-Marshelling (for reading it as part of raw harvest data)
+type MathFormula struct {
+	Source string `json:"source,omitempty" xml:"innerxml"` // html source code of this formula (if any)
+
+	DocumentURL string `json:"durl,omitempty" xml:"-"`  // document url (if any)
+	LocalID     string `json:"url" xml:"local_id,attr"` // local formula id
+
+	XPath        string            `json:"xpath,omitempty" xml:"-"` // XPath from the formula -> query
+	Substitution map[string]string `json:"subst,omitempty" xml:"-"` // values for the replaced terms
 }
 
-// ID returns the (local) id for this MathInfo Element
-func (info *MathInfo) ID() string {
-	parts := strings.Split(info.URL, "#")
-	return parts[len(parts)-1]
+// TODO: Rename local-id field in json
+// TODO: Add JSON + XML Tests
+// TODO: Check if we need the documentURL
+
+// SetURL sets the url of a MathInfo object
+func (formula *MathFormula) SetURL(url string) {
+	idx := strings.LastIndex(url, "#")
+
+	// if we have no '#' we only have a local id
+	if idx == -1 {
+		formula.DocumentURL = ""
+		formula.LocalID = url
+		return
+	}
+
+	// set the appropriate parts of the url
+	formula.DocumentURL = url[:idx]
+	formula.LocalID = url[idx+1:]
 }
 
 // RealMathID return the real math id
-func (info *MathInfo) RealMathID() string {
-	mathid := info.ID()
+func (formula *MathFormula) RealMathID() string {
+	mathid := formula.LocalID
 	if _, err := strconv.Atoi(mathid); err == nil {
 		return "math" + mathid
 	}
@@ -29,5 +49,6 @@ func (info *MathInfo) RealMathID() string {
 
 // Variable represents a query variable
 type Variable struct {
-	Name string `json:"name"` // the name of this query variable
+	Name  string `json:"name"`  // name of the variable
+	XPath string `json:"xpath"` // xpath of the variable relative to the root
 }

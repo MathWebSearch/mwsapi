@@ -12,7 +12,6 @@ import (
 
 // newDocumentResult populates a non-nil result by using results form a page
 func newDocumentResult(res *result.Result, page *elasticutils.ResultsPage) (err error) {
-
 	// it is an elasticsearch document query
 	res.Kind = "elastic-document"
 
@@ -51,7 +50,7 @@ func newDocumentHit(obj *elasticutils.Object) (hit *result.Hit, err error) {
 	hit.Element = &raw
 
 	// create the math elements, without knowing the size beforehand
-	hit.Math = []*result.MathInfo{}
+	hit.Math = []*result.MathFormula{}
 
 	for _, mwsid := range raw.MWSNumbers {
 		// load the data
@@ -71,11 +70,9 @@ func newDocumentHit(obj *elasticutils.Object) (hit *result.Hit, err error) {
 
 		// and iterate over it
 		for _, key := range keys {
-			value := data[key]
-			hit.Math = append(hit.Math, &result.MathInfo{
-				URL:   key,
-				XPath: value.XPath,
-			})
+			res := &result.MathFormula{XPath: data[key].XPath}
+			res.SetURL(key)
+			hit.Math = append(hit.Math, res)
 		}
 	}
 
@@ -98,9 +95,9 @@ func newHighlightHit(hit *result.Hit, obj *elasticutils.Object) (err error) {
 	// map() over doc.Math
 	for i, math := range hit.Math {
 		var ok bool
-		hit.Math[i].Source, ok = hit.Element.MathSource[math.ID()]
+		hit.Math[i].Source, ok = hit.Element.MathSource[math.LocalID]
 		if !ok {
-			return fmt.Errorf("Result %s with source info %#v missing info for %s", hit.ID, hit.Element.MathSource, math.ID())
+			return fmt.Errorf("Result %s with source info %#v missing info for %s", hit.ID, hit.Element.MathSource, math.LocalID)
 		}
 	}
 

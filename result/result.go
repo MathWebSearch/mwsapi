@@ -41,5 +41,5 @@ type Hit struct {
 	Snippets []string `json:"snippets,omitempty"` // extracts of this hit (if any)
 	XHTML    string   `json:"xhtml,omitempty"`    // xhtml source of this hit (if available)
 
-	Math []*MathInfo `json:"math_ids"` // math found within this hit
+	Math []*MathFormula `json:"math_ids"` // math found within this hit
 }

@@ -3,6 +3,7 @@ package integrationtest
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -18,7 +19,18 @@ func TestJSONAsset(t *testing.T, name string, res interface{}, filename string) 
 
 	// load the file or fail
 	ebytes, err := ioutil.ReadFile(filename)
-	if err != nil {
+
+	// file does not exist => create an empty asset
+	if err != nil && os.IsNotExist(err) {
+		t.Errorf("%s Unable to load asset %q, creating file with 'null' in it. ", name, filename)
+		ebytes, err = writeJSONFile(t, nil, filename)
+		if err != nil {
+			t.Errorf("%s Unable to write asset %q: %s", name, filename, err.Error())
+			return false
+		}
+
+		// else just throw the error message
+	} else if err != nil {
 		t.Errorf("%s Unable to load asset %q: %s", name, filename, err.Error())
 		return false
 	}
