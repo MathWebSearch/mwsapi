@@ -16,7 +16,7 @@ type rawResult struct {
 
 	TookInMS int `json:"time"` // how long the query took, in ms
 
-	Variables []*result.Variable `json:"qvars"` // list of query variables in the original query
+	Variables []*result.QueryVariable `json:"qvars"` // list of query variables in the original query
 
 	MathWebSearchIDs []int64       `json:"ids,omitempty"`  // MathWebSearchIds
 	Hits             []*result.Hit `json:"hits,omitempty"` // the actual hits of this element

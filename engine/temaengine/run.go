@@ -67,7 +67,7 @@ func runTemaSearchQuery(conn *connection.TemaConnection, q *query.Query, res *re
 	nextinnerfrom := from    // the next inner 'from'
 	hadinnerresults := false // did we take care of inner results
 
-	res.Variables = []*result.Variable{}
+	res.Variables = []*result.QueryVariable{}
 	setvariables := false
 
 	maxHits := int(size)                                  // the maximum number of hits

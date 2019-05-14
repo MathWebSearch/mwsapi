@@ -4,7 +4,8 @@ import (
 	"time"
 )
 
-// Result represents an arbirary result
+// Result represents a Query Result
+// which can be from either MathWebSearch, ElasticSearch or a combined TemaSearch Result
 type Result struct {
 	Kind string `json:"kind"` // the kind of query this is a result to
 
@@ -15,7 +16,7 @@ type Result struct {
 	From  int64 `json:"from"`  // result number this page starts at
 	Size  int64 `json:"size"`  // (maximum) number of results in this page
 
-	Variables []*Variable `json:"qvars,omitempty"` // the list of
+	Variables []*QueryVariable `json:"qvars,omitempty"` // the list of
 
 	HitIDs []int64 `json:"ids,omitempty"`  // the ids of the hits
 	Hits   []*Hit  `json:"hits,omitempty"` // the current page of hits

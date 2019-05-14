@@ -46,9 +46,3 @@ func (formula *MathFormula) RealMathID() string {
 	}
 	return mathid
 }
-
-// Variable represents a query variable
-type Variable struct {
-	Name  string `json:"name"`  // name of the variable
-	XPath string `json:"xpath"` // xpath of the variable relative to the root
-}
