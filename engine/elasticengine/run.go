@@ -64,7 +64,7 @@ func Run(conn *connection.ElasticConnection, q *query.ElasticQuery, from int64, 
 	}
 
 	// add the time taken
-	res.Kind = "elastic"
+	res.Kind = result.ElasticKind
 	res.TookComponents["highlight"] = &tookTotal
 
 	return

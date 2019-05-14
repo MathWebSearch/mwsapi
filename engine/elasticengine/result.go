@@ -13,7 +13,7 @@ import (
 // newDocumentResult populates a non-nil result by using results form a page
 func newDocumentResult(res *result.Result, page *elasticutils.ResultsPage) (err error) {
 	// it is an elasticsearch document query
-	res.Kind = "elastic-document"
+	res.Kind = result.ElasticDocumentKind
 
 	// prepare result objejct
 	res.Total = page.Total

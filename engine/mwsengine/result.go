@@ -37,7 +37,7 @@ func newMWSResult(res *result.Result, response *http.Response) (err error) {
 	took := time.Duration(raw.TookInMS) * time.Millisecond
 	res.Took = &took
 
-	res.Kind = "mwsd"
+	res.Kind = result.MathWebSearchKind
 	res.Total = raw.Total
 
 	res.TookComponents = map[string]*time.Duration{

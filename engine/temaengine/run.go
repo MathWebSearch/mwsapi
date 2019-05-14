@@ -58,9 +58,10 @@ func runTemaSearchQuery(conn *connection.TemaConnection, q *query.Query, res *re
 		return
 	}
 
+	res.Kind = result.TemaSearchKind
 	res.Hits = []*result.Hit{} // buffer for the inner hits
-	// TODO: Allocate this into max size from the start, and then buffer
 
+	// TODO: Allocate this into max size from the start, and then buffer
 	outerfrom := int64(0) // current start index for outer queries
 	innerfrom := from     // offset for the inner query
 
