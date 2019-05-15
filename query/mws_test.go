@@ -30,7 +30,7 @@ func TestMWSQuery_Raw(t *testing.T) {
 			ReturnTotal:  true,
 			OutputFormat: "json",
 
-			Expressions: []*MWSExpression{&MWSExpression{"<mws:qvar>x</mws:qvar>", xml.Name{}}},
+			Expressions: []*MWSExpression{&MWSExpression{xml.Name{}, "<mws:qvar>x</mws:qvar>"}},
 		}},
 
 		{"with mws-ids", fields{[]string{"<mws:qvar>x</mws:qvar>"}, true}, args{56, 74}, &RawMWSQuery{
@@ -40,7 +40,7 @@ func TestMWSQuery_Raw(t *testing.T) {
 			ReturnTotal:  true,
 			OutputFormat: "mws-ids",
 
-			Expressions: []*MWSExpression{&MWSExpression{"<mws:qvar>x</mws:qvar>", xml.Name{}}},
+			Expressions: []*MWSExpression{&MWSExpression{xml.Name{}, "<mws:qvar>x</mws:qvar>"}},
 		}},
 	}
 	for _, tt := range tests {

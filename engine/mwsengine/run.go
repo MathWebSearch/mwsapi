@@ -57,8 +57,7 @@ func runRaw(conn *connection.MWSConnection, q *query.RawMWSQuery) (res *result.R
 		From: q.From,
 		Size: q.Size,
 	}
+	err = res.UnmarshalMWS(resp)
 
-	// and get the response
-	err = newMWSResult(res, resp)
 	return
 }
