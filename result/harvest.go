@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"strings"
+
+	"github.com/MathWebSearch/mwsapi/utils"
 )
 
 // HarvestElement represents an <mws:data> harvest node, which can be contained both within ElasticSearch and MWS
@@ -19,27 +21,19 @@ type HarvestElement struct {
 	MathSource map[string]string `json:"math"` // Source of replaced math elements within this document
 }
 
-type xHarvestElement struct {
-	XMLName xml.Name `xml:"data"`
-
-	ID struct {
-		Value string `xml:",innerxml"`
-	} `xml:"id"`
-	Text struct {
-		Value string `xml:",innerxml"`
-	} `xml:"text"`
-
-	Metadata struct {
-		Value string `xml:",innerxml"`
-	} `xml:"metadata"`
-
-	Math []*MathFormula `xml:"math"`
-}
-
 // UnmarshalXML unmarshals xml into a harvest element
 func (he *HarvestElement) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
-	// read an xharvestelement
-	var h xHarvestElement
+	// raw data
+	var h struct {
+		XMLName xml.Name `xml:"data"`
+
+		ID   utils.InnerXML `xml:"id"`
+		Text utils.InnerXML `xml:"text"`
+
+		Metadata utils.InnerXML `xml:"metadata"`
+
+		Math []*MathFormula `xml:"math"`
+	}
 	err = d.DecodeElement(&h, &start)
 	if err != nil {
 		return
@@ -47,12 +41,12 @@ func (he *HarvestElement) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (
 
 	// turn it into a harvestelement
 	*he = HarvestElement{
-		Segment: h.ID.Value,
-		Text:    h.Text.Value,
+		Segment: string(h.ID),
+		Text:    string(h.Text),
 	}
 
 	// load the metadata, and set it to an {} if omitted
-	v := strings.TrimSpace(h.Metadata.Value)
+	v := strings.TrimSpace(string(h.Metadata))
 	if v == "" {
 		v = "{}"
 	}

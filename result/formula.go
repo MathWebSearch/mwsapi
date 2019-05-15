@@ -18,10 +18,6 @@ type MathFormula struct {
 	Substitution map[string]string `json:"subst,omitempty"` // values for the replaced terms
 }
 
-// TODO: Rename local-id field in json
-// TODO: Add JSON + XML Tests
-// TODO: Check if we need the documentURL
-
 // SetURL sets the url of a MathInfo object
 func (formula *MathFormula) SetURL(url string) {
 	idx := strings.LastIndex(url, "#")
