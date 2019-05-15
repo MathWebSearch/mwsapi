@@ -15,8 +15,8 @@ type HarvestElement struct {
 
 	Text string `json:"text"` // Text of this element
 
-	MWSPaths   map[int64]map[string]MathFormula `json:"mws_id"`  // information about each identifier within this document
-	MWSNumbers []int64                          `json:"mws_ids"` // list of identifiers within this document
+	MWSPaths   map[int64]map[string]MathFormula `json:"mws_id,omitempty"`  // information about each identifier within this document
+	MWSNumbers []int64                          `json:"mws_ids,omitempty"` // list of identifiers within this document
 
 	MathSource map[string]string `json:"math"` // Source of replaced math elements within this document
 }
