@@ -16,7 +16,7 @@ func TestMain(m *testing.M) {
 const MWSXMLAnyQuery = "<mws:qvar>x</mws:qvar>"
 const MWSXMLPlusQuery = "<m:apply><plus /><mws:qvar>x</mws:qvar><mws:qvar>y</mws:qvar></m:apply>"
 
-func TestMWSQuery(t *testing.T) {
+func TestTemaQuery(t *testing.T) {
 	integrationtest.MarkSkippable(t)
 
 	tests := []struct {

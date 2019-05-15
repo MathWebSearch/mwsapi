@@ -10,7 +10,7 @@ func TestMain(m *testing.M) {
 	integrationtest.Main(m, "docker-compose-elasticsync.yml", nil, "http://localhost:9200/")
 }
 
-func TestMWSQuery(t *testing.T) {
+func TestElasticSync(t *testing.T) {
 	integrationtest.MarkSkippable(t)
 
 	tests := []struct {

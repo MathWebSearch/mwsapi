@@ -13,7 +13,7 @@ func TestMain(m *testing.M) {
 	}, "http://localhost:9300/")
 }
 
-func TestMWSQuery(t *testing.T) {
+func TestElasticQuery(t *testing.T) {
 	integrationtest.MarkSkippable(t)
 
 	tests := []struct {
