@@ -8,13 +8,13 @@ import (
 )
 
 // checkSegmentIndex checks the segment index for a given segment
-func (proc *Process) checkSegmentIndex(segment string) (segobj *result.ElasticSegment, obj *elasticutils.Object, created bool, err error) {
+func (proc *Process) checkSegmentIndex(segment string) (segobj *result.HarvestSegment, obj *elasticutils.Object, created bool, err error) {
 	// the query
 	q := elastic.NewBoolQuery()
 	q = q.Must(elastic.NewTermQuery("segment", segment))
 
 	// the fields
-	segFields := result.ElasticSegment{
+	segFields := result.HarvestSegment{
 		ID:      segment,
 		Hash:    "",
 		Touched: true,

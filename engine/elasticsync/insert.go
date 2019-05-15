@@ -18,7 +18,7 @@ func (proc *Process) insertSegmentHarvests(segment string) error {
 	go func() {
 		e := utils.ProcessLinePairs(segment, true, func(_, contentLine string) (err error) {
 			// unmarshal the content
-			var content *result.ElasticElement
+			var content *result.HarvestElement
 			err = json.Unmarshal([]byte(contentLine), &content)
 			if err != nil {
 				return

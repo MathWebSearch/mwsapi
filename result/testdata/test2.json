@@ -1,0 +1,8 @@
+{
+    "segment": "in/6109972/6109972.xhtml",
+    "metadata": {},
+    "mws_ids": [],
+    "mws_id": {},
+    "math": {},
+    "text": "html{border: 0px #006699 solid;border-left-width: 15px} body {margin: 15px;padding: 0px;background-color:#ffffff;color:black; font-family:helvetica;font-size: 14px;line-height: 1.4em} div.volume-title {font-size:24pt;text-align:center;font-weight:bold} div.title {font-style:italic;font-weight:bold} div.mathics {font-size:larger;font-weight:bold} span.mathics-zbl {float:right} div.matverw {font-size:smaller} div.review {margin:5mm 5mm 5mm 5mm} div.aunot {font-weight:bold} div.published {font-weight:bold} .number {font-style: italic; text-align:right} div.reviewer{font-style:italic;text-align:right} EN 35Q35 76W05 35A01 35A02 Riemann problem; elementary wave; Magnetogasdynamics; shock wave; rarefaction wave serial article Liu, Yujin; Sun, Wenhua Number: 6109972 Riemann problem and wave interactions in Magnetogasdynamics. 2013 Summary: This paper is mainly concerned with the Riemann problem for one-dimensional ideal isentropic Magnetogasdynamics with transverse magnetic field. The existence and uniqueness of the solutions of the Riemann problem are obtained constructively with the characteristic method. Furthermore, we investigate the interactions of the elementary waves."
+}

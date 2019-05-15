@@ -42,7 +42,7 @@ func (proc *Process) clearSegments() (err error) {
 
 // clearSegment removes a single segment
 func (proc *Process) clearSegment(sync func(func()), so *elasticutils.Object) (err error) {
-	segment := &result.ElasticSegment{}
+	segment := &result.HarvestSegment{}
 	err = so.Unpack(segment)
 	if err != nil {
 		return
@@ -72,7 +72,7 @@ func (proc *Process) clearSegment(sync func(func()), so *elasticutils.Object) (e
 }
 
 // clearSegmentHarvests clears segments belonging to a harvest
-func (proc *Process) clearSegmentHarvests(segment *result.ElasticSegment) error {
+func (proc *Process) clearSegmentHarvests(segment *result.HarvestSegment) error {
 	q := elastic.NewBoolQuery()
 	q = q.Must(elastic.NewTermQuery("segment", segment.ID))
 

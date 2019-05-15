@@ -9,13 +9,13 @@ import (
 // It supports JSON Marshal + Unmarshal (for reading it from mws results and sending it to the user)
 // And XML Un-Marshelling (for reading it as part of raw harvest data)
 type MathFormula struct {
-	Source string `json:"source,omitempty" xml:"innerxml"` // html source code of this formula (if any)
+	Source string `json:"source,omitempty" xml:",chardata"` // html source code of this formula (if any)
 
-	DocumentURL string `json:"durl,omitempty" xml:"-"`  // document url (if any)
+	DocumentURL string `json:"durl,omitempty"`          // document url (if any)
 	LocalID     string `json:"url" xml:"local_id,attr"` // local formula id
 
-	XPath        string            `json:"xpath,omitempty" xml:"-"` // XPath from the formula -> query
-	Substitution map[string]string `json:"subst,omitempty" xml:"-"` // values for the replaced terms
+	XPath        string            `json:"xpath,omitempty"` // XPath from the formula -> query
+	Substitution map[string]string `json:"subst,omitempty"` // values for the replaced terms
 }
 
 // TODO: Rename local-id field in json

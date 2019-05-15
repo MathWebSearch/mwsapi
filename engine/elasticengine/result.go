@@ -42,7 +42,7 @@ func newDocumentHit(obj *elasticutils.Object) (hit *result.Hit, err error) {
 	}
 
 	// unpack the result element we get from elastic
-	var raw result.ElasticElement
+	var raw result.HarvestElement
 	err = obj.Unpack(&raw)
 	if err != nil {
 		return

@@ -7,7 +7,7 @@ type Hit struct {
 	URL   string `json:"url,omitempty"` // the url of the document returned
 	XPath string `json:"xpath"`         // the xpath of the query term to the formulae referred to by this id
 
-	Element *ElasticElement `json:"source,omitempty"` // the raw ElasticSearch element (if any)
+	Element *HarvestElement `json:"source,omitempty"` // the raw ElasticSearch element (if any)
 
 	Metadata interface{} `json:"metadata,omitempty"` // arbitrary document meta-data
 
