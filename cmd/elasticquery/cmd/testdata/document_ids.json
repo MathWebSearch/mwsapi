@@ -6,6 +6,7 @@
     "hits": [
         {
             "id": "AnR6jWoBetFwNTV0G-Co",
+            "xpath": "",
             "source": {
                 "metadata": {},
                 "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_6Haon6.harvest.json",
@@ -826,6 +827,7 @@
         },
         {
             "id": "-3R6jWoBetFwNTV0G9-i",
+            "xpath": "",
             "source": {
                 "metadata": {},
                 "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_08ataM.harvest.json",
@@ -1425,6 +1427,7 @@
         },
         {
             "id": "a3R6jWoBetFwNTV0H-Bl",
+            "xpath": "",
             "source": {
                 "metadata": {},
                 "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_iZkAQ0.harvest.json",
@@ -2112,6 +2115,7 @@
         },
         {
             "id": "5HR6jWoBetFwNTV0G99t",
+            "xpath": "",
             "source": {
                 "metadata": {},
                 "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_IxnUiX.harvest.json",
@@ -2845,6 +2849,7 @@
         },
         {
             "id": "WnR6jWoBetFwNTV0H-BV",
+            "xpath": "",
             "source": {
                 "metadata": {},
                 "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_o9Ap12.harvest.json",
@@ -3075,6 +3080,7 @@
         },
         {
             "id": "FnR6jWoBetFwNTV0HOAI",
+            "xpath": "",
             "source": {
                 "metadata": {},
                 "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_Tlx8py.harvest.json",
@@ -3440,6 +3446,7 @@
         },
         {
             "id": "0XR6jWoBetFwNTV0G99Z",
+            "xpath": "",
             "source": {
                 "metadata": {},
                 "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_Uc0cZN.harvest.json",
@@ -3768,6 +3775,7 @@
         },
         {
             "id": "NnR6jWoBetFwNTV0HuDQ",
+            "xpath": "",
             "source": {
                 "metadata": {},
                 "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_iW6A23.harvest.json",
@@ -3928,6 +3936,7 @@
         },
         {
             "id": "-nR6jWoBetFwNTV0G9-i",
+            "xpath": "",
             "source": {
                 "metadata": {},
                 "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_08ataM.harvest.json",
@@ -4428,6 +4437,7 @@
         },
         {
             "id": "enR6jWoBetFwNTV0IOAc",
+            "xpath": "",
             "source": {
                 "metadata": {},
                 "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_uyBlI8.harvest.json",

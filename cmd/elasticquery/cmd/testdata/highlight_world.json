@@ -6,6 +6,7 @@
   "hits": [
     {
       "id": "cnR6jWoBetFwNTV0IOAQ",
+      "xpath": "",
       "source": {
         "metadata": {},
         "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_pvT6yP.harvest.json",
@@ -22,6 +23,7 @@
     },
     {
       "id": "_3R6jWoBetFwNTV0G9-o",
+      "xpath": "",
       "source": {
         "metadata": {},
         "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_6Haon6.harvest.json",
@@ -78,6 +80,7 @@
     },
     {
       "id": "i3R6jWoBetFwNTV0IOAu",
+      "xpath": "",
       "source": {
         "metadata": {},
         "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_sr1f6y.harvest.json",
@@ -93,6 +96,7 @@
     },
     {
       "id": "63R6jWoBetFwNTV0G99z",
+      "xpath": "",
       "source": {
         "metadata": {},
         "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_CVCRZU.harvest.json",
@@ -109,6 +113,7 @@
     },
     {
       "id": "1nR6jWoBetFwNTV0G99Z",
+      "xpath": "",
       "source": {
         "metadata": {},
         "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_Uc0cZN.harvest.json",
@@ -124,6 +129,7 @@
     },
     {
       "id": "8XR6jWoBetFwNTV0G99z",
+      "xpath": "",
       "source": {
         "metadata": {},
         "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_CVCRZU.harvest.json",
@@ -228,6 +234,7 @@
     },
     {
       "id": "GnR6jWoBetFwNTV0HOAI",
+      "xpath": "",
       "source": {
         "metadata": {},
         "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_Tlx8py.harvest.json",
@@ -243,6 +250,7 @@
     },
     {
       "id": "w3R6jWoBetFwNTV0Gt_O",
+      "xpath": "",
       "source": {
         "metadata": {},
         "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_JpJaMR.harvest.json",

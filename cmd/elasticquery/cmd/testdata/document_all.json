@@ -6,6 +6,7 @@
   "hits": [
     {
       "id": "8XR6jWoBetFwNTV0G99z",
+      "xpath": "",
       "source": {
         "metadata": {},
         "segment": "/Users/twiesing/Projects/github.com/MathWebSearch/mwsapi/integrationtest/testdata/data/tema/harvest_CVCRZU.harvest.json",
