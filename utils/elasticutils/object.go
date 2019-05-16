@@ -42,7 +42,7 @@ func (obj *Object) GetID() string {
 func (obj *Object) Index() (err error) {
 	// if we already have an id, it is already indexed
 	if obj.IsIndexed() {
-		return errors.New("Already indexed")
+		return errors.New("[Object.Index] Already indexed")
 	}
 
 	// grab the fields
@@ -55,7 +55,7 @@ func (obj *Object) Index() (err error) {
 	ctx := context.Background()
 	result, err := obj.client.Index().Index(obj.index).Type(obj.tp).BodyJson(doc).Do(ctx)
 	if err == nil && result.Shards.Successful <= 0 {
-		err = errors.New("Index() reported 0 successful shards")
+		err = errors.New("[Object.Index] Elasticsearch reported 0 successful shards")
 	}
 
 	if err != nil {
@@ -72,7 +72,7 @@ func (obj *Object) Index() (err error) {
 func (obj *Object) Reload() (err error) {
 
 	if !obj.IsIndexed() {
-		return errors.New("Not indexed")
+		return errors.New("[Object.Reload] Not indexed")
 	}
 
 	ctx := context.Background()
@@ -80,7 +80,7 @@ func (obj *Object) Reload() (err error) {
 	// fetch from the db and return unless an error occured
 	result, err := obj.client.Get().Index(obj.index).Type(obj.tp).Id(obj.id).Do(ctx)
 	if err == nil && !result.Found {
-		err = errors.New("Reload() did not find object")
+		err = errors.New("[Object.Reload] Did not find object")
 	}
 
 	if err != nil {
@@ -106,7 +106,7 @@ func (obj *Object) updateFromHit(source *elastic.SearchHit) error {
 func (obj *Object) Save() (err error) {
 	// check if we are indexed
 	if !obj.IsIndexed() {
-		return errors.New("Not indexed")
+		return errors.New("[Object.Save] Not indexed")
 	}
 
 	// grab the fields
@@ -121,7 +121,7 @@ func (obj *Object) Save() (err error) {
 
 	//check errors
 	if err == nil && (res.Result != "noop" && res.Shards.Successful <= 0) {
-		err = errors.New("Save() reported non-noop result with 0 successful shards ")
+		err = errors.New("[Object.Save] Elasticsearch reported non-noop result with 0 successful shards ")
 	}
 
 	return
@@ -130,7 +130,7 @@ func (obj *Object) Save() (err error) {
 // Delete deletes this object
 func (obj *Object) Delete() (err error) {
 	if !obj.IsIndexed() {
-		return errors.New("Not indexed")
+		return errors.New("[Object.Delete] Not indexed")
 	}
 
 	// just clears the object
@@ -138,7 +138,7 @@ func (obj *Object) Delete() (err error) {
 	res, err := obj.client.Delete().Index(obj.index).Type(obj.tp).Id(obj.id).Do(ctx)
 
 	if err == nil && res.Result != "deleted" {
-		err = errors.New("Delete() did not report deleted result ")
+		err = errors.New("[Object.Delete] Elasticsearch did not report deleted result")
 	}
 
 	// id no longer valid

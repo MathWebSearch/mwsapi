@@ -55,22 +55,23 @@ func (hit *Hit) UnmarshalElasticDocument(obj *elasticutils.Object) (err error) {
 // UnmarshalElasticHighlight populates a document hit with a highlight hit
 func (hit *Hit) UnmarshalElasticHighlight(obj *elasticutils.Object) (err error) {
 	if obj.Hit == nil || obj.Hit.Highlight == nil {
-		return errors.New("No highlights returned")
+		return errors.New("[Hit.UnmarshalElasticHighlight] No highlights returned")
 	}
 
 	// load the highlights
 	var ok bool
 	hit.Snippets, ok = (*obj.Hit.Highlight)["text"]
 	if !ok {
-		return errors.New("No highlights returned")
+		return errors.New("[Hit.UnmarshalElasticHighlight] No highlights returned")
 	}
 
 	// map() over doc.Math
+	// TODO: Out-source this into a Hit function
 	for i, math := range hit.Math {
 		var ok bool
 		hit.Math[i].Source, ok = hit.Element.MathSource[math.LocalID]
 		if !ok {
-			return fmt.Errorf("Result %s with source info %#v missing info for %s", hit.ID, hit.Element.MathSource, math.LocalID)
+			return fmt.Errorf("[Hit.UnmarshalElasticHighlight] Result %s with source info %#v missing info for %s", hit.ID, hit.Element.MathSource, math.LocalID)
 		}
 	}
 

@@ -48,7 +48,7 @@ func ProcessLinePairs(filename string, allowLeftover bool, parser func(string, s
 	}
 
 	if readFirstLine && !allowLeftover {
-		return errors.New("File did not contain an even number of lines")
+		return errors.New("[ProcessLinePairs] File did not contain an even number of lines")
 	}
 
 	// if something broke, throw an error

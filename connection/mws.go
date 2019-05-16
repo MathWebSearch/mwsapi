@@ -69,7 +69,7 @@ func (conn *MWSConnection) ping() (err error) {
 
 	// check that the status code is 200
 	if res.StatusCode != 200 {
-		err = errors.New("MathWebSearch did not respond with code HTTP 200")
+		err = errors.New("[MWSConnection.ping] MathWebSearch did not respond with code HTTP 200")
 	}
 
 	return

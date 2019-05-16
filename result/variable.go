@@ -22,7 +22,7 @@ func (qvar *QueryVariable) Value(resultTerm string) (value string, err error) {
 
 	// check that we have a result
 	if len(values) == 0 {
-		err = errors.New("XPath did not find any results")
+		err = errors.New("[QueryVariable.Value] XPath did not find any results")
 		return
 	}
 

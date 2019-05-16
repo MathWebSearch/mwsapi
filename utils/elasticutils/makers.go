@@ -105,7 +105,7 @@ func FetchObjectsPage(client *elastic.Client, index string, tp string, query ela
 	results, err := search.Do(ctx)
 
 	if err == nil && results.TimedOut {
-		err = errors.New("Search() reported TimedOut=true")
+		err = errors.New("[Search] Elasticsearch reported TimedOut=true")
 	}
 
 	if err != nil {

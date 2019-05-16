@@ -21,7 +21,7 @@ func CreateIndex(client *elastic.Client, index string, mapping interface{}) (cre
 	if !exists {
 		res, err := client.CreateIndex(index).BodyJson(mapping).Do(ctx)
 		if err == nil && !res.Acknowledged {
-			err = errors.New("CreateIndex() reported acknowledged=false")
+			err = errors.New("[CreateIndex] Elasticsearch reported acknowledged=false")
 		}
 
 		if err != nil {
@@ -39,7 +39,7 @@ func RefreshIndex(client *elastic.Client, indices ...string) (err error) {
 	res, err := client.Refresh(indices...).Do(ctx)
 
 	if err == nil && res.Shards.Successful <= 0 {
-		err = errors.New("Refresh() reported 0 successful shards")
+		err = errors.New("[RereshIndex] Elasticsearch reported 0 successful shards")
 	}
 
 	return
@@ -51,7 +51,7 @@ func FlushIndex(client *elastic.Client, indices ...string) (err error) {
 	res, err := client.Flush(indices...).Do(ctx)
 
 	if err == nil && res.Shards.Successful <= 0 {
-		err = errors.New("Flush() reported 0 successful shards")
+		err = errors.New("[Flush] Elasticsearch reported 0 successful shards")
 	}
 
 	return

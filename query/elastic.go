@@ -43,7 +43,7 @@ func (q *ElasticQuery) RawDocumentQuery() (RawElasticQuery, error) {
 	}
 
 	if !nonEmptyQuery {
-		return nil, errors.New("Query had neither text nor mws_ids")
+		return nil, errors.New("[ElasticQuery.RawDocumentQuery] Query had neither text nor mws_ids")
 	}
 
 	// and return the query itself
@@ -70,7 +70,7 @@ func (q *ElasticQuery) RawHighlightQuery(res *result.Hit) (RawElasticQuery, *ela
 	}
 
 	if !nonEmptyQuery {
-		return nil, nil, errors.New("elastic-highlight: Neither text nor ids provided")
+		return nil, nil, errors.New("[ElasticQuery.RawHighlightQuery] Neither text nor ids provided")
 	}
 
 	// build the highlight itself

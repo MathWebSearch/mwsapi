@@ -52,14 +52,14 @@ func (hit *Hit) UnmarshalJSON(bytes []byte) error {
 func (hit *Hit) PopulateMath() error {
 	// if we already have some math, return an error
 	if len(hit.Math) > 0 {
-		return errors.New("PopulateMath: Math already populated")
+		return errors.New("[Hit.PopulateMath] Math already populated")
 	}
 
 	for _, mwsid := range hit.Element.MWSNumbers {
 		// load the data
 		data, ok := hit.Element.MWSPaths[mwsid]
 		if !ok {
-			return fmt.Errorf("Result %q missing path info for %d", hit.ID, mwsid)
+			return fmt.Errorf("[PopulateMath] Result %q missing path info for %d", hit.ID, mwsid)
 		}
 
 		// sort the keys in alphabetical order

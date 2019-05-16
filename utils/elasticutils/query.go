@@ -21,7 +21,7 @@ func CreateBulk(client *elastic.Client, index string, tp string, objects chan in
 	res, err := bulkRequest.Do(ctx)
 
 	if err == nil && res.Errors {
-		err = errors.New("Bulk() reported Errors=true")
+		err = errors.New("[CreateBulk] Elasticsearch reported Errors=true")
 	}
 
 	return
@@ -33,7 +33,7 @@ func UpdateAll(client *elastic.Client, index string, tp string, script *elastic.
 	res, err := client.UpdateByQuery(index).Type(tp).Query(elastic.NewMatchAllQuery()).Script(script).Do(ctx)
 
 	if err == nil && res.TimedOut {
-		err = errors.New("UpdateByQuery() reported TimedOut=true")
+		err = errors.New("[UpdateAll] Elasticsearch reported TimedOut=true")
 	}
 
 	return
@@ -45,7 +45,7 @@ func DeleteBulk(client *elastic.Client, index string, tp string, query elastic.Q
 	res, err := client.DeleteByQuery(index).Type(tp).Query(query).Do(ctx)
 
 	if err == nil && res.TimedOut {
-		err = errors.New("DeleteByQuery() reported TimedOut=true")
+		err = errors.New("[DeleteBulk] Elasticsearch reported TimedOut=true")
 	}
 
 	return

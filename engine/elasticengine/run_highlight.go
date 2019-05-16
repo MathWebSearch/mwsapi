@@ -23,7 +23,7 @@ func runHighlightQuery(conn *connection.ElasticConnection, q *query.ElasticQuery
 	// fetch the object and the highlights
 	obj, took, err := elasticutils.FetchObject(conn.Client, conn.Config.HarvestIndex, conn.Config.HarvestType, qq, h)
 	if err == nil && obj == nil {
-		err = errors.New("Can not find result")
+		err = errors.New("[runHighlightQuery] Can not find result")
 	}
 
 	if err != nil {
