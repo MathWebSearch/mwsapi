@@ -13,7 +13,7 @@ import (
 )
 
 // runHighlightQuery runs a highlight query for a given element
-func runHighlightQuery(conn *connection.ElasticConnection, q *query.ElasticQuery, hit *result.Hit) (res *result.Hit, took *time.Duration, err error) {
+func runHighlightQuery(conn *connection.ElasticConnection, q *query.ElasticQuery, hit *result.Hit) (took *time.Duration, err error) {
 	// build the highlight query
 	qq, h, err := q.RawHighlightQuery(hit)
 	if err != nil {
@@ -31,12 +31,6 @@ func runHighlightQuery(conn *connection.ElasticConnection, q *query.ElasticQuery
 	}
 
 	// and build the highlight result
-	err = newHighlightHit(hit, obj)
-	if err != nil {
-		return
-	}
-
-	// and take over the result
-	res = hit
+	err = hit.UnmarshalElasticHighlight(obj)
 	return
 }

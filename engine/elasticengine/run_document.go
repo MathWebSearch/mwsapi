@@ -37,7 +37,6 @@ func RunDocument(conn *connection.ElasticConnection, q *query.ElasticQuery, from
 		return
 	}
 
-	err = newDocumentResult(res, page)
-
-	return
+	// and un-marshal the results
+	return nil, res.UnmarshalElastic(page)
 }

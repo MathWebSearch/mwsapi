@@ -1,4 +1,4 @@
-package elasticengine
+package result
 
 import (
 	"errors"
@@ -6,57 +6,56 @@ import (
 	"sort"
 	"time"
 
-	"github.com/MathWebSearch/mwsapi/result"
 	"github.com/MathWebSearch/mwsapi/utils/elasticutils"
 )
 
-// newDocumentResult populates a non-nil result by using results form a page
-func newDocumentResult(res *result.Result, page *elasticutils.ResultsPage) (err error) {
+// UnmarshalElastic un-marshals a response from elastic
+func (res *Result) UnmarshalElastic(page *elasticutils.ResultsPage) error {
 	// it is an elasticsearch document query
-	res.Kind = result.ElasticDocumentKind
+	res.Kind = ElasticDocumentKind
 
 	// prepare result objejct
 	res.Total = page.Total
-	res.Hits = make([]*result.Hit, len(page.Hits))
+	res.Hits = make([]*Hit, len(page.Hits))
 	res.Size = int64(len(page.Hits))
 
 	// and make the new hits
 	for i, hit := range page.Hits {
-		res.Hits[i], err = newDocumentHit(hit)
+		err := res.Hits[i].UnmarshalElasticDocument(hit)
 		if err != nil {
 			return err
 		}
 	}
 
+	// add the time it took in the document phase
+	document := time.Duration(page.Took) * time.Millisecond
 	res.TookComponents = map[string]*time.Duration{
-		"document": &page.Took,
+		"document": &document,
 	}
 
-	return
+	return nil
 }
 
-// newDocumentHit creates a new Hit within a document result
-func newDocumentHit(obj *elasticutils.Object) (hit *result.Hit, err error) {
-	hit = &result.Hit{
+// UnmarshalElasticDocument unmarshals a document hit from elasticsearch
+func (hit *Hit) UnmarshalElasticDocument(obj *elasticutils.Object) (err error) {
+	// create the Hit and set it's id properly
+	*hit = Hit{
 		ID: obj.GetID(),
 	}
 
-	// unpack the result element we get from elastic
-	var raw result.HarvestElement
-	err = obj.Unpack(&raw)
+	// un-marshal the harvest element
+	err = obj.Unpack(&hit.Element)
 	if err != nil {
 		return
 	}
-	hit.Element = &raw
 
-	// create the math elements, without knowing the size beforehand
-	hit.Math = []*result.MathFormula{}
-
-	for _, mwsid := range raw.MWSNumbers {
+	// load all the MWSElement and the paths
+	// TODO: Move this into a seperate method later on
+	for _, mwsid := range hit.Element.MWSNumbers {
 		// load the data
-		data, ok := raw.MWSPaths[mwsid]
+		data, ok := hit.Element.MWSPaths[mwsid]
 		if !ok {
-			return nil, fmt.Errorf("Result %q missing path info for %d", hit.ID, mwsid)
+			return fmt.Errorf("Result %q missing path info for %d", hit.ID, mwsid)
 		}
 
 		// sort the keys in alphabetical order
@@ -70,7 +69,7 @@ func newDocumentHit(obj *elasticutils.Object) (hit *result.Hit, err error) {
 
 		// and iterate over it
 		for _, key := range keys {
-			res := &result.MathFormula{XPath: data[key].XPath}
+			res := &MathFormula{XPath: data[key].XPath}
 			res.SetURL(key)
 			hit.Math = append(hit.Math, res)
 		}
@@ -79,8 +78,8 @@ func newDocumentHit(obj *elasticutils.Object) (hit *result.Hit, err error) {
 	return
 }
 
-// newHighlightHit populates a document hit with a highlight hit
-func newHighlightHit(hit *result.Hit, obj *elasticutils.Object) (err error) {
+// UnmarshalElasticHighlight populates a document hit with a highlight hit
+func (hit *Hit) UnmarshalElasticHighlight(obj *elasticutils.Object) (err error) {
 	if obj.Hit == nil || obj.Hit.Highlight == nil {
 		return errors.New("No highlights returned")
 	}

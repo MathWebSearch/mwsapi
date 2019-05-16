@@ -42,7 +42,8 @@ func Run(conn *connection.ElasticConnection, q *query.ElasticQuery, from int64, 
 		func(idx int, doc *result.Hit) {
 			job := gogroup.GroupJob(func(_ func(func())) (err error) {
 				var took *time.Duration
-				res.Hits[idx], took, err = runHighlightQuery(conn, q, doc)
+
+				took, err = runHighlightQuery(conn, q, doc)
 
 				// add the total time taken
 				if err == nil {
