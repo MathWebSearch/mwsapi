@@ -3,7 +3,6 @@ package result
 import (
 	"errors"
 	"fmt"
-	"sort"
 	"time"
 
 	"github.com/MathWebSearch/mwsapi/utils/elasticutils"
@@ -49,33 +48,8 @@ func (hit *Hit) UnmarshalElasticDocument(obj *elasticutils.Object) (err error) {
 		return
 	}
 
-	// load all the MWSElement and the paths
-	// TODO: Move this into a seperate method later on
-	for _, mwsid := range hit.Element.MWSNumbers {
-		// load the data
-		data, ok := hit.Element.MWSPaths[mwsid]
-		if !ok {
-			return fmt.Errorf("Result %q missing path info for %d", hit.ID, mwsid)
-		}
-
-		// sort the keys in alphabetical order
-		keys := make([]string, len(data))
-		count := 0
-		for key := range data {
-			keys[count] = key
-			count++
-		}
-		sort.Strings(keys)
-
-		// and iterate over it
-		for _, key := range keys {
-			res := &MathFormula{XPath: data[key].XPath}
-			res.SetURL(key)
-			hit.Math = append(hit.Math, res)
-		}
-	}
-
-	return
+	// and populate the math field
+	return hit.PopulateMath()
 }
 
 // UnmarshalElasticHighlight populates a document hit with a highlight hit
