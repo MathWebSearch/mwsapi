@@ -29,7 +29,7 @@ func Main(a *Args) (res interface{}, err error) {
 	{
 		// run the sync process
 		stats, err := process.Run()
-		if err == nil && a.Normalize {
+		if err == nil && a.Normalize && stats != nil {
 			stats.Normalize()
 		}
 

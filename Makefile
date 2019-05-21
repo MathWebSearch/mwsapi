@@ -33,6 +33,9 @@ testdeps:
 
 # Integration Tests
 integrationdeps:
-	cd integrationtest/testdata && docker-compose pull
+	cd integrationtest/testdata && docker-compose -f docker-compose-elasticquery.yml pull
+	cd integrationtest/testdata && docker-compose -f docker-compose-elasticsync.yml pull
+	cd integrationtest/testdata && docker-compose -f docker-compose-mwsquery.yml pull
+	cd integrationtest/testdata && docker-compose -f docker-compose-temaquery.yml pull
 integrationtest: testdeps
 	CGO_ENABLED=0 $(GOTEST) -v -p 1 ./cmd/...

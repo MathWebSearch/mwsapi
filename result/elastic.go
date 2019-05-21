@@ -20,6 +20,7 @@ func (res *Result) UnmarshalElastic(page *elasticutils.ResultsPage) error {
 
 	// and make the new hits
 	for i, hit := range page.Hits {
+		res.Hits[i] = &Hit{}
 		err := res.Hits[i].UnmarshalElasticDocument(hit)
 		if err != nil {
 			return err
@@ -38,9 +39,7 @@ func (res *Result) UnmarshalElastic(page *elasticutils.ResultsPage) error {
 // UnmarshalElasticDocument unmarshals a document hit from elasticsearch
 func (hit *Hit) UnmarshalElasticDocument(obj *elasticutils.Object) (err error) {
 	// create the Hit and set it's id properly
-	*hit = Hit{
-		ID: obj.GetID(),
-	}
+	hit.ID = obj.GetID()
 
 	// un-marshal the harvest element
 	err = obj.Unpack(&hit.Element)

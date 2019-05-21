@@ -36,7 +36,7 @@ func Main(a *Args) (res interface{}, err error) {
 		res, err := temaengine.Run(c, q, a.From, a.Size)
 
 		// normalize if requested
-		if err == nil && a.Normalize {
+		if err == nil && a.Normalize && res != nil {
 			res.Normalize()
 		}
 

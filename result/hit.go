@@ -45,7 +45,12 @@ func (hit *Hit) UnmarshalJSON(bytes []byte) error {
 	}
 
 	// else unmarshal the xml as an element
-	return xml.Unmarshal([]byte("<data>"+h.XHTML+"</data>"), &h.Element)
+	err := xml.Unmarshal([]byte("<data>"+h.XHTML+"</data>"), &h.Element)
+	if err != nil {
+		return err
+	}
+
+	return hit.PopulateMathSource()
 }
 
 // PopulateMath populates the 'Math' property of this hit using the 'math' property of the result
@@ -56,16 +61,16 @@ func (hit *Hit) PopulateMath() error {
 	}
 
 	for _, mwsid := range hit.Element.MWSNumbers {
-		// load the data
-		data, ok := hit.Element.MWSPaths[mwsid]
+		// load the path data
+		path, ok := hit.Element.MWSPaths[mwsid]
 		if !ok {
-			return fmt.Errorf("[PopulateMath] Result %q missing path info for %d", hit.ID, mwsid)
+			return fmt.Errorf("[Hit.PopulateMath] Result %q missing path info for %d", hit.ID, mwsid)
 		}
 
 		// sort the keys in alphabetical order
-		keys := make([]string, len(data))
+		keys := make([]string, len(path))
 		count := 0
-		for key := range data {
+		for key := range path {
 			keys[count] = key
 			count++
 		}
@@ -73,9 +78,41 @@ func (hit *Hit) PopulateMath() error {
 
 		// and iterate over it
 		for _, key := range keys {
-			res := &MathFormula{XPath: data[key].XPath}
+			res := &MathFormula{XPath: path[key].XPath}
 			res.SetURL(key)
+
 			hit.Math = append(hit.Math, res)
+		}
+	}
+
+	// ensure that math is not a nil-slice
+	if hit.Math == nil {
+		hit.Math = []*MathFormula{}
+	}
+
+	return hit.PopulateMathSource()
+}
+
+// PopulateMathSource populates the maths sources for all mathFormulae within this hit
+func (hit *Hit) PopulateMathSource() error {
+	for _, math := range hit.Math {
+		key := math.LocalID
+		source, ok := hit.Element.MathSource[key]
+		if !ok {
+			return fmt.Errorf("[Hit.PopulateMathSource] Missing source info for %s", key)
+		}
+		math.Source = source
+	}
+
+	return nil
+}
+
+// PopulateSubsitutions populates the subsitutions field of all found math formulae
+// in this hit
+func (hit *Hit) PopulateSubsitutions(res *Result) error {
+	for _, math := range hit.Math {
+		if err := math.PopulateSubsitutions(hit, res); err != nil {
+			return err
 		}
 	}
 	return nil

@@ -49,5 +49,5 @@ func (res *Result) UnmarshalMWS(response *http.Response) error {
 	res.HitIDs = r.MathWebSearchIDs
 	res.Hits = r.Hits
 
-	return nil
+	return res.PopulateSubsitutions()
 }

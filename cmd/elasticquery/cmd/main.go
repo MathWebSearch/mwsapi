@@ -47,7 +47,7 @@ func Main(a *Args) (res interface{}, err error) {
 		}
 
 		// normalize if requested
-		if err == nil && a.Normalize {
+		if err == nil && a.Normalize && res != nil {
 			res.Normalize()
 		}
 

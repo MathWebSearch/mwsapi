@@ -43,3 +43,13 @@ func (res *Result) Normalize() {
 	res.Took = nil
 	res.TookComponents = nil
 }
+
+// PopulateSubsitutions populates all substiutions within all hits of this result
+func (res *Result) PopulateSubsitutions() error {
+	for _, hit := range res.Hits {
+		if err := hit.PopulateSubsitutions(res); err != nil {
+			return err
+		}
+	}
+	return nil
+}

@@ -38,5 +38,6 @@ func RunDocument(conn *connection.ElasticConnection, q *query.ElasticQuery, from
 	}
 
 	// and un-marshal the results
-	return nil, res.UnmarshalElastic(page)
+	err = res.UnmarshalElastic(page)
+	return
 }
