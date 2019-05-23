@@ -83,8 +83,9 @@ func filterByAttributeLocalName(nodesIn []*xmlquery.Node, localName string, valu
 }
 
 // NavigateAnnotation navigates within an annotation element
-// and matches the presentation accordingly
-func (math *MathML) NavigateAnnotation(xpth string) (err error) {
+// if updateSemantics is set to true, it also forcibly to semantics element using an xref attribute.
+// if updateSemantics is set to false, it also tries to update the semantics element, but if updating fails, ignores the error
+func (math *MathML) NavigateAnnotation(xpth string, updateSemantics bool) (err error) {
 	// if we have no xpath, we have nothing to do
 	// and can return immediatly
 	if xpth == "" {
@@ -101,8 +102,21 @@ func (math *MathML) NavigateAnnotation(xpth string) (err error) {
 		return errors.New("[MathML.NavigateAnnotation] XPath inside <annotation-xml> did not return any results")
 	}
 
-	// and update the semantics element
-	return math.updateSemantics()
+	// update the semantics element
+	err = math.updateSemantics()
+
+	// if we asked to update semantics and got an error
+	// ignore the error, and set the semantics to nil
+	if err != nil && !updateSemantics {
+		err = nil
+		math.semantics = nil
+	}
+
+	// update semantics if requested
+	if updateSemantics {
+		err = math.updateSemantics()
+	}
+	return
 }
 
 // Copy makes a copy of this struct, allowing NavigateAnnotation() to not change the original object
@@ -119,7 +133,7 @@ func (math *MathML) updateSemantics() (err error) {
 	// find the xref
 	xref := math.annotation.SelectAttr("xref")
 	if xref == "" {
-		return errors.New("[MathML.updatePresentation] Missing xref attribute in <semantics>")
+		return errors.New("[MathML.updatePresentation] Missing xref attribute in <annotation-xml>")
 	}
 
 	// escape it with "s around it
@@ -140,13 +154,23 @@ func (math *MathML) updateSemantics() (err error) {
 	return
 }
 
-// OutputXML turns this node into a valid <math> element
+// OutputXML turns this node into an <m:math> element
+// It hard-codes the "m" namespace and uses it for all elements by default.
+// When no semantics element exists, it returns an <m:semantics> with only an annotation child.
 func (math *MathML) OutputXML() string {
-	semantics := math.semantics.OutputXML(true)
-	annotation := math.annotation.OutputXML(true)
+	// load semantics if they are not nil
+	var semantics string
+	if math.semantics != nil {
+		semantics = math.semantics.OutputXML(true)
+	}
+
+	// load annotation if they are not nil
+	var annotation string
+	if math.annotation != nil {
+		annotation = "<m:annotation-xml encoding=\"MathML-Content\">" + math.annotation.OutputXML(true) + "</m:annotation-xml>"
+	}
 
 	// build an appropriate math element
 	return "<m:math xmlns=\"" + MathMLNamespace + "\" xmlns:m=\"" + MathMLNamespace + "\">" +
-		"<m:semantics>" + semantics + "<m:annotation-xml encoding=\"MathML-Content\">" +
-		annotation + "</m:annotation-xml></m:semantics></m:math>"
+		"<m:semantics>" + semantics + annotation + "</m:semantics></m:math>"
 }

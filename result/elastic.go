@@ -2,7 +2,6 @@ package result
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/MathWebSearch/mwsapi/utils/elasticutils"
@@ -21,10 +20,13 @@ func (res *Result) UnmarshalElastic(page *elasticutils.ResultsPage) error {
 	// and make the new hits
 	for i, hit := range page.Hits {
 		res.Hits[i] = &Hit{}
-		err := res.Hits[i].UnmarshalElasticDocument(hit)
-		if err != nil {
+		if err := res.Hits[i].UnmarshalElasticDocument(hit); err != nil {
 			return err
 		}
+		if err := res.Hits[i].PopulateSubsitutions(res); err != nil {
+			return err
+		}
+
 	}
 
 	// add the time it took in the document phase
@@ -62,16 +64,6 @@ func (hit *Hit) UnmarshalElasticHighlight(obj *elasticutils.Object) (err error) 
 	hit.Snippets, ok = (*obj.Hit.Highlight)["text"]
 	if !ok {
 		return errors.New("[Hit.UnmarshalElasticHighlight] No highlights returned")
-	}
-
-	// map() over doc.Math
-	// TODO: Out-source this into a Hit function
-	for i, math := range hit.Math {
-		var ok bool
-		hit.Math[i].Source, ok = hit.Element.MathSource[math.LocalID]
-		if !ok {
-			return fmt.Errorf("[Hit.UnmarshalElasticHighlight] Result %s with source info %#v missing info for %s", hit.ID, hit.Element.MathSource, math.LocalID)
-		}
 	}
 
 	return

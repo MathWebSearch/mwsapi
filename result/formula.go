@@ -75,7 +75,7 @@ func (formula *MathFormula) PopulateSubsitutions(hit *Hit, res *Result) (err err
 	}
 
 	// find the term representing the entire found term
-	err = mathml.NavigateAnnotation(".." + formula.XPath)
+	err = mathml.NavigateAnnotation(".."+formula.XPath, false)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (formula *MathFormula) PopulateSubsitutions(hit *Hit, res *Result) (err err
 		copy := mathml.Copy()
 
 		// navigate to the xpath
-		err = copy.NavigateAnnotation("." + variable.XPath)
+		err = copy.NavigateAnnotation("."+variable.XPath, true)
 		if err != nil {
 			return err
 		}

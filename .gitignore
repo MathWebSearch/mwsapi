@@ -5,7 +5,7 @@
 /elasticsync
 /temaquery
 
-testdata/tmp
+integrationtest/testdata/lockfile
 
 # Binaries for programs and plugins
 *.exe

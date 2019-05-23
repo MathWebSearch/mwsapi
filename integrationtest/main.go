@@ -10,6 +10,10 @@ import (
 // Main is the entry point for an integration test
 // service and urls are passed directly to StartDockerService and StopDockerService
 func Main(m *testing.M, servicefile string, init func(client *http.Client) error, urls ...string) {
+	// lock the tests -- only one integrationtest can run at the same time
+	LockTests()
+	defer UnLockTests()
+
 	// parse the flags manually to ensure that .Verbose() and .Short() are set
 	flag.Parse()
 

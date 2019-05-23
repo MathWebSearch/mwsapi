@@ -56,7 +56,7 @@ func (proc *Process) Run() (stats *Stats, err error) {
 	// keep track of how long the process takes
 	start := time.Now()
 	defer func() {
-		stats.Duration = time.Since(start)
+		proc.stats.Duration = time.Since(start)
 	}()
 
 	// Create the index and mapping

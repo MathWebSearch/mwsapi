@@ -14,8 +14,7 @@ import (
 // StartDockerService starts docker-compose configured services from the given servicefile
 // and then blocks until a url returns http status code 200
 func StartDockerService(service string, urls ...string) (client *http.Client, err error) {
-
-	err = runExternalCommand("docker-compose", "-f", service, "up", "--remove-orphans", "--force-recreate", "-d")
+	err = runExternalCommand("docker-compose", "-f", service, "up", "--force-recreate", "-d")
 	if err != nil {
 		return
 	}
@@ -66,7 +65,6 @@ func StartDockerService(service string, urls ...string) (client *http.Client, er
 // StopDockerService gracefully stops and removes the docker-compose configured services from servicefile
 // including all volumes
 func StopDockerService(servicefile string) (err error) {
-
 	// stop the service
 	return runExternalCommand("docker-compose", "-f", servicefile, "down", "-v")
 }
