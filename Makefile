@@ -12,7 +12,7 @@ GOFLAGS=-a
 EXECUTABLES=mwsapid mwsquery elasticquery elasticsync temaquery
 
 all: test build
-.PHONY : all build test integrationtest integrationpull clean run deps testdeps
+.PHONY : all build test integrationtest integrationpull clean deps testdeps
 
 build: $(EXECUTABLES)
 
@@ -25,8 +25,6 @@ clean:
 	$(GOCLEAN)
 	rm -f integrationtest/testdata/lockfile
 	rm -f $(EXECUTABLES)
-run: build-local
-	./$(BINARY_NAME)
 deps:
 	$(GOGET) -v ./...
 testdeps:
