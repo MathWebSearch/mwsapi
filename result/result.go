@@ -50,7 +50,7 @@ func (res *Result) Normalize() {
 func (res *Result) PopulateSubsitutions() error {
 	for _, hit := range res.Hits {
 		if err := hit.PopulateSubsitutions(res); err != nil {
-			err = errors.Wrap(err, "hit.PopulateSubstiutions failed")
+			err = errors.Wrap(err, "hit.PopulateSubsitutions failed")
 			return err
 		}
 	}

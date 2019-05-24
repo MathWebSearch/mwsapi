@@ -46,7 +46,7 @@ func TestMathML(t *testing.T) {
 			}
 
 			// navigate
-			err = gotMath.NavigateAnnotation(tt.navigate, true)
+			err = gotMath.NavigateAnnotation(tt.navigate)
 			if (err != nil) != tt.wantNavigateErr {
 				t.Errorf("ParseMathML().NavigateSemantic() error = %v, wantErr %v", err, tt.wantNavigateErr)
 				return

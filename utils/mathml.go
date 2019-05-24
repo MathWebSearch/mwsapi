@@ -40,12 +40,12 @@ func ParseMathML(source string) (math *MathML, err error) {
 	// first find the MathML:semantics node
 	semanticsRoot := xmlquery.FindOne(math.root, "//*[local-name()='semantics']")
 	if semanticsRoot == nil {
-		return nil, errors.New("[ParseMathML] No <semantics> found")
+		return nil, errors.Errorf("No <semantics> element found in %q", math.root.OutputXML(true))
 	}
 	// then the first non-annotation node
 	math.semantics = xmlquery.FindOne(semanticsRoot, "./*[not(local-name()='annotation' or local-name()='annotation-xml')]")
 	if math.semantics == nil {
-		return nil, errors.New("[ParseMathML] <semantics> did not contain any non-<annotation> or non-<annotation-xml> child")
+		return nil, errors.Errorf("Did not find any non-<annotation> or non-<annotation-xml> children in %q", math.root.OutputXML(true))
 	}
 
 	// our xpath implementation does not seem to support dynamic attributes, e.g. @*[local-name()='encoding']=
@@ -62,14 +62,14 @@ func ParseMathML(source string) (math *MathML, err error) {
 	if len(annotations) == 0 {
 		return nil, errors.New("[ParseMathML] <semantics> element did not contain any MathML-Content <annotation-xml>")
 	}
-	math.annotation = xmlquery.FindOne(annotations[0], "./*[1]")
+	annotation := xmlquery.FindOne(annotations[0], "./*[1]")
 	if len(annotations) == 0 {
 		return nil, errors.New("[ParseMathML] <annotation-xml> did not contain any children")
 	}
 
 	// and update the semantics
-	err = math.updateSemantics()
-	err = errors.Wrap(err, "math.updateSemantics failed")
+	err = math.updateSemantics(annotation)
+	err = errors.Wrap(err, "Updating semantics failed")
 	return
 }
 
@@ -85,10 +85,9 @@ func filterByAttributeLocalName(nodesIn []*xmlquery.Node, localName string, valu
 	return
 }
 
-// NavigateAnnotation navigates within an annotation element
-// if updateSemantics is set to true, it also forcibly to semantics element using an xref attribute.
-// if updateSemantics is set to false, it also tries to update the semantics element, but if updating fails, ignores the error
-func (math *MathML) NavigateAnnotation(xpth string, updateSemantics bool) (err error) {
+// NavigateAnnotation navigates within an <annotation> element and updates the semantics accordingly
+// if the xpth is invalid or an error occurs, annotation and semantics remain unchanged
+func (math *MathML) NavigateAnnotation(xpth string) (err error) {
 	// if we have no xpath, we have nothing to do
 	// and can return immediatly
 	if xpth == "" {
@@ -100,21 +99,15 @@ func (math *MathML) NavigateAnnotation(xpth string, updateSemantics bool) (err e
 		return
 	}
 
-	math.annotation = xmlquery.FindOne(math.annotation, xpth)
-	if math.annotation == nil {
-		return errors.New("[MathML.NavigateAnnotation] XPath inside <annotation-xml> did not return any results")
+	// resolve the annotation element
+	annotation := xmlquery.FindOne(math.annotation, xpth)
+	if annotation == nil {
+		return errors.Errorf("XPath %q inside %q did not return any results", xpth, math.annotation.OutputXML(true))
 	}
 
 	// update the semantics element
-	err = math.updateSemantics()
-	err = errors.Wrap(err, "math.updateSemantics failed")
-
-	// if we asked to update semantics and got an error
-	// ignore the error, and set the semantics to nil
-	if err != nil && !updateSemantics {
-		err = nil
-		math.semantics = nil
-	}
+	err = math.updateSemantics(annotation)
+	err = errors.Wrap(err, "Updating semantics failed")
 
 	return
 }
@@ -128,28 +121,32 @@ func (math *MathML) Copy() *MathML {
 	}
 }
 
-// update presentation updates the presentation element
-func (math *MathML) updateSemantics() (err error) {
+// updateSemantics updates the annotation reference and the corresponding semantics element
+// if an error occurs, nothing is changed
+func (math *MathML) updateSemantics(annotation *xmlquery.Node) (err error) {
 	// find the xref
-	xref := math.annotation.SelectAttr("xref")
+	xref := annotation.SelectAttr("xref")
 	if xref == "" {
-		return errors.New("[MathML.updatePresentation] Missing xref attribute in <annotation-xml>")
+		return errors.Errorf("Missing xref attribute in %q", annotation.OutputXML(true))
 	}
 
 	// escape it with "s around it
 	if strings.ContainsRune(xref, '"') {
 		if strings.ContainsRune(xref, '\'') {
-			return errors.New("[MathML.updatePresentation] xref attribute contains both single and double quote")
+			return errors.Errorf("xref attribute %q of %q contains both single and double quote", xref, annotation.OutputXML(true))
 		}
 		xref = "'" + xref + "'"
 	} else {
 		xref = "\"" + xref + "\""
 	}
 
-	math.semantics = xmlquery.FindOne(math.root, "//*[@xml:id="+xref+"]")
-	if math.semantics == nil {
-		return errors.New("[MathML.updatePresentation] Missing <semantics> child with id")
+	semantics := xmlquery.FindOne(math.root, "//*[@xml:id="+xref+"]")
+	if semantics == nil {
+		return errors.Errorf("Missing <semantics> child with id %q in %q", xref, math.root.OutputXML(true))
 	}
+
+	math.semantics = semantics
+	math.annotation = annotation
 
 	return
 }

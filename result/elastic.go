@@ -23,10 +23,10 @@ func (res *Result) UnmarshalElastic(page *elasticutils.ResultsPage) error {
 		if err := res.Hits[i].UnmarshalElasticDocument(hit); err != nil {
 			return errors.Wrap(err, "res.Hits[i].UnmarshalElasticDocument failed")
 		}
-		if err := res.Hits[i].PopulateSubsitutions(res); err != nil {
-			return errors.Wrap(err, "res.Hits[i].PopulateSubsitutions failed")
-		}
-
+		// TODO: Re-enable subsitutions once this has been done properly
+		//if err := res.Hits[i].PopulateSubsitutions(res); err != nil {
+		//	return errors.Wrap(err, "res.Hits[i].PopulateSubsitutions failed")
+		//}
 	}
 
 	// add the time it took in the document phase
@@ -39,6 +39,7 @@ func (res *Result) UnmarshalElastic(page *elasticutils.ResultsPage) error {
 }
 
 // UnmarshalElasticDocument unmarshals a document hit from elasticsearch
+// If ids is non-nil use only ids for Math Elements
 func (hit *Hit) UnmarshalElasticDocument(obj *elasticutils.Object) (err error) {
 	// create the Hit and set it's id properly
 	hit.ID = obj.GetID()

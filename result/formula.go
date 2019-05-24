@@ -56,8 +56,7 @@ func (formula *MathFormula) RealMathID() string {
 	return mathid
 }
 
-// PopulateSubsitutions populates the subsitutions field of this MathFormula
-// given a hit and a result
+// PopulateSubsitutions populates the subsitutions field of this MathFormula, given a hit and a result
 func (formula *MathFormula) PopulateSubsitutions(hit *Hit, res *Result) (err error) {
 	if len(formula.Substitution) > 0 {
 		return errors.Errorf("[MathFormula.PopulateSubsitutions] Substiution already populated ")
@@ -75,8 +74,8 @@ func (formula *MathFormula) PopulateSubsitutions(hit *Hit, res *Result) (err err
 	}
 
 	// find the term representing the entire found term
-	err = mathml.NavigateAnnotation(".."+formula.XPath, false)
-	err = errors.Wrap(err, "mathml.NavigateAnnotation failed")
+	err = mathml.NavigateAnnotation(".." + formula.XPath)
+	err = errors.Wrapf(err, "Navigating to match XPath %q in %q failed", formula.XPath, mathml.OutputXML())
 	if err != nil {
 		return err
 	}
@@ -92,8 +91,8 @@ func (formula *MathFormula) PopulateSubsitutions(hit *Hit, res *Result) (err err
 		copy := mathml.Copy()
 
 		// navigate to the xpath
-		err = copy.NavigateAnnotation("."+variable.XPath, true)
-		err = errors.Wrap(err, "copy.NavigateAnnotation failed")
+		err = copy.NavigateAnnotation("." + variable.XPath)
+		err = errors.Wrapf(err, "Navigating to Query Variable %s with XPath %q failed in %q", variable.Name, variable.XPath, copy.OutputXML())
 		if err != nil {
 			return err
 		}
