@@ -7,6 +7,7 @@ import (
 	"github.com/MathWebSearch/mwsapi/query"
 	"github.com/MathWebSearch/mwsapi/result"
 	"github.com/MathWebSearch/mwsapi/utils/elasticutils"
+	"github.com/pkg/errors"
 )
 
 // RunDocument runs the document query
@@ -26,6 +27,7 @@ func RunDocument(conn *connection.ElasticConnection, q *query.ElasticQuery, from
 
 	// make the document query
 	qq, err := q.RawDocumentQuery()
+	err = errors.Wrap(err, "a.RawDocumentQuery failed")
 	if err != nil {
 		return
 	}
@@ -33,11 +35,13 @@ func RunDocument(conn *connection.ElasticConnection, q *query.ElasticQuery, from
 	// grab the results
 	// TODO: Paralellize this with appropriate page size
 	page, err := elasticutils.FetchObjectsPage(conn.Client, conn.Config.HarvestIndex, conn.Config.HarvestType, qq, nil, from, size)
+	err = errors.Wrap(err, "elasticutils.FetchObjectsPage failed")
 	if err != nil {
 		return
 	}
 
 	// and un-marshal the results
 	err = res.UnmarshalElastic(page)
+	err = errors.Wrap(err, "res.UnmarshalElastic failed")
 	return
 }

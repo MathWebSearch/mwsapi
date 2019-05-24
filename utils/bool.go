@@ -1,8 +1,9 @@
 package utils
 
 import (
-	"fmt"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // BooleanYesNo represents a boolean that is xml encoded as "yes" or "no"
@@ -29,7 +30,7 @@ func (byesno *BooleanYesNo) UnmarshalText(text []byte) (err error) {
 
 		// do not load the else
 	} else {
-		err = fmt.Errorf("Boolean should be \"yes\" or \"no\", not %q", qtext)
+		err = errors.Errorf("Boolean should be \"yes\" or \"no\", not %q", qtext)
 	}
 
 	return

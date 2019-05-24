@@ -3,9 +3,9 @@ package result
 import (
 	"encoding/json"
 	"encoding/xml"
-	"errors"
-	"fmt"
 	"sort"
+
+	"github.com/pkg/errors"
 )
 
 // Hit represents a single Hit
@@ -36,6 +36,7 @@ func (hit *Hit) UnmarshalJSON(bytes []byte) error {
 
 	// unmarshal the helper
 	if err := json.Unmarshal(bytes, &h); err != nil {
+		err = errors.Wrap(err, "json.Unmarshal failed")
 		return err
 	}
 
@@ -47,10 +48,13 @@ func (hit *Hit) UnmarshalJSON(bytes []byte) error {
 	// else unmarshal the xml as an element
 	err := xml.Unmarshal([]byte("<data>"+h.XHTML+"</data>"), &h.Element)
 	if err != nil {
+		err = errors.Wrap(err, "xml.Unmarshal failed")
 		return err
 	}
 
-	return hit.PopulateMathSource()
+	err = hit.PopulateMathSource()
+	err = errors.Wrap(err, "hit.PopulateMathSource failed")
+	return err
 }
 
 // PopulateMath populates the 'Math' property of this hit using the 'math' property of the result
@@ -64,7 +68,7 @@ func (hit *Hit) PopulateMath() error {
 		// load the path data
 		path, ok := hit.Element.MWSPaths[mwsid]
 		if !ok {
-			return fmt.Errorf("[Hit.PopulateMath] Result %q missing path info for %d", hit.ID, mwsid)
+			return errors.Errorf("[Hit.PopulateMath] Result %q missing path info for %d", hit.ID, mwsid)
 		}
 
 		// sort the keys in alphabetical order
@@ -90,7 +94,9 @@ func (hit *Hit) PopulateMath() error {
 		hit.Math = []*MathFormula{}
 	}
 
-	return hit.PopulateMathSource()
+	err := hit.PopulateMathSource()
+	err = errors.Wrap(err, "hit.PopulateMathSource failed")
+	return err
 }
 
 // PopulateMathSource populates the maths sources for all mathFormulae within this hit
@@ -99,7 +105,7 @@ func (hit *Hit) PopulateMathSource() error {
 		key := math.LocalID
 		source, ok := hit.Element.MathSource[key]
 		if !ok {
-			return fmt.Errorf("[Hit.PopulateMathSource] Missing source info for %s", key)
+			return errors.Errorf("[Hit.PopulateMathSource] Missing source info for %s", key)
 		}
 		math.Source = source
 	}
@@ -112,6 +118,7 @@ func (hit *Hit) PopulateMathSource() error {
 func (hit *Hit) PopulateSubsitutions(res *Result) error {
 	for _, math := range hit.Math {
 		if err := math.PopulateSubsitutions(hit, res); err != nil {
+			err = errors.Wrap(err, "math.PopulateSubsitutions failed")
 			return err
 		}
 	}

@@ -8,6 +8,7 @@ import (
 	"github.com/MathWebSearch/mwsapi/query"
 	"github.com/MathWebSearch/mwsapi/result"
 	"github.com/MathWebSearch/mwsapi/utils/gogroup"
+	"github.com/pkg/errors"
 )
 
 // Run runs an elasticsearch query
@@ -44,6 +45,7 @@ func Run(conn *connection.ElasticConnection, q *query.ElasticQuery, from int64, 
 				var took *time.Duration
 
 				took, err = runHighlightQuery(conn, q, doc)
+				err = errors.Wrap(err, "runHighlightQuery failed")
 
 				// add the total time taken
 				if err == nil {

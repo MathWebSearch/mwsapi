@@ -1,10 +1,10 @@
 package result
 
 import (
-	"errors"
 	"time"
 
 	"github.com/MathWebSearch/mwsapi/utils/elasticutils"
+	"github.com/pkg/errors"
 )
 
 // UnmarshalElastic un-marshals a response from elastic
@@ -21,10 +21,10 @@ func (res *Result) UnmarshalElastic(page *elasticutils.ResultsPage) error {
 	for i, hit := range page.Hits {
 		res.Hits[i] = &Hit{}
 		if err := res.Hits[i].UnmarshalElasticDocument(hit); err != nil {
-			return err
+			return errors.Wrap(err, "res.Hits[i].UnmarshalElasticDocument failed")
 		}
 		if err := res.Hits[i].PopulateSubsitutions(res); err != nil {
-			return err
+			return errors.Wrap(err, "res.Hits[i].PopulateSubsitutions failed")
 		}
 
 	}
@@ -45,6 +45,7 @@ func (hit *Hit) UnmarshalElasticDocument(obj *elasticutils.Object) (err error) {
 
 	// un-marshal the harvest element
 	err = obj.Unpack(&hit.Element)
+	err = errors.Wrap(err, "obj.Unpack failed")
 	if err != nil {
 		return
 	}

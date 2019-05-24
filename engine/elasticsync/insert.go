@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/MathWebSearch/mwsapi/result"
+	"github.com/pkg/errors"
 
 	"github.com/MathWebSearch/mwsapi/utils"
 	"github.com/MathWebSearch/mwsapi/utils/elasticutils"
@@ -20,6 +21,7 @@ func (proc *Process) insertSegmentHarvests(segment string) error {
 			// unmarshal the content
 			var content *result.HarvestElement
 			err = json.Unmarshal([]byte(contentLine), &content)
+			err = errors.Wrap(err, "json.Unmarshal failed")
 			if err != nil {
 				return
 			}
@@ -41,6 +43,7 @@ func (proc *Process) insertSegmentHarvests(segment string) error {
 
 	// run the insert and get the errors
 	bulkError := elasticutils.CreateBulk(proc.conn.Client, proc.conn.Config.HarvestIndex, proc.conn.Config.HarvestType, bulk)
+	bulkError = errors.Wrap(bulkError, "elasticutils.CreateBulk failed")
 	parseError := <-errChan
 
 	// return the parser error

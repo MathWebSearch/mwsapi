@@ -2,6 +2,8 @@ package utils
 
 import (
 	"encoding/xml"
+
+	"github.com/pkg/errors"
 )
 
 // InnerXML is an alias for string, which is read from / written to XML
@@ -14,6 +16,7 @@ func (innerxml *InnerXML) UnmarshalXML(d *xml.Decoder, start xml.StartElement) e
 		Value string `xml:",innerxml"`
 	}
 	err := d.DecodeElement(&inner, &start)
+	err = errors.Wrap(err, "d.DecodeElement failed")
 	if err != nil {
 		return err
 	}
@@ -27,5 +30,5 @@ func (innerxml *InnerXML) MarshalXML(e *xml.Encoder, start xml.StartElement) err
 	inner := struct {
 		Value string `xml:",innerxml"`
 	}{Value: string(*innerxml)}
-	return e.EncodeElement(&inner, start)
+	return errors.Wrap(e.EncodeElement(&inner, start), "e.EncodeElement failed")
 }

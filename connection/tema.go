@@ -2,6 +2,7 @@ package connection
 
 import (
 	"github.com/MathWebSearch/mwsapi/utils/gogroup"
+	"github.com/pkg/errors"
 )
 
 // TemaConnection represents a connection to a TemaSearch instance, that is a joined (MathWebSearch, ElasticSearch) instance
@@ -16,12 +17,14 @@ func NewTemaConnection(MWSPort int, MWSHost string, ElasticPort int, ElasticHost
 
 	// create the MWS Connection
 	conn.MWS, err = NewMWSConnection(MWSPort, MWSHost)
+	err = errors.Wrap(err, "NewMWSConnection failed")
 	if err != nil {
 		return
 	}
 
 	// create the tema connection
 	conn.Elastic, err = NewElasticConnection(ElasticPort, ElasticHost)
+	err = errors.Wrap(err, "NewElasticConnection failed")
 	return
 }
 
@@ -30,18 +33,19 @@ func (conn *TemaConnection) connect() (err error) {
 
 	// connect to mws
 	mws := gogroup.GroupJob(func(_ func(func())) error {
-		return conn.MWS.connect()
+		return errors.Wrap(conn.MWS.connect(), "conn.MWS.connect failed")
 	})
 	group.Add(&mws)
 
 	// connect to tema
 	tema := gogroup.GroupJob(func(_ func(func())) error {
-		return conn.Elastic.connect()
+		return errors.Wrap(conn.Elastic.connect(), "conn.Elastic.connect failed")
 	})
 	group.Add(&tema)
 
 	// wait for both to finish
 	err = group.Wait()
+	err = errors.Wrap(err, "group.Wait failed")
 
 	// if either of the connections failed
 	// then we need to disconnect the other

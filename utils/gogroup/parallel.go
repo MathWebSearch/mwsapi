@@ -2,6 +2,8 @@ package gogroup
 
 import (
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 // parallelGroup represents a group that can run an unlimited number of groups in parallel
@@ -117,7 +119,7 @@ func (group *parallelGroup) Wait() (err error) {
 	if group.needsSync {
 		group.worker.Wait()
 	}
-	return group.err
+	return errors.Wrap(group.err, "group.err failed")
 }
 
 // UWait is the same as wait, but only updates error if it isn't nil

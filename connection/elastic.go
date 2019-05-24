@@ -3,6 +3,7 @@ package connection
 import (
 	"time"
 
+	"github.com/pkg/errors"
 	elastic "gopkg.in/olivere/elastic.v6"
 )
 
@@ -51,6 +52,7 @@ func NewElasticConnection(port int, hostname string) (conn *ElasticConnection, e
 
 	// and validate the connection
 	err = Validate(conn.port, conn.hostname)
+	err = errors.Wrap(err, "Validate failed")
 	return
 }
 
@@ -59,6 +61,7 @@ func (conn *ElasticConnection) connect() (err error) {
 	// create a new elasticsearch server
 	client, err := elastic.NewClient(elastic.SetURL(MakeURL(conn.port, conn.hostname, "")), elastic.SetSniff(false), elastic.SetHealthcheckTimeoutStartup(conn.Config.Timeout))
 	if err != nil {
+		err = errors.Wrap(err, "elastic.NewClient failed")
 		return
 	}
 

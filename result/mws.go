@@ -7,12 +7,14 @@ import (
 	"time"
 
 	"github.com/MathWebSearch/mwsapi/utils"
+	"github.com/pkg/errors"
 )
 
 // UnmarshalMWS un-marshals a resoponse from mws
 func (res *Result) UnmarshalMWS(response *http.Response) error {
 	defer response.Body.Close() // close the body when done
 	responseBytes, err := ioutil.ReadAll(response.Body)
+	err = errors.Wrap(err, "ioutil.ReadAll failed")
 	if err != nil {
 		return err
 	}
@@ -28,6 +30,7 @@ func (res *Result) UnmarshalMWS(response *http.Response) error {
 		Hits             []*Hit  `json:"hits,omitempty"`
 	}
 	if err := json.Unmarshal(responseBytes, &r); err != nil {
+		err = errors.Wrap(err, "json.Unmarshal failed")
 		return err
 	}
 

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/MathWebSearch/mwsapi/connection"
+	"github.com/pkg/errors"
 )
 
 // Process represent args to the syncronisation process
@@ -61,42 +62,50 @@ func (proc *Process) Run() (stats *Stats, err error) {
 
 	// Create the index and mapping
 	err = proc.createIndex()
+	err = errors.Wrap(err, "proc.createIndex failed")
 	if err != nil {
 		return
 	}
 
 	// Reset the segment index
 	err = proc.resetSegmentIndex()
+	err = errors.Wrap(err, "proc.resetSegmentIndex failed")
+
 	if err != nil {
 		return
 	}
 
 	// refresh all the indexes
 	err = proc.refreshIndex()
+	err = errors.Wrap(err, "proc.refreshIndex failed")
 	if err != nil {
 		return
 	}
 
 	// upsert segments
 	err = proc.upsertSegments()
+	err = errors.Wrap(err, "proc.upsertSegments failed")
 	if err != nil {
 		return
 	}
 
 	// refresh all the indexes
 	err = proc.refreshIndex()
+	err = errors.Wrap(err, "proc.refreshIndex failed")
 	if err != nil {
 		return
 	}
 
 	// clear old segements
 	err = proc.clearSegments()
+	err = errors.Wrap(err, "proc.clearSegments failed")
 	if err != nil {
 		return
 	}
 
 	// flush all the indexes
 	err = proc.flushIndex()
+	err = errors.Wrap(err, "proc.flushIndex failed")
 	if err != nil {
 		return
 	}

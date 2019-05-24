@@ -1,9 +1,10 @@
 package connection
 
 import (
-	"errors"
 	"net/http"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // MWSConnection represents a connection to MathWebSearch
@@ -39,6 +40,7 @@ func NewMWSConnection(port int, hostname string) (conn *MWSConnection, err error
 
 	// and validate the connection
 	err = Validate(conn.port, conn.hostname)
+	err = errors.Wrap(err, "Validate failed")
 	return
 }
 
@@ -54,6 +56,7 @@ func (conn *MWSConnection) connect() (err error) {
 
 	// ping and make sure the connection actually works
 	err = conn.ping()
+	err = errors.Wrap(err, "conn.ping failed")
 	if err != nil {
 		conn.Client = nil
 	}
@@ -63,6 +66,7 @@ func (conn *MWSConnection) connect() (err error) {
 
 func (conn *MWSConnection) ping() (err error) {
 	res, err := conn.Client.Get(conn.URL())
+	err = errors.Wrap(err, "conn.Client.Get failed")
 	if err != nil {
 		return
 	}

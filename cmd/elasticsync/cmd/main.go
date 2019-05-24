@@ -5,6 +5,7 @@ import (
 
 	"github.com/MathWebSearch/mwsapi/connection"
 	"github.com/MathWebSearch/mwsapi/engine/elasticsync"
+	"github.com/pkg/errors"
 )
 
 // Main represents the main interface of the elasticsync command
@@ -12,6 +13,7 @@ func Main(a *Args) (res interface{}, err error) {
 	// make a new connection
 	c, err := connection.NewElasticConnection(a.ElasticPort, a.ElasticHost)
 	if err != nil {
+		err = errors.Wrap(err, "connection.NewElasticConnection failed")
 		return
 	}
 
@@ -32,6 +34,8 @@ func Main(a *Args) (res interface{}, err error) {
 		if err == nil && a.Normalize && stats != nil {
 			stats.Normalize()
 		}
+
+		err = errors.Wrap(err, "process.Run failed")
 
 		// and return
 		return stats, err

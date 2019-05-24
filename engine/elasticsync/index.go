@@ -2,6 +2,7 @@ package elasticsync
 
 import (
 	"github.com/MathWebSearch/mwsapi/result"
+	"github.com/pkg/errors"
 	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/MathWebSearch/mwsapi/utils/elasticutils"
@@ -22,11 +23,13 @@ func (proc *Process) checkSegmentIndex(segment string) (segobj *result.HarvestSe
 
 	// fetch or create it
 	obj, created, err = elasticutils.FetchOrCreateObject(proc.conn.Client, proc.conn.Config.SegmentIndex, proc.conn.Config.SegmentType, q, segFields)
+	err = errors.Wrap(err, "elasticutils.FetchOrCreateObject failed")
 	if err != nil {
 		return
 	}
 
 	// and unpack the object
 	err = obj.Unpack(&segobj)
+	err = errors.Wrap(err, "obj.Unpack failed")
 	return
 }

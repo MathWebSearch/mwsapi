@@ -4,6 +4,7 @@ import (
 	"sync/atomic"
 
 	"github.com/MathWebSearch/mwsapi/utils/gogroup"
+	"github.com/pkg/errors"
 
 	"github.com/MathWebSearch/mwsapi/utils"
 )
@@ -17,7 +18,7 @@ func (proc *Process) upsertSegments() (err error) {
 	err = utils.IterateFiles(proc.harvestFolder, ".json", func(path string) error {
 		job := gogroup.GroupJob(func(sync func(func())) error {
 			proc.Printf(sync, "=> %s\n", path)
-			return proc.upsertSegment(sync, path)
+			return errors.Wrap(proc.upsertSegment(sync, path), "proc.upsertSegment failed")
 		})
 		group.Add(&job)
 		return nil
@@ -39,6 +40,7 @@ func (proc *Process) upsertSegment(sync func(func()), segment string) (err error
 	// compute the hash
 	proc.Print(sync, "  computing hash ... ")
 	hash, err := utils.HashFile(segment)
+	err = errors.Wrap(err, "utils.HashFile failed")
 
 	if err != nil {
 		proc.PrintlnERROR(sync, "ERROR")
@@ -50,6 +52,7 @@ func (proc *Process) upsertSegment(sync func(func()), segment string) (err error
 	proc.Print(sync, "  checking segment index ... ")
 
 	seg, obj, created, err := proc.checkSegmentIndex(segment)
+	err = errors.Wrap(err, "proc.checkSegmentIndex failed")
 	if err != nil {
 		proc.PrintlnERROR(sync, "ERROR")
 		return err
@@ -84,6 +87,7 @@ func (proc *Process) upsertSegment(sync func(func()), segment string) (err error
 
 		proc.Print(sync, "  Clearing harvests belonging to segment ... ")
 		err = proc.clearSegmentHarvests(seg)
+		err = errors.Wrap(err, "proc.clearSegmentHarvests failed")
 		if err != nil {
 			proc.PrintlnERROR(sync, "ERROR")
 			return err
@@ -93,6 +97,7 @@ func (proc *Process) upsertSegment(sync func(func()), segment string) (err error
 		// we need to clear out the old segments from the db, and put the new ones in
 		proc.Print(sync, "  Loading harvests from segment into index ... ")
 		err = proc.insertSegmentHarvests(segment)
+		err = errors.Wrap(err, "proc.insertSegmentHarvests failed")
 		if err != nil {
 			proc.PrintlnERROR(sync, "ERROR")
 			return err
@@ -108,6 +113,7 @@ func (proc *Process) upsertSegment(sync func(func()), segment string) (err error
 
 	// repack and save it
 	err = obj.Pack(seg)
+	err = errors.Wrap(err, "obj.Pack failed")
 	if err == nil {
 		err = obj.Save()
 	}

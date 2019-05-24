@@ -1,11 +1,15 @@
 package elasticsync
 
-import "github.com/MathWebSearch/mwsapi/utils/elasticutils"
+import (
+	"github.com/MathWebSearch/mwsapi/utils/elasticutils"
+	"github.com/pkg/errors"
+)
 
 // createIndex creates an index to prepare for segmented updates
 func (proc *Process) createIndex() (err error) {
 	proc.Printf(nil, "Creating Harvest Index %s ... ", proc.conn.Config.HarvestIndex)
 	created, err := elasticutils.CreateIndex(proc.conn.Client, proc.conn.Config.HarvestIndex, harvestMapping(proc.conn.Config))
+	err = errors.Wrap(err, "elasticutils.CreateIndex failed")
 	if err != nil {
 		proc.PrintlnERROR(nil, "ERROR")
 		return
@@ -18,6 +22,7 @@ func (proc *Process) createIndex() (err error) {
 
 	proc.Printf(nil, "Creating Segment Index %s ... ", proc.conn.Config.SegmentIndex)
 	created, err = elasticutils.CreateIndex(proc.conn.Client, proc.conn.Config.SegmentIndex, segmentMapping(proc.conn.Config))
+	err = errors.Wrap(err, "elasticutils.CreateIndex failed")
 	if err != nil {
 		proc.PrintlnERROR(nil, "ERROR")
 		return

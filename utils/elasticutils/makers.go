@@ -2,9 +2,10 @@ package elasticutils
 
 import (
 	"context"
-	"errors"
 	"io"
 	"time"
+
+	"github.com/pkg/errors"
 
 	elastic "gopkg.in/olivere/elastic.v6"
 )
@@ -16,6 +17,7 @@ func NewObjectFromID(client *elastic.Client, index string, tp string, id string)
 
 	// reload it from the db, clear if it fails
 	err = obj.Reload()
+	err = errors.Wrap(err, "obj.Reload failed")
 	if err != nil {
 		obj = nil
 	}
@@ -28,11 +30,13 @@ func NewObjectFromFields(client *elastic.Client, index string, tp string, Data i
 
 	// pack the fields into the object
 	err = obj.Pack(Data)
+	err = errors.Wrap(err, "obj.Pack failed")
 	if err != nil {
 		return
 	}
 
 	err = obj.Index()
+	err = errors.Wrap(err, "obj.Index failed")
 	return
 }
 
@@ -43,6 +47,7 @@ func NewObjectFromHit(client *elastic.Client, hit *elastic.SearchHit) (obj *Obje
 
 	//update it from the hit
 	err = obj.updateFromHit(hit)
+	err = errors.Wrap(err, "obj.updateFromHit failed")
 	if err != nil {
 		obj = nil
 	}
@@ -103,6 +108,7 @@ func FetchObjectsPage(client *elastic.Client, index string, tp string, query ela
 	}
 
 	results, err := search.Do(ctx)
+	err = errors.Wrap(err, "search.Do failed")
 
 	if err == nil && results.TimedOut {
 		err = errors.New("[Search] Elasticsearch reported TimedOut=true")
@@ -122,6 +128,7 @@ func FetchObjectsPage(client *elastic.Client, index string, tp string, query ela
 	// iterate over the hits
 	for i, hit := range results.Hits.Hits {
 		obj, err := NewObjectFromHit(client, hit)
+		err = errors.Wrap(err, "NewObjectFromHit failed")
 		if err != nil {
 			return nil, err
 		}
@@ -141,6 +148,7 @@ func FetchObject(client *elastic.Client, index string, tp string, query elastic.
 
 	// fetch a page of objects
 	results, err := FetchObjectsPage(client, index, tp, query, highlight, 0, 1)
+	err = errors.Wrap(err, "FetchObjectsPage failed")
 	if err != nil {
 		return
 	}
@@ -161,12 +169,14 @@ func FetchObject(client *elastic.Client, index string, tp string, query elastic.
 func FetchOrCreateObject(client *elastic.Client, index string, tp string, query elastic.Query, Data interface{}) (obj *Object, created bool, err error) {
 	// first try and fetch the object
 	obj, _, err = FetchObject(client, index, tp, query, nil)
+	err = errors.Wrap(err, "FetchObject failed")
 	if err != nil || obj != nil {
 		return
 	}
 
 	// if that fails create it
 	obj, err = NewObjectFromFields(client, index, tp, Data)
+	err = errors.Wrap(err, "NewObjectFromFields failed")
 	created = true
 
 	return

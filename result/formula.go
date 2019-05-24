@@ -1,12 +1,11 @@
 package result
 
 import (
-	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/MathWebSearch/mwsapi/utils"
+	"github.com/pkg/errors"
 )
 
 // MathFormula represents information about a single located math formula
@@ -61,21 +60,23 @@ func (formula *MathFormula) RealMathID() string {
 // given a hit and a result
 func (formula *MathFormula) PopulateSubsitutions(hit *Hit, res *Result) (err error) {
 	if len(formula.Substitution) > 0 {
-		return fmt.Errorf("[MathFormula.PopulateSubsitutions] Substiution already populated ")
+		return errors.Errorf("[MathFormula.PopulateSubsitutions] Substiution already populated ")
 	}
 
 	if formula.Source == "" {
-		return fmt.Errorf("[MathFormula.PopulateSubsitutions] Missing formula source, can not populate subsitutions")
+		return errors.Errorf("[MathFormula.PopulateSubsitutions] Missing formula source, can not populate subsitutions")
 	}
 
 	// parse the mathml
 	mathml, err := formula.MathML()
+	err = errors.Wrap(err, "formula.MathML failed")
 	if err != nil {
 		return
 	}
 
 	// find the term representing the entire found term
 	err = mathml.NavigateAnnotation(".."+formula.XPath, false)
+	err = errors.Wrap(err, "mathml.NavigateAnnotation failed")
 	if err != nil {
 		return err
 	}
@@ -92,6 +93,7 @@ func (formula *MathFormula) PopulateSubsitutions(hit *Hit, res *Result) (err err
 
 		// navigate to the xpath
 		err = copy.NavigateAnnotation("."+variable.XPath, true)
+		err = errors.Wrap(err, "copy.NavigateAnnotation failed")
 		if err != nil {
 			return err
 		}

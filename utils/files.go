@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"crypto/sha256"
 	"encoding/hex"
-	"errors"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/pkg/errors"
 )
 
 const bufferCapcityInBytes = 128 * 1024 // 128 MB
@@ -16,6 +17,7 @@ const bufferCapcityInBytes = 128 * 1024 // 128 MB
 func ProcessLinePairs(filename string, allowLeftover bool, parser func(string, string) error) (err error) {
 	// load the file
 	file, err := os.Open(filename)
+	err = errors.Wrap(err, "os.Open failed")
 	if err != nil {
 		return err
 	}
@@ -38,6 +40,7 @@ func ProcessLinePairs(filename string, allowLeftover bool, parser func(string, s
 			// we read the first one already, so read the second one
 		} else {
 			err := parser(firstLine, scanner.Text())
+			err = errors.Wrap(err, "parser failed")
 			if err != nil {
 				return err
 			}
@@ -52,7 +55,9 @@ func ProcessLinePairs(filename string, allowLeftover bool, parser func(string, s
 	}
 
 	// if something broke, throw an error
-	return scanner.Err()
+	err = scanner.Err()
+	err = errors.Wrap(err, "scanner.Err failed")
+	return
 }
 
 //IterateFiles iterates over files in a directory with a given extension
@@ -62,7 +67,9 @@ func IterateFiles(dir string, extension string, callback func(string) error) (er
 			return err
 		}
 		if filepath.Ext(path) == extension {
-			return callback(path)
+			err = callback(path)
+			err = errors.Wrap(err, "callback failed")
+			return err
 		}
 		return nil
 	})
@@ -75,6 +82,7 @@ func HashFile(filename string) (hash string, err error) {
 
 	// open the segment
 	f, err := os.Open(filename)
+	err = errors.Wrap(err, "os.open failed")
 	if err != nil {
 		return
 	}
@@ -82,6 +90,7 @@ func HashFile(filename string) (hash string, err error) {
 
 	// start hashing the file
 	if _, err := io.Copy(hasher, f); err != nil {
+		err = errors.Wrap(err, "io.Copy failed")
 		return "", err
 	}
 

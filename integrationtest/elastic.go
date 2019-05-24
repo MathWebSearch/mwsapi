@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/pkg/errors"
 )
 
 // LoadElasticSnapshot loads an elastic snapshot
@@ -19,16 +21,20 @@ func LoadElasticSnapshot(client *http.Client, url string, location string) (err 
 	}
 
 	err = registerBackupLocation(client, url, reponame, location)
+	err = errors.Wrap(err, "registerBackupLocation failed")
 	if err != nil {
 		return
 	}
 
 	err = loadSnapshot(client, url, reponame, snapshotname)
+	err = errors.Wrap(err, "loadSnapshot failed")
 	if err != nil {
 		return
 	}
 
-	return refreshElasticSearch(client, url)
+	err = refreshElasticSearch(client, url)
+	err = errors.Wrap(err, "refreshElasticSearch failed")
+	return
 }
 
 type j map[string]interface{}
@@ -44,6 +50,7 @@ func registerBackupLocation(client *http.Client, url string, reponame string, lo
 		},
 	}
 	d, err := json.Marshal(data)
+	err = errors.Wrap(err, "json.Marshal failed")
 	if err != nil {
 		return
 	}
@@ -51,6 +58,7 @@ func registerBackupLocation(client *http.Client, url string, reponame string, lo
 	// make a PUT request to the appropriate url
 	uri := fmt.Sprintf("%s/_snapshot/%s", url, reponame)
 	req, err := http.NewRequest(http.MethodPut, uri, bytes.NewBuffer(d))
+	err = errors.Wrap(err, "http.NewRequest failed")
 	if err != nil {
 		return err
 	}
@@ -58,18 +66,20 @@ func registerBackupLocation(client *http.Client, url string, reponame string, lo
 
 	// and send it
 	res, err := client.Do(req)
+	err = errors.Wrap(err, "client.Do failed")
 	if err != nil {
 		return
 	}
 
 	bodyBytes, err := ioutil.ReadAll(res.Body)
+	err = errors.Wrap(err, "ioutil.ReadAll failed")
 	if err != nil {
 		return
 	}
 
 	// and return
 	if res.StatusCode != 200 {
-		return fmt.Errorf("%s returned %s", uri, string(bodyBytes))
+		return errors.Errorf("%s returned %s", uri, string(bodyBytes))
 	}
 	return
 }
@@ -81,6 +91,7 @@ func loadSnapshot(client *http.Client, url string, reponame string, snapshotname
 		"include_global_state": true,
 	}
 	d, err := json.Marshal(data)
+	err = errors.Wrap(err, "json.Marshal failed")
 	if err != nil {
 		return
 	}
@@ -88,39 +99,48 @@ func loadSnapshot(client *http.Client, url string, reponame string, snapshotname
 	// the request itself
 	uri := fmt.Sprintf("%s/_snapshot/%s/%s/_restore", url, reponame, snapshotname)
 	req, err := http.NewRequest(http.MethodPost, uri, bytes.NewBuffer(d))
-	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-
+	err = errors.Wrap(err, "http.NewRequest failed")
 	if err != nil {
 		return
 	}
+
+	// set the header
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 
 	// and send it
 	res, err := client.Do(req)
+	err = errors.Wrap(err, "client.Do failed")
 	if err != nil {
 		return
 	}
 
-	return expectHTTP200(res, uri)
+	err = expectHTTP200(res, uri)
+	err = errors.Wrap(err, "expectHTTP200 failed")
+	return
 }
 
 func refreshElasticSearch(client *http.Client, url string) (err error) {
 	uri := fmt.Sprintf("%s/_refresh", url)
 	res, err := client.Get(uri)
+	err = errors.Wrap(err, "client.Get failed")
 	if err != nil {
 		return
 	}
 
-	return expectHTTP200(res, uri)
+	err = expectHTTP200(res, uri)
+	err = errors.Wrap(err, "expectHTTP200 failed")
+	return
 }
 
 func expectHTTP200(res *http.Response, uri string) (err error) {
 	bodyBytes, err := ioutil.ReadAll(res.Body)
+	err = errors.Wrap(err, "ioutil.ReadAll failed")
 	if err != nil {
 		return
 	}
 
 	if res.StatusCode != 200 {
-		return fmt.Errorf("%s returned %s", uri, string(bodyBytes))
+		return errors.Errorf("%s returned %s", uri, string(bodyBytes))
 	}
 
 	return

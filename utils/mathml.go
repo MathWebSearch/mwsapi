@@ -2,8 +2,9 @@ package utils
 
 import (
 	"encoding/xml"
-	"errors"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/antchfx/xpath"
 
@@ -31,6 +32,7 @@ func ParseMathML(source string) (math *MathML, err error) {
 
 	// parse the xml node
 	math.root, err = xmlquery.Parse(reader)
+	err = errors.Wrap(err, "xmlquery.Parse failed")
 	if err != nil {
 		return
 	}
@@ -67,6 +69,7 @@ func ParseMathML(source string) (math *MathML, err error) {
 
 	// and update the semantics
 	err = math.updateSemantics()
+	err = errors.Wrap(err, "math.updateSemantics failed")
 	return
 }
 
@@ -104,6 +107,7 @@ func (math *MathML) NavigateAnnotation(xpth string, updateSemantics bool) (err e
 
 	// update the semantics element
 	err = math.updateSemantics()
+	err = errors.Wrap(err, "math.updateSemantics failed")
 
 	// if we asked to update semantics and got an error
 	// ignore the error, and set the semantics to nil
@@ -112,10 +116,6 @@ func (math *MathML) NavigateAnnotation(xpth string, updateSemantics bool) (err e
 		math.semantics = nil
 	}
 
-	// update semantics if requested
-	if updateSemantics {
-		err = math.updateSemantics()
-	}
 	return
 }
 

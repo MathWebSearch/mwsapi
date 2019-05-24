@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/MathWebSearch/mwsapi/utils"
+	"github.com/pkg/errors"
 )
 
 // HarvestElement represents an <mws:data> harvest node, which can be contained both within ElasticSearch and MWS
@@ -35,6 +36,7 @@ func (he *HarvestElement) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (
 		Math []*MathFormula `xml:"math"`
 	}
 	err = d.DecodeElement(&h, &start)
+	err = errors.Wrap(err, "d.DecodeElement failed")
 	if err != nil {
 		return
 	}
@@ -51,6 +53,7 @@ func (he *HarvestElement) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (
 		v = "{}"
 	}
 	err = json.Unmarshal([]byte(v), &he.Metadata)
+	err = errors.Wrap(err, "json.Unmarshal failed")
 	if err != nil {
 		return
 	}

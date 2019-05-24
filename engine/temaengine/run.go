@@ -6,6 +6,7 @@ import (
 
 	"github.com/MathWebSearch/mwsapi/engine/elasticengine"
 	"github.com/MathWebSearch/mwsapi/engine/mwsengine"
+	"github.com/pkg/errors"
 
 	"github.com/MathWebSearch/mwsapi/connection"
 	"github.com/MathWebSearch/mwsapi/query"
@@ -36,17 +37,20 @@ func Run(conn *connection.TemaConnection, q *query.Query, from int64, size int64
 	// mws query => run an mws query
 	if tp == query.MWSQueryKind {
 		err = runMWSQuery(conn, q, res, from, size)
+		err = errors.Wrap(err, "runMWSQuery failed")
 		return
 	}
 
 	// count elastic queries using the appropriate function
 	if tp == query.ElasticQueryKind {
 		err = runElasticQuery(conn, q, res, from, size)
+		err = errors.Wrap(err, "runElasticQuery failed")
 		return
 	}
 
 	// else run the multi-plexec query
 	err = runTemaSearchQuery(conn, q, res, from, size)
+	err = errors.Wrap(err, "runTemaSearchQuery failed")
 	return
 }
 
@@ -79,6 +83,7 @@ outer:
 	for len(res.Hits) <= maxHits {
 		// fetch the next outer page
 		outer, err := mwsengine.Run(conn.MWS, qq, outerfrom, outerPageSize)
+		err = errors.Wrap(err, "mwsengine.Run failed")
 		outerfrom += outerPageSize
 		if err != nil {
 			return err
@@ -107,6 +112,7 @@ outer:
 			// TODO: Re-do pagination
 			inner, err := elasticengine.Run(conn.Elastic, qqq, innerfrom, conn.Elastic.Config.MaxPageSize)
 			innerfrom += conn.Elastic.Config.MaxPageSize
+			err = errors.Wrap(err, "elasticengine.Run failed")
 			if err != nil {
 				return err
 			}
@@ -143,6 +149,7 @@ outer:
 func runMWSQuery(conn *connection.TemaConnection, q *query.Query, res *result.Result, from int64, size int64) (err error) {
 	// run the query
 	result, err := mwsengine.Run(conn.MWS, q.MWSQuery(), from, size)
+	err = errors.Wrap(err, "mwsengine.Run failed")
 	if err != nil {
 		return
 	}
@@ -156,6 +163,7 @@ func runMWSQuery(conn *connection.TemaConnection, q *query.Query, res *result.Re
 func runElasticQuery(conn *connection.TemaConnection, q *query.Query, res *result.Result, from int64, size int64) (err error) {
 	// run the query
 	result, err := elasticengine.Run(conn.Elastic, q.ElasticQuery(nil), from, size)
+	err = errors.Wrap(err, "elasticengine.Run failed")
 	if err != nil {
 		return
 	}

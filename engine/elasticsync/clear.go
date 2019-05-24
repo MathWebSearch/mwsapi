@@ -5,6 +5,7 @@ import (
 
 	"github.com/MathWebSearch/mwsapi/result"
 	"github.com/MathWebSearch/mwsapi/utils/gogroup"
+	"github.com/pkg/errors"
 
 	"github.com/MathWebSearch/mwsapi/utils/elasticutils"
 	elastic "gopkg.in/olivere/elastic.v6"
@@ -24,7 +25,7 @@ func (proc *Process) clearSegments() (err error) {
 		func(so *elasticutils.Object) {
 			job := gogroup.GroupJob(func(sync func(func())) error {
 				atomic.AddInt64(&proc.stats.RemovedSegments, 1)
-				return proc.clearSegment(sync, so)
+				return errors.Wrap(proc.clearSegment(sync, so), "proc.ClearSegment failed")
 			})
 			group.Add(&job)
 		}(so)
@@ -44,6 +45,7 @@ func (proc *Process) clearSegments() (err error) {
 func (proc *Process) clearSegment(sync func(func()), so *elasticutils.Object) (err error) {
 	segment := &result.HarvestSegment{}
 	err = so.Unpack(segment)
+	err = errors.Wrap(err, "so.Unpack failed")
 	if err != nil {
 		return
 	}
@@ -52,6 +54,7 @@ func (proc *Process) clearSegment(sync func(func()), so *elasticutils.Object) (e
 	// clear the harvests
 	proc.Print(sync, "  Clearing harvests belonging to segment ... ")
 	err = proc.clearSegmentHarvests(segment)
+	err = errors.Wrap(err, "proc.clearSegmentHarvests failed")
 	if err != nil {
 		proc.PrintlnERROR(sync, "ERROR")
 		return
@@ -61,6 +64,7 @@ func (proc *Process) clearSegment(sync func(func()), so *elasticutils.Object) (e
 	// and remove segment itself
 	proc.Print(sync, "  Removing segment ... ")
 	err = so.Delete()
+	err = errors.Wrap(err, "so.Delete failed")
 	if err == nil {
 		proc.PrintlnOK(sync, "OK")
 	} else {
@@ -72,9 +76,11 @@ func (proc *Process) clearSegment(sync func(func()), so *elasticutils.Object) (e
 }
 
 // clearSegmentHarvests clears segments belonging to a harvest
-func (proc *Process) clearSegmentHarvests(segment *result.HarvestSegment) error {
+func (proc *Process) clearSegmentHarvests(segment *result.HarvestSegment) (err error) {
 	q := elastic.NewBoolQuery()
 	q = q.Must(elastic.NewTermQuery("segment", segment.ID))
 
-	return elasticutils.DeleteBulk(proc.conn.Client, proc.conn.Config.HarvestIndex, proc.conn.Config.HarvestType, q)
+	err = elasticutils.DeleteBulk(proc.conn.Client, proc.conn.Config.HarvestIndex, proc.conn.Config.HarvestType, q)
+	err = errors.Wrap(err, "elasticutils.DeleteBulk failed")
+	return
 }

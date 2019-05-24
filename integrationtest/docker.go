@@ -9,12 +9,14 @@ import (
 	"time"
 
 	"github.com/MathWebSearch/mwsapi/utils/gogroup"
+	"github.com/pkg/errors"
 )
 
 // StartDockerService starts docker-compose configured services from the given servicefile
 // and then blocks until a url returns http status code 200
 func StartDockerService(service string, urls ...string) (client *http.Client, err error) {
 	err = runExternalCommand("docker-compose", "-f", service, "up", "--force-recreate", "-d")
+	err = errors.Wrap(err, "runExternalCommand failed")
 	if err != nil {
 		return
 	}
@@ -40,6 +42,7 @@ func StartDockerService(service string, urls ...string) (client *http.Client, er
 						})
 					}
 					res, err := client.Get(url)
+					err = errors.Wrap(err, "client.Get failed")
 					if err == nil && res.StatusCode == 200 {
 						break
 					}
@@ -66,7 +69,9 @@ func StartDockerService(service string, urls ...string) (client *http.Client, er
 // including all volumes
 func StopDockerService(servicefile string) (err error) {
 	// stop the service
-	return runExternalCommand("docker-compose", "-f", servicefile, "down", "-v")
+	err = runExternalCommand("docker-compose", "-f", servicefile, "down", "-v")
+	err = errors.Wrap(err, "runExternalCommand failed")
+	return
 }
 
 // runExternalCommand runs an external command in the TestDataPath directory
@@ -83,5 +88,7 @@ func runExternalCommand(exe string, args ...string) (err error) {
 	}
 
 	// finally run the command
-	return cmd.Run()
+	err = cmd.Run()
+	err = errors.Wrap(err, "cmd.Run failed")
+	return
 }

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // Connection represents the connection to a given daemon
@@ -15,11 +17,11 @@ type Connection interface {
 // Validate validates details to a connection
 func Validate(port int, hostname string) (e error) {
 	if port <= 0 || port > 65535 {
-		return fmt.Errorf("%d is not a valid port number. Port numbers are in the range (1, 65535) inclusive. ", port)
+		return errors.Errorf("%d is not a valid port number. Port numbers are in the range (1, 65535) inclusive. ", port)
 	}
 
 	if hostname == "" {
-		return fmt.Errorf("%q is not a valid hostname. It should not be empty. ", hostname)
+		return errors.Errorf("%q is not a valid hostname. It should not be empty. ", hostname)
 	}
 
 	return
@@ -36,7 +38,7 @@ func MakeURL(port int, hostname string, protocol string) string {
 
 // Connect connects to the daemon represented by this connection
 func Connect(c Connection) error {
-	return c.connect()
+	return errors.Wrap(c.connect(), "c.connect failed")
 }
 
 // AwaitConnect repeatedly tries to connect to the daemon until the connection suceeds
@@ -50,6 +52,7 @@ func AwaitConnect(c Connection, retryInterval time.Duration, maxRetries int, onF
 		if err == nil {
 			break
 		}
+		err = errors.Wrap(err, "c.connect failed")
 
 		// call the failure handler
 		if onFailure != nil {

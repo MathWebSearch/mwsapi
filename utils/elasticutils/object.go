@@ -3,7 +3,8 @@ package elasticutils
 import (
 	"context"
 	"encoding/json"
-	"errors"
+
+	"github.com/pkg/errors"
 
 	"gopkg.in/olivere/elastic.v6"
 )
@@ -47,6 +48,7 @@ func (obj *Object) Index() (err error) {
 
 	// grab the fields
 	doc, err := obj.UnpackFields()
+	err = errors.Wrap(err, "obj.UnpackFields failed")
 	if err != nil {
 		return
 	}
@@ -54,6 +56,7 @@ func (obj *Object) Index() (err error) {
 	// perform the Indexing operation
 	ctx := context.Background()
 	result, err := obj.client.Index().Index(obj.index).Type(obj.tp).BodyJson(doc).Do(ctx)
+	err = errors.Wrap(err, "obj.client.Index failed")
 	if err == nil && result.Shards.Successful <= 0 {
 		err = errors.New("[Object.Index] Elasticsearch reported 0 successful shards")
 	}
@@ -79,6 +82,7 @@ func (obj *Object) Reload() (err error) {
 
 	// fetch from the db and return unless an error occured
 	result, err := obj.client.Get().Index(obj.index).Type(obj.tp).Id(obj.id).Do(ctx)
+	err = errors.Wrap(err, "obj.client.Get failed")
 	if err == nil && !result.Found {
 		err = errors.New("[Object.Reload] Did not find object")
 	}
@@ -111,6 +115,7 @@ func (obj *Object) Save() (err error) {
 
 	// grab the fields
 	doc, err := obj.UnpackFields()
+	err = errors.Wrap(err, "obj.UnpackFields failed")
 	if err != nil {
 		return
 	}
@@ -118,6 +123,7 @@ func (obj *Object) Save() (err error) {
 	// and replace it in the database
 	ctx := context.Background()
 	res, err := obj.client.Update().Index(obj.index).Type(obj.tp).Id(obj.id).Doc(doc).Do(ctx)
+	err = errors.Wrap(err, "obj.client.Update failed")
 
 	//check errors
 	if err == nil && (res.Result != "noop" && res.Shards.Successful <= 0) {
@@ -136,6 +142,7 @@ func (obj *Object) Delete() (err error) {
 	// just clears the object
 	ctx := context.Background()
 	res, err := obj.client.Delete().Index(obj.index).Type(obj.tp).Id(obj.id).Do(ctx)
+	err = errors.Wrap(err, "obj.client.Delete failed")
 
 	if err == nil && res.Result != "deleted" {
 		err = errors.New("[Object.Delete] Elasticsearch did not report deleted result")
@@ -151,12 +158,15 @@ func (obj *Object) Delete() (err error) {
 
 // Unpack will unpack this object as json
 func (obj *Object) Unpack(v interface{}) (err error) {
-	return json.Unmarshal(*obj.Source, v)
+	err = json.Unmarshal(*obj.Source, v)
+	err = errors.Wrap(err, "json.Unmarshal failed")
+	return
 }
 
 // UnpackFields unpacks this object into a set of fields
 func (obj *Object) UnpackFields() (fields map[string]interface{}, err error) {
 	err = obj.Unpack(&fields)
+	err = errors.Wrap(err, "obj.Unpack failed")
 	return
 }
 
@@ -165,6 +175,7 @@ func (obj *Object) Pack(v interface{}) (err error) {
 	// decode the bytes
 	var bytes json.RawMessage
 	bytes, err = json.Marshal(v)
+	err = errors.Wrap(err, "json.Marshal failed")
 	if err != nil {
 		return
 	}

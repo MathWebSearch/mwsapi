@@ -9,6 +9,7 @@ import (
 	"github.com/MathWebSearch/mwsapi/connection"
 	"github.com/MathWebSearch/mwsapi/query"
 	"github.com/MathWebSearch/mwsapi/result"
+	"github.com/pkg/errors"
 )
 
 // Run runs an MWS Query
@@ -23,7 +24,9 @@ func Run(conn *connection.MWSConnection, query *query.MWSQuery, from int64, size
 	}()
 
 	// TODO: Paralellize this with appropriate page size
-	return runRaw(conn, query.Raw(from, size))
+	res, err = runRaw(conn, query.Raw(from, size))
+	err = errors.Wrap(err, "runRaw failed")
+	return
 }
 
 // RunRaw runs a raw query
@@ -33,12 +36,14 @@ func runRaw(conn *connection.MWSConnection, q *query.RawMWSQuery) (res *result.R
 
 	// turn the query into xml
 	b, err := xml.Marshal(q)
+	err = errors.Wrap(err, "xml.Marshal failed")
 	if err != nil {
 		return
 	}
 
 	// make a request object
 	req, err := http.NewRequest("POST", conn.URL(), bytes.NewBuffer(b))
+	err = errors.Wrap(err, "http.NewRequest failed")
 	if err != nil {
 		return
 	}
@@ -48,6 +53,7 @@ func runRaw(conn *connection.MWSConnection, q *query.RawMWSQuery) (res *result.R
 
 	// run the request
 	resp, err := conn.Client.Do(req)
+	err = errors.Wrap(err, "conn.Client.Do failed")
 	if err != nil {
 		return
 	}
@@ -58,6 +64,7 @@ func runRaw(conn *connection.MWSConnection, q *query.RawMWSQuery) (res *result.R
 		Size: q.Size,
 	}
 	err = res.UnmarshalMWS(resp)
+	err = errors.Wrap(err, "res.UnmarshalMWS failed")
 
 	return
 }

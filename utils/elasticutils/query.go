@@ -2,7 +2,8 @@ package elasticutils
 
 import (
 	"context"
-	"errors"
+
+	"github.com/pkg/errors"
 
 	"gopkg.in/olivere/elastic.v6"
 )
@@ -19,6 +20,7 @@ func CreateBulk(client *elastic.Client, index string, tp string, objects chan in
 
 	ctx := context.Background()
 	res, err := bulkRequest.Do(ctx)
+	err = errors.Wrap(err, "bulkRequest.Do failed")
 
 	if err == nil && res.Errors {
 		err = errors.New("[CreateBulk] Elasticsearch reported Errors=true")
@@ -31,6 +33,7 @@ func CreateBulk(client *elastic.Client, index string, tp string, objects chan in
 func UpdateAll(client *elastic.Client, index string, tp string, script *elastic.Script) (err error) {
 	ctx := context.Background()
 	res, err := client.UpdateByQuery(index).Type(tp).Query(elastic.NewMatchAllQuery()).Script(script).Do(ctx)
+	err = errors.Wrap(err, "client.UpdateByQuery failed")
 
 	if err == nil && res.TimedOut {
 		err = errors.New("[UpdateAll] Elasticsearch reported TimedOut=true")
@@ -43,6 +46,7 @@ func UpdateAll(client *elastic.Client, index string, tp string, script *elastic.
 func DeleteBulk(client *elastic.Client, index string, tp string, query elastic.Query) (err error) {
 	ctx := context.Background()
 	res, err := client.DeleteByQuery(index).Type(tp).Query(query).Do(ctx)
+	err = errors.Wrap(err, "client.DeleteByQuery failed")
 
 	if err == nil && res.TimedOut {
 		err = errors.New("[DeleteBulk] Elasticsearch reported TimedOut=true")

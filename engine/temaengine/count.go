@@ -4,6 +4,7 @@ import (
 	"sync/atomic"
 
 	"github.com/MathWebSearch/mwsapi/engine/elasticengine"
+	"github.com/pkg/errors"
 
 	"github.com/MathWebSearch/mwsapi/connection"
 	"github.com/MathWebSearch/mwsapi/engine/mwsengine"
@@ -23,16 +24,22 @@ func Count(conn *connection.TemaConnection, q *query.Query) (count int64, err er
 
 	// count mws queries using the appropriate function
 	if tp == query.MWSQueryKind {
-		return countMWSQuery(conn, q)
+		count, err = countMWSQuery(conn, q)
+		err = errors.Wrap(err, "countMWSQuery failed")
+		return
 	}
 
 	// count elastic queries using the appropriate function
 	if tp == query.ElasticQueryKind {
-		return countElasticQuery(conn, q, nil)
+		count, err = countElasticQuery(conn, q, nil)
+		err = errors.Wrap(err, "countElasticQuery failed")
+		return
 	}
 
 	// returns
-	return countTemaSearchQuery(conn, q)
+	count, err = countTemaSearchQuery(conn, q)
+	err = errors.Wrap(err, "countTemaSearchQuery failed")
+	return
 }
 
 func countMWSQuery(conn *connection.TemaConnection, q *query.Query) (int64, error) {
@@ -49,6 +56,7 @@ func countTemaSearchQuery(conn *connection.TemaConnection, q *query.Query) (coun
 
 	// query the total number of outer results
 	outerTotal, err := mwsengine.Count(conn.MWS, qq)
+	err = errors.Wrap(err, "mwsengine.Count failed")
 	if err != nil || outerTotal == 0 {
 		return
 	}
@@ -64,12 +72,14 @@ func countTemaSearchQuery(conn *connection.TemaConnection, q *query.Query) (coun
 			job := gogroup.GroupJob(func(sync func(func())) (e error) {
 				// run the outer query and exit if it has an empty result
 				outer, e := mwsengine.Run(conn.MWS, qq, from, conn.MWS.Config.MaxPageSize)
+				e = errors.Wrap(e, "mwsengine.Run failed")
 				if e != nil || len(outer.HitIDs) == 0 {
 					return
 				}
 
 				// get the total number of inner results
 				innertotal, e := elasticengine.Count(conn.Elastic, q.ElasticQuery(outer.HitIDs))
+				e = errors.Wrap(e, "elasticengine.Count failed")
 				if e != nil {
 					return
 				}

@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 
 	"github.com/MathWebSearch/mwsapi/utils"
+	"github.com/pkg/errors"
 )
 
 // MWSQuery represents a user-provided MWS Query
@@ -66,7 +67,7 @@ func (raw RawMWSQuery) MarshalXML(e *xml.Encoder, start xml.StartElement) error 
 		"http://www.w3.org/1998/Math/MathML",
 	}
 	start.Name = xml.Name{Local: "mws:query", Space: ""} // TODO: Fixme, why is this not working
-	return e.EncodeElement(r, start)
+	return errors.Wrap(e.EncodeElement(r, start), "e.EncodeElement failed")
 }
 
 // MWSExpression represents a single expression that is being searched for

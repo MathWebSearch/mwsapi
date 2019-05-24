@@ -2,6 +2,8 @@ package result
 
 import (
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // Result represents a Query Result which can be from either MathWebSearch, ElasticSearch or a combined TemaSearch Result
@@ -48,6 +50,7 @@ func (res *Result) Normalize() {
 func (res *Result) PopulateSubsitutions() error {
 	for _, hit := range res.Hits {
 		if err := hit.PopulateSubsitutions(res); err != nil {
+			err = errors.Wrap(err, "hit.PopulateSubstiutions failed")
 			return err
 		}
 	}

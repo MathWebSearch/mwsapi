@@ -2,6 +2,7 @@ package elasticsync
 
 import (
 	"github.com/MathWebSearch/mwsapi/utils/elasticutils"
+	"github.com/pkg/errors"
 	"gopkg.in/olivere/elastic.v6"
 )
 
@@ -11,6 +12,7 @@ func (proc *Process) resetSegmentIndex() (err error) {
 
 	// reset the touched part to false
 	err = elasticutils.UpdateAll(proc.conn.Client, proc.conn.Config.SegmentIndex, proc.conn.Config.SegmentType, elastic.NewScript("ctx._source.touched = false"))
+	err = errors.Wrap(err, "elasticutils.UpdateAll failed")
 	if err == nil {
 		proc.PrintlnOK(nil, "OK")
 	} else {

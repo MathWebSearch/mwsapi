@@ -2,6 +2,8 @@ package gogroup
 
 import (
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 // asyncGroup represents a group that can run an unlimited number of groups in parallel
@@ -81,7 +83,7 @@ func (group *asyncGroup) Wait() (err error) {
 	if group.needsSync {
 		group.worker.Wait()
 	}
-	return group.err
+	return errors.Wrap(group.err, "group.err failed")
 }
 
 // Close closes this asyncGroup
