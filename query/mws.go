@@ -9,8 +9,8 @@ import (
 
 // MWSQuery represents a user-provided MWS Query
 type MWSQuery struct {
-	Expressions []string // MathWebSearch Expressions to query for
-	MwsIdsOnly  bool     // if set to true, use method "mws_ids", else "json"
+	Expressions []string `json:"expressions,omitempty"` // MathWebSearch Expressions to query for
+	MwsIdsOnly  bool     `json:"mwsids,omitempty"`      // if set to true, use method "mws_ids", else "json"
 }
 
 // Raw turns this query  into a raw mws query

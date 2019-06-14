@@ -31,7 +31,7 @@ func NewMWSConnection(port int, hostname string) (conn *MWSConnection, err error
 		hostname: hostname,
 
 		Config: &MWSConfiguration{
-			Timeout: 5 * time.Second,
+			Timeout: time.Minute,
 
 			PoolSize:    10,
 			MaxPageSize: 10,
@@ -52,7 +52,9 @@ func (conn *MWSConnection) URL() string {
 // connect connects to this connection
 func (conn *MWSConnection) connect() (err error) {
 	// create a new http client
-	conn.Client = &http.Client{}
+	conn.Client = &http.Client{
+		Timeout: conn.Config.Timeout,
+	}
 
 	// ping and make sure the connection actually works
 	err = conn.ping()

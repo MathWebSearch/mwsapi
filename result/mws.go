@@ -2,7 +2,6 @@ package result
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -13,11 +12,7 @@ import (
 // UnmarshalMWS un-marshals a resoponse from mws
 func (res *Result) UnmarshalMWS(response *http.Response) error {
 	defer response.Body.Close() // close the body when done
-	responseBytes, err := ioutil.ReadAll(response.Body)
-	err = errors.Wrap(err, "ioutil.ReadAll failed")
-	if err != nil {
-		return err
-	}
+	decoder := json.NewDecoder(response.Body)
 
 	// read the adapted data from the json
 	var r struct {
@@ -29,7 +24,7 @@ func (res *Result) UnmarshalMWS(response *http.Response) error {
 		MathWebSearchIDs []int64 `json:"ids,omitempty"`
 		Hits             []*Hit  `json:"hits,omitempty"`
 	}
-	if err := json.Unmarshal(responseBytes, &r); err != nil {
+	if err := decoder.Decode(&r); err != nil {
 		err = errors.Wrap(err, "json.Unmarshal failed")
 		return err
 	}

@@ -7,21 +7,19 @@ A [golang](https://golang.org) library and set of tools to setup, query and main
 ## Overview
 
 - `cmd`: Implementation of commands
-    - `cmd/temaquery`: Queries A joined MathWebSearch + ElasticSearch Setu
-    - `cmd/mwsapid`: HTTP Daemon serving temasearch queries (not yet implemented)
+    - `cmd/temaquery`: Queries A joined MathWebSearch + ElasticSearch Setup
+    - `cmd/mwsapid`: HTTP Daemon serving temasearch queries
     - `cmd/mwsquery`: Queries a (plain) MathWebSearch instance for MathWebSeach Queries
     - `cmd/elasticquery`: Queries a (plain) Elasticsearch instance for Tema Queries
     - `cmd/elasticsync`: Creates and maintains an Elasticsearch instance for use with Temasearch
 - `connection`: Contains Connection Code to MathWebSearch and ElasticSearch
-
-(Rest is not up-to-date)
-
-- `temasearch`: Code implementing joined (mws, tema) queries
-- `mws`: Code interacting with MathWebSearch
-- `tema`: Code interacting with Elasticsearch / TemaSearch
-    - `tema/sync`: Code to synchronize a TemaSearch index with Elasticsearch
-    - `tema/query`: Code to query TemaSearch
-- `elasticutils`: Utility wrappers around Elasticsearch objects
+- `engine`: Underlying code used by commands above
+    - `engine/elasticsync`: Creates and maintains an Elasticsearch instance for use with Temasearch
+    - `engine/elasticengine`: ElasticSearch only queries
+    - `engine/mwsengine`: MathWebSearch queries
+    - `engine/temaengine`: TemaSearch Queries
+- `query`: Implements query parsing and serializing
+- `result`: Implements result parsing and serializing
 - `utils`: General utility functions
 
 ## Processes
@@ -132,6 +130,100 @@ Internally, each query consists of two phases:
 A normal query runs both phases. 
 For debugging, it is possible to only run the document phase by running the `-document-phase-only` flag. 
 
+## API Daemon
+
+The program in `cmd/mwsapid` implements an HTTP Daemon that can answer all the queries above. 
+It can be configured using the command line arguments:
+
+```
+Usage of mwsapid:
+  -elastic-host string
+        Host to use for elasticsearch
+  -elastic-port int
+        Port to use for elasticsearch (default 9200)
+  -mws-host string
+        Host to use for mathwebsearch. If omitted, disable mathwebsearch support
+  -mws-port int
+        Port to use for mathwebsearch (default 8080)
+  -host string
+        Host to listen on (default "localhost")
+  -port int
+        Port to listen on for queries (default 3000)
+```
+
+### General Structure
+
+The server supports three kinds of requests -- which are described in more detail below. 
+When using `POST` requests, all parameters should be encoded using JSON in the body. 
+
+For all requests, the server will respond with a JSON object in the body. 
+By default, this corresponds to a simple `application/json` response. 
+However, when the URL-parameter `callback` is provided, a [`JSONP`](https://web.archive.org/web/20160304044218/http://www.json-p.org/) response is sent instead. 
+
+Furthermore, the server makes use of the following status codes:
+
+| Code | Description           | Meaning                                                                        |
+|------|-----------------------|--------------------------------------------------------------------------------|
+| 200  | OK                    | Request suceeded and the body will contain the desired response.               |
+| 400  | Bad Request           | Malformed request, this occurs if some parameters are out of range or missing. |
+| 404  | Not Found             | The given request was not found or is not supported by the server.             |
+| 405  | Method Not Allowed    | The request method (i.e. POST or GET) is not allowed for the given request.    |
+| 500  | Internal Server Error | Something went wrong when trying to answer the query.                          |
+
+When responding with a non-200 status code, the body will always contain a JSON string with a detailed error message. 
+This message is not intended for end users, instead it should be used by developers to debug the issue at hand. 
+
+### Status Request
+
+The Status Handler is called running a GET on `/`.
+It takes no parameters and returns a [StatusResponse](engine/server.go) with the following structure: 
+
+| Field   | Type                 | Description                              |
+|---------|----------------------|------------------------------------------|
+| name    | `string`             | Name of this server. Always `mwsapid`.   |
+| tagline | `string`             | Server Tagline.                          |
+| engines | `dict<string, bool>` | Supported "engines" or routes.           |
+
+Example Response:
+
+```json
+{
+    "name":"mwsapid",
+    "tagline":"You know, for math",
+    "engines": {
+        "mws":true,
+        "tema":false
+    }
+}
+```
+
+### MathWebSearch Request
+
+The MWS Handler is called running a POST on `/mws/`.
+It takes parameters of type [MWSAPIRequest](engine/mwsengine/handler.go). 
+All parameters are optional, however when all parameters are omitted, an empty object must be passed as the body. 
+
+| Field       | Type                 | Description                                                                                             |
+|-------------|----------------------|---------------------------------------------------------------------------------------------------------|
+| expressions | `Array<string>` | List of MathWebSearch expressions. Each should be a the body of a single "mws:expression" tag, using the "mws" and "m" predefined namespaces. |
+| mwsids      | `boolean`    | When true, do not return MathWebSearch results, but only their IDs                                              |
+| count       | `boolean`    | When true, return only count of results, not results themselves.                                                |
+| from        | `number`     | Used for pagination. 0-based index to start result set at. Defaults to 0, must be >= 0.                         |
+| size        | `number`     | Used for pagination. Maximum number of results to returns. Defaults to 10, must be between 0 and 100 inclusive. |
+
+For example, when the server is running on localhost at port 3000, the following curl command could be used to make a simple request:
+
+```curl -d '{"expressions":["<mws:qvar>x</mws:qvar>"]}' -H "Content-Type: application/json" -X POST http://localhost:3000/mws/```
+
+If the count parameter is true, the response will be a single json number. 
+Otherwise, the server will return a [Result](result/result.go) struct. 
+This behaviour is identical to the `mwsquery` executable. 
+Example responses can be found in the [cmd/mwsquery/cmd/testdata](cmd/mwsquery/cmd/testdata) folder. 
+
+### TmeaSearch Request
+
+Not yet documented. 
+
 ## Docker
 
 For convenience, a Dockerfile serving the `API` daemon is provided. 
@@ -141,6 +233,17 @@ It can be run as follows:
 ```
 docker run mathwebsearch/mwsapi
 ```
+
+It serves the API Daemon (see above) on port 3000 by default and can be customized using the following environment variables:
+
+- MWSAPID_HOST: Host to listen for requests. Defaults to "0.0.0.0". 
+- MWSAPID_PORT: Port to listen for requests. Defaults to 3000. 
+
+- MWSAPID_MWS_HOST: Host to expect MathWebSearch Daemon on. If omitted, MathWebSearch support is disabled. 
+- MWSAPID_MWS_PORT: Port to expect MathWwebSearch Daemon on. Defaults to 8080. 
+
+- MWSAPID_ELASTIC_HOST: Host to expect Elasticsearch Daemon on. If omitted, TemaSearch support is disabled.
+- MWSAPID_ELASTIC_PORT: Port to expected Elasticsearch on. Default to 9200. 
 
 Furthermore, a Docker Image for elasticsync also exists. 
 See [MathWebSearch/tema-elasticsync](https://github.com/MathWebSearch/tema-elasticsync) for details. 
