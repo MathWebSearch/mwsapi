@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"sort"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -40,8 +41,9 @@ func (hit *Hit) UnmarshalJSON(bytes []byte) error {
 		return err
 	}
 
-	// no harvest element => done
-	if h.XHTML == "" {
+	// if no harvest element was returned
+	// we do not need to unmarshal it
+	if strings.TrimSpace(h.XHTML) == "" {
 		return nil
 	}
 

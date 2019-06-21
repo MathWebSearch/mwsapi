@@ -47,15 +47,15 @@ func (he *HarvestElement) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (
 		Text:    string(h.Text),
 	}
 
-	// load the metadata, and set it to an {} if omitted
+	// load the metadata, set it to an {} if undefined
 	v := strings.TrimSpace(string(h.Metadata))
 	if v == "" {
 		v = "{}"
 	}
+	// try and unmarshal it, but set it to the trimmed string on failure
 	err = json.Unmarshal([]byte(v), &he.Metadata)
-	err = errors.Wrap(err, "json.Unmarshal failed")
 	if err != nil {
-		return
+		he.Metadata = strings.TrimSpace(v)
 	}
 
 	// iterate over the found math elements
