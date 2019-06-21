@@ -16,7 +16,7 @@ type Result struct {
 
 	Total int64 `json:"total"` // the total number of results
 	From  int64 `json:"from"`  // result number this page starts at
-	Size  int64 `json:"size"`  // (maximum) number of results in this page
+	Size  int64 `json:"size"`  // number of results returned
 
 	Variables []*QueryVariable `json:"qvars,omitempty"` // the list of
 
