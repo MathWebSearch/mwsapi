@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/MathWebSearch/mwsapi/connection"
 	"github.com/MathWebSearch/mwsapi/engine"
@@ -23,7 +24,9 @@ func (handler *MWSHandler) Connect() (err error) {
 	if handler.Host != "" {
 		handler.connection, err = connection.NewMWSConnection(handler.Port, handler.Host)
 		if err == nil {
-			err = connection.Connect(handler.connection)
+			err = connection.AwaitConnect(handler.connection, 5*time.Second, -1, func(e error) {
+				log.Printf("Failed to connect to MWS, retyring: %s", e)
+			})
 		}
 		if err != nil {
 			err = errors.Wrap(err, "Failed to connect to MWS")
