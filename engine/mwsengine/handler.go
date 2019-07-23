@@ -78,6 +78,8 @@ func (handler *MWSHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) (co
 		return
 	}
 
+	log.Printf("[%s] %v\n", r.RemoteAddr, request.MWSQuery.Expressions)
+
 	// run the query, or the count
 	if request.Count {
 		res, err = Count(handler.connection, request.MWSQuery)
