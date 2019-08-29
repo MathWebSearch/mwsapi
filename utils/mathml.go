@@ -140,9 +140,17 @@ func (math *MathML) updateSemantics(annotation *xmlquery.Node) (err error) {
 		xref = "\"" + xref + "\""
 	}
 
+	// search for @xml:id first
 	semantics := xmlquery.FindOne(math.root, "//*[@xml:id="+xref+"]")
+
+	// sometimes we have malformed xml, so search for anything named id
+	// TODO: xmlquery should support or(A,B)
 	if semantics == nil {
-		return errors.Errorf("Missing <semantics> child with id %q in %q", xref, math.root.OutputXML(true))
+		semantics = xmlquery.FindOne(math.root, "//*[@id="+xref+"]")
+	}
+
+	if semantics == nil {
+		return errors.Errorf("Missing (<semantics>) child with id %s in:\n%s", xref, math.semantics.OutputXML(true))
 	}
 
 	math.semantics = semantics
