@@ -65,6 +65,11 @@ func runRaw(conn *connection.MWSConnection, q *query.RawMWSQuery) (res *result.R
 	}
 	err = res.UnmarshalMWS(resp)
 	err = errors.Wrap(err, "res.UnmarshalMWS failed")
+    // remove all MathSource elements to make the response a little more lightweight
+    // maybe make this optional in the future?
+    for _, hit := range res.Hits {
+        hit.Element.MathSource = nil
+    }
 
 	return
 }
