@@ -26,6 +26,7 @@ func Run(conn *connection.MWSConnection, query *query.MWSQuery, from int64, size
 	// TODO: Paralellize this with appropriate page size
 	res, err = runRaw(conn, query.Raw(from, size))
 	err = errors.Wrap(err, "runRaw failed")
+
 	return
 }
 

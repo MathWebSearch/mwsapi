@@ -9,6 +9,7 @@ import (
 	"github.com/MathWebSearch/mwsapi/connection"
 	"github.com/MathWebSearch/mwsapi/engine"
 	"github.com/MathWebSearch/mwsapi/query"
+	"github.com/MathWebSearch/mwsapi/result"
 	"github.com/pkg/errors"
 )
 
@@ -87,7 +88,16 @@ func (handler *MWSHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) (co
 	if request.Count {
 		res, err = Count(handler.connection, request.MWSQuery)
 	} else {
-		res, err = Run(handler.connection, request.MWSQuery, request.From, request.Size)
+        res, err = Run(handler.connection, request.MWSQuery, request.From, request.Size)
+        if(!request.Complete){
+            // remove the math source when requested
+            i,ok := res.(*result.Result)
+            if(ok){
+                for _, hit := range i.Hits {
+                    hit.Element.MathSource = nil
+                }
+            }
+        }
 	}
 
 	// if there was an error, wrap it and set the status code
@@ -99,6 +109,7 @@ func (handler *MWSHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) (co
 	return
 }
 
+
 // MaxRequestSize is the maximum request size supported by the api
 const MaxRequestSize = 100
 
@@ -109,6 +120,7 @@ type MWSAPIRequest struct {
 	Count bool  `json:"count,omitempty"`
 	From  int64 `json:"from,omitempty"`
 	Size  int64 `json:"size,omitempty"`
+    Complete bool `json:"complete,omitempty"`
 }
 
 // Validate validates an MWSAPI Request
