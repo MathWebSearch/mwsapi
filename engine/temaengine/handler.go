@@ -1,9 +1,10 @@
 package temaengine
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
+
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/MathWebSearch/mwsapi/connection"
 	"github.com/MathWebSearch/mwsapi/engine"
@@ -53,7 +54,7 @@ func (handler *TemaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) (c
 	var request TemaAPIRequest
 
 	// decode the request
-	decoder := json.NewDecoder(r.Body)
+	decoder := jsoniter.NewDecoder(r.Body)
 	err = decoder.Decode(&request)
 	if err != nil {
 		code = http.StatusBadRequest

@@ -1,10 +1,11 @@
 package mwsengine
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"time"
+
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/MathWebSearch/mwsapi/connection"
 	"github.com/MathWebSearch/mwsapi/engine"
@@ -54,7 +55,7 @@ func (handler *MWSHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) (co
 	var request MWSAPIRequest
 
 	// decode the request
-	decoder := json.NewDecoder(r.Body)
+	decoder := jsoniter.NewDecoder(r.Body)
 	err = decoder.Decode(&request)
 	if err != nil {
 		code = http.StatusBadRequest
@@ -88,16 +89,16 @@ func (handler *MWSHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) (co
 	if request.Count {
 		res, err = Count(handler.connection, request.MWSQuery)
 	} else {
-        res, err = Run(handler.connection, request.MWSQuery, request.From, request.Size)
-        if(!request.Complete){
-            // remove the math source when requested
-            i,ok := res.(*result.Result)
-            if(ok){
-                for _, hit := range i.Hits {
-                    hit.Element.MathSource = nil
-                }
-            }
-        }
+		res, err = Run(handler.connection, request.MWSQuery, request.From, request.Size)
+		if !request.Complete {
+			// remove the math source when requested
+			i, ok := res.(*result.Result)
+			if ok {
+				for _, hit := range i.Hits {
+					hit.Element.MathSource = nil
+				}
+			}
+		}
 	}
 
 	// if there was an error, wrap it and set the status code
@@ -109,7 +110,6 @@ func (handler *MWSHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) (co
 	return
 }
 
-
 // MaxRequestSize is the maximum request size supported by the api
 const MaxRequestSize = 100
 
@@ -117,10 +117,10 @@ const MaxRequestSize = 100
 type MWSAPIRequest struct {
 	*query.MWSQuery
 
-	Count bool  `json:"count,omitempty"`
-	From  int64 `json:"from,omitempty"`
-	Size  int64 `json:"size,omitempty"`
-    Complete bool `json:"complete,omitempty"`
+	Count    bool  `json:"count,omitempty"`
+	From     int64 `json:"from,omitempty"`
+	Size     int64 `json:"size,omitempty"`
+	Complete bool  `json:"complete,omitempty"`
 }
 
 // Validate validates an MWSAPI Request

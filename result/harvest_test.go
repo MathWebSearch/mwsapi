@@ -1,11 +1,12 @@
 package result
 
 import (
-	"encoding/json"
 	"encoding/xml"
 	"io/ioutil"
 	"reflect"
 	"testing"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 func TestHarvestElementUnmarshal(t *testing.T) {
@@ -41,7 +42,7 @@ func TestHarvestElementUnmarshal(t *testing.T) {
 			}
 
 			// Manual testing; todo: remove me
-			// bytes, _ := json.Marshal(gotXML)
+			// bytes, _ := jsoniter.Marshal(gotXML)
 			// fmt.Println(string(bytes))
 
 			// read the bytes of the json
@@ -53,7 +54,7 @@ func TestHarvestElementUnmarshal(t *testing.T) {
 
 			// parse it
 			var gotJSON HarvestElement
-			err = json.Unmarshal([]byte(jsonBytes), &gotJSON)
+			err = jsoniter.Unmarshal([]byte(jsonBytes), &gotJSON)
 			if (err != nil) != tt.wantJSONErr {
 				t.Errorf("HarvestElement.UnmarshalJSON() error = %v, wantJSONErr %v", err, tt.wantJSONErr)
 				return

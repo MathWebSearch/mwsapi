@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"encoding/json"
+	"github.com/json-iterator/go"
 	"fmt"
 	"os"
 )
@@ -14,7 +14,7 @@ func OutputJSONOrErr(res interface{}, err error) {
 	}
 
 	// stdout the json
-	bytes, _ := json.MarshalIndent(res, "", "  ")
+	bytes, _ := jsoniter.MarshalIndent(res, "", "  ")
 	os.Stdout.Write(bytes)
 	fmt.Println("")
 }

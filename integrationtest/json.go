@@ -1,33 +1,26 @@
 package integrationtest
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"testing"
 
+	jsoniter "github.com/json-iterator/go"
+
 	"github.com/pkg/errors"
 )
 
-// normalizeJSON normalizes a json string
-func normalizeJSON(in string) (out string, err error) {
+// normalizeJSON normalizes json into an interface{}
+func normalizeJSON(in string) (interface{}, error) {
 	var t interface{}
 
 	// Unmarshal into a generic interface
-	err = json.Unmarshal([]byte(in), &t)
+	err := jsoniter.Unmarshal([]byte(in), &t)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	// Remarshal it
-	outB, err := json.Marshal(&t)
-	if err != nil {
-		return
-	}
-
-	// and return
-	out = string(outB)
-	return
+	return t, nil
 }
 
 // Outputs json into {$asset}.out for debugging purposes
@@ -42,8 +35,8 @@ func outputDebugJSON(t *testing.T, res interface{}, asset string) (filename stri
 // writeJSONFile writes a json version of res into filename
 func writeJSONFile(t *testing.T, res interface{}, filename string) (bytes []byte, err error) {
 	// Remarshal it
-	bytes, err = json.MarshalIndent(res, "", "  ")
-	err = errors.Wrap(err, "json.MarshalIndent failed")
+	bytes, err = jsoniter.MarshalIndent(res, "", "  ")
+	err = errors.Wrap(err, "jsoniter.MarshalIndent failed")
 	if err != nil {
 		return
 	}

@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
+	jsoniter "github.com/json-iterator/go"
+
 	"github.com/pkg/errors"
 
 	"gopkg.in/olivere/elastic.v6"
@@ -158,8 +160,8 @@ func (obj *Object) Delete() (err error) {
 
 // Unpack will unpack this object as json
 func (obj *Object) Unpack(v interface{}) (err error) {
-	err = json.Unmarshal(*obj.Source, v)
-	err = errors.Wrap(err, "json.Unmarshal failed")
+	err = jsoniter.Unmarshal(*obj.Source, v)
+	err = errors.Wrap(err, "jsoniter.Unmarshal failed")
 	return
 }
 
@@ -174,8 +176,8 @@ func (obj *Object) UnpackFields() (fields map[string]interface{}, err error) {
 func (obj *Object) Pack(v interface{}) (err error) {
 	// decode the bytes
 	var bytes json.RawMessage
-	bytes, err = json.Marshal(v)
-	err = errors.Wrap(err, "json.Marshal failed")
+	bytes, err = jsoniter.Marshal(v)
+	err = errors.Wrap(err, "jsoniter.Marshal failed")
 	if err != nil {
 		return
 	}

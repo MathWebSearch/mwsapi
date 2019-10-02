@@ -1,7 +1,7 @@
 package result
 
 import (
-	"encoding/json"
+	"github.com/json-iterator/go"
 	"encoding/xml"
 	"sort"
 	"strings"
@@ -36,8 +36,8 @@ func (hit *Hit) UnmarshalJSON(bytes []byte) error {
 	}
 
 	// unmarshal the helper
-	if err := json.Unmarshal(bytes, &h); err != nil {
-		err = errors.Wrap(err, "json.Unmarshal failed")
+	if err := jsoniter.Unmarshal(bytes, &h); err != nil {
+		err = errors.Wrap(err, "jsoniter.Unmarshal failed")
 		return err
 	}
 
