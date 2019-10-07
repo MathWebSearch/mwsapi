@@ -1,7 +1,7 @@
 package elasticsync
 
 import (
-	jsoniter "github.com/json-iterator/go"
+	"encoding/json"
 
 	"github.com/MathWebSearch/mwsapi/result"
 	"github.com/pkg/errors"
@@ -20,8 +20,8 @@ func (proc *Process) insertSegmentHarvests(segment string) error {
 		e := utils.ProcessLinePairs(segment, true, func(_, contentLine string) (err error) {
 			// unmarshal the content
 			var content *result.HarvestElement
-			err = jsoniter.Unmarshal([]byte(contentLine), &content)
-			err = errors.Wrap(err, "jsoniter.Unmarshal failed")
+			err = json.Unmarshal([]byte(contentLine), &content)
+			err = errors.Wrap(err, "json.Unmarshal failed")
 			if err != nil {
 				return
 			}

@@ -66,7 +66,7 @@ The program in `cmd/elasticsync` creates and maintains an Elasticsearch Index fo
 
 A Temasearch Index is a set of JSON objects conforming to the [Temasearch Harvest Element Schema](tema/Element.go).
 In the following we call each such document a _Harvest Element_.
-A group of elements belonging to a single .harvest file (which in and of itself belongs to one source file) is usually contained in one line of an elasticsearch index file ending in .jsoniter.
+A group of elements belonging to a single .harvest file (which in and of itself belongs to one source file) is usually contained in one line of an elasticsearch index file ending in .json.
 For backward compatibility, in between each lines of items in the index, an additional document containing legacy meta-information should be stored.
 These .json files are stored within one folder on disk.
 

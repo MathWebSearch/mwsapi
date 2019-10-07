@@ -1,7 +1,7 @@
 package result
 
 import (
-	"github.com/json-iterator/go"
+	"encoding/json"
 	"encoding/xml"
 	"strings"
 
@@ -53,7 +53,7 @@ func (he *HarvestElement) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (
 		v = "{}"
 	}
 	// try and unmarshal it, but set it to the trimmed string on failure
-	err = jsoniter.Unmarshal([]byte(v), &he.Metadata)
+	err = json.Unmarshal([]byte(v), &he.Metadata)
 	if err != nil {
 		he.Metadata = strings.TrimSpace(v)
 	}

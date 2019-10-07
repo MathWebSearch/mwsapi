@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"github.com/json-iterator/go"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -111,7 +111,7 @@ func (server *Server) ensureMethod(w http.ResponseWriter, r *http.Request, metho
 // jsonResponse returns a json or jsonp response
 func (server *Server) jsonResponse(w http.ResponseWriter, r *http.Request, code int, response interface{}) {
 	// marshal the response
-	data, err := jsoniter.Marshal(response)
+	data, err := json.Marshal(response)
 	if err != nil {
 		data = []byte(`{"error":true,"message":"Unknown error"}`)
 		code = http.StatusInternalServerError

@@ -1,7 +1,7 @@
 package result
 
 import (
-	"github.com/json-iterator/go"
+	"encoding/json"
 	"net/http"
 	"time"
 
@@ -12,7 +12,7 @@ import (
 // UnmarshalMWS un-marshals a resoponse from mws
 func (res *Result) UnmarshalMWS(response *http.Response) error {
 	defer response.Body.Close() // close the body when done
-	decoder := jsoniter.NewDecoder(response.Body)
+	decoder := json.NewDecoder(response.Body)
 
 	// read the adapted data from the json
 	var r struct {
@@ -25,7 +25,7 @@ func (res *Result) UnmarshalMWS(response *http.Response) error {
 		Hits             []*Hit  `json:"hits,omitempty"`
 	}
 	if err := decoder.Decode(&r); err != nil {
-		err = errors.Wrap(err, "jsoniter.Unmarshal failed")
+		err = errors.Wrap(err, "json.Unmarshal failed")
 		return err
 	}
 

@@ -1,18 +1,16 @@
 package integrationtest
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
-	"reflect"
 	"testing"
-
-	jsoniter "github.com/json-iterator/go"
 )
 
 // TestJSONAsset compares a result with a json file
 func TestJSONAsset(t *testing.T, name string, res interface{}, filename string) bool {
 	// marshal the first file into json
-	gbytes, err := jsoniter.Marshal(res)
+	gbytes, err := json.Marshal(res)
 	if err != nil {
 		t.Errorf("%s Unable to marshal result: %s", name, err.Error())
 		return false
@@ -37,18 +35,22 @@ func TestJSONAsset(t *testing.T, name string, res interface{}, filename string) 
 		return false
 	}
 	expected := string(ebytes)
-
-	gotJSON, err := normalizeJSON(got)
-	if err != nil {
-		return false
-	}
-	expectedJSON, err := normalizeJSON(expected)
-	if err != nil {
-		return false
-	}
-
 	// Read json, then re-marshal
-	if !reflect.DeepEqual(gotJSON, expectedJSON) {
+
+	// trim all the things
+	got, err = normalizeJSON(got)
+	if err != nil {
+		t.Errorf("%s got invalid json: %s", name, err.Error())
+		return false
+	}
+
+	expected, err = normalizeJSON(expected)
+	if err != nil {
+		t.Errorf("%s invalid json in asset %q: %s", name, filename, err.Error())
+		return false
+	}
+
+	if got != expected {
 		fn, err := outputDebugJSON(t, res, filename)
 
 		if err == nil {

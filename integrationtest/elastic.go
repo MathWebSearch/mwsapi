@@ -2,7 +2,7 @@ package integrationtest
 
 import (
 	"bytes"
-	"github.com/json-iterator/go"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -49,8 +49,8 @@ func registerBackupLocation(client *http.Client, url string, reponame string, lo
 			"readonly": true,
 		},
 	}
-	d, err := jsoniter.Marshal(data)
-	err = errors.Wrap(err, "jsoniter.Marshal failed")
+	d, err := json.Marshal(data)
+	err = errors.Wrap(err, "json.Marshal failed")
 	if err != nil {
 		return
 	}
@@ -90,8 +90,8 @@ func loadSnapshot(client *http.Client, url string, reponame string, snapshotname
 	data := j{
 		"include_global_state": true,
 	}
-	d, err := jsoniter.Marshal(data)
-	err = errors.Wrap(err, "jsoniter.Marshal failed")
+	d, err := json.Marshal(data)
+	err = errors.Wrap(err, "json.Marshal failed")
 	if err != nil {
 		return
 	}
