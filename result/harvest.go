@@ -5,7 +5,6 @@ import (
 	"encoding/xml"
 	"strings"
 
-	"github.com/MathWebSearch/mwsapi/utils"
 	"github.com/pkg/errors"
 )
 
@@ -22,40 +21,43 @@ type HarvestElement struct {
 	MathSource map[string]string `json:"math"` // Source of replaced math elements within this document
 }
 
+// innerXML is a utility struct used to extract inner xml from specific elements
+type innerXML struct {
+	InnerXML string `xml:",innerxml"`
+}
+
 // UnmarshalXML unmarshals xml into a harvest element
-func (he *HarvestElement) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
-	// raw data
+func (he *HarvestElement) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	// try to decode the raw data or fail
 	var h struct {
 		XMLName xml.Name `xml:"data"`
 
-		ID   utils.InnerXML `xml:"id"`
-		Text utils.InnerXML `xml:"text"`
+		ID   innerXML `xml:"id"`
+		Text innerXML `xml:"text"`
 
-		Metadata utils.InnerXML `xml:"metadata"`
+		Metadata innerXML `xml:"metadata"`
 
 		Math []*MathFormula `xml:"math"`
 	}
-	err = d.DecodeElement(&h, &start)
-	err = errors.Wrap(err, "d.DecodeElement failed")
-	if err != nil {
-		return
+	if err := d.DecodeElement(&h, &start); err != nil {
+		return errors.Wrap(err, "d.DecodeElement failed")
 	}
 
-	// turn it into a harvestelement
+	// start creating a harvest element
 	*he = HarvestElement{
-		Segment: string(h.ID),
-		Text:    string(h.Text),
+		Segment: h.ID.InnerXML,
+		Text:    h.Text.InnerXML,
 	}
 
-	// load the metadata, set it to an {} if undefined
-	v := strings.TrimSpace(string(h.Metadata))
-	if v == "" {
-		v = "{}"
-	}
-	// try and unmarshal it, but set it to the trimmed string on failure
-	err = json.Unmarshal([]byte(v), &he.Metadata)
-	if err != nil {
-		he.Metadata = strings.TrimSpace(v)
+	// load the metadata, set it to nil if undefined
+	v := strings.TrimSpace(h.Metadata.InnerXML)
+	if v != "" {
+		// try and unmarshal it, but set it to the trimmed string on failure
+		if err := json.Unmarshal([]byte(v), &he.Metadata); err != nil {
+			he.Metadata = v
+		}
+	} else {
+		he.Metadata = struct{}{}
 	}
 
 	// iterate over the found math elements
