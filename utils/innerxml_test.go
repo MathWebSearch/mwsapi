@@ -36,6 +36,19 @@ func TestInnerXML_ToXML(t *testing.T) {
 	}
 }
 
+func BenchmarkInnerXML_ToXML(b *testing.B) {
+	source := struct {
+		XMLName xml.Name `xml:"args"`
+		Text    InnerXML `xml:"element"`
+	}{
+		Text: "<hello></hello>",
+	}
+
+	for n := 0; n < b.N; n++ {
+		xml.Marshal(&source)
+	}
+}
+
 func TestInnerXML_FromXML(t *testing.T) {
 	type args struct {
 		Text InnerXML `xml:"element"`
@@ -62,5 +75,18 @@ func TestInnerXML_FromXML(t *testing.T) {
 				t.Errorf("InnerXML.FromXML() = %v, want %v", got, tt.wantArgs)
 			}
 		})
+	}
+}
+
+func BenchmarkInnerXML_FromXML(b *testing.B) {
+	bytes := []byte("<args><element>Hello World</element></args>")
+
+	var dest struct {
+		Text InnerXML `xml:"element"`
+	}
+	tdest := &dest
+
+	for n := 0; n < b.N; n++ {
+		xml.Unmarshal(bytes, tdest)
 	}
 }

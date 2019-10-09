@@ -60,3 +60,47 @@ func TestMathML(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkMathML_Parse_1(b *testing.B) {
+	bmarkmathmlparse(b, "testdata/mathml/in1.xml")
+}
+
+func BenchmarkMathML_Parse_2(b *testing.B) {
+	bmarkmathmlparse(b, "testdata/mathml/in2.xml")
+}
+
+func BenchmarkMathML_Parse_3(b *testing.B) {
+	bmarkmathmlparse(b, "testdata/mathml/in3.xml")
+}
+
+func bmarkmathmlparse(b *testing.B, fn string) {
+	// read input and turn it into a string
+	source, err := ioutil.ReadFile(fn)
+	if err != nil {
+		b.Error(err.Error())
+		return
+	}
+	ssource := string(source)
+
+	for n := 0; n < b.N; n++ {
+		ParseMathML(ssource)
+	}
+}
+
+func BenchmarkMathML_Navigate(b *testing.B) {
+	// read input and turn it into a string
+	source, err := ioutil.ReadFile("testdata/mathml/in3.xml")
+	if err != nil {
+		b.Error(err.Error())
+		return
+	}
+	gotMath, err := ParseMathML(string(source))
+	if (err != nil) != false {
+		b.Errorf("ParseMathML() error = %v, wantErr %v", err, false)
+		return
+	}
+
+	for n := 0; n < b.N; n++ {
+		gotMath.Copy().NavigateAnnotation("/*[2]/*[5]")
+	}
+}

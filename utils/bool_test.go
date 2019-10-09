@@ -36,6 +36,16 @@ func TestBooleanYesNo_MarshalText(t *testing.T) {
 	}
 }
 
+func BenchmarkBooleanYesNo_MarshalText(b *testing.B) {
+	byes := BooleanYesNo(true)
+	bno := BooleanYesNo(false)
+
+	for n := 0; n < b.N; n++ {
+		xml.Marshal(byes)
+		xml.Marshal(bno)
+	}
+}
+
 func TestBooleanYesNo_UnmarshalText(t *testing.T) {
 	type element struct {
 		XMLName xml.Name     `xml:"element"`
@@ -63,5 +73,21 @@ func TestBooleanYesNo_UnmarshalText(t *testing.T) {
 				t.Errorf("BooleanYesNo.UnmarshalText() = %v, want %v", gotElement, tt.wantElement)
 			}
 		})
+	}
+}
+
+func BenchmarkBooleanYesNo_UnmarshalText(b *testing.B) {
+	byes := []byte("<element value=\"yes\"></element>")
+	bno := []byte("<element value=\"no\"></element>")
+
+	var dest struct {
+		XMLName xml.Name     `xml:"element"`
+		Value   BooleanYesNo `xml:"value,attr"`
+	}
+	tdest := &dest
+
+	for n := 0; n < b.N; n++ {
+		xml.Unmarshal(byes, tdest)
+		xml.Unmarshal(bno, tdest)
 	}
 }

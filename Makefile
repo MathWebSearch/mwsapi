@@ -21,6 +21,8 @@ $(EXECUTABLES): %: deps
 
 test: testdeps
 	CGO_ENABLED=0 $(GOTEST) -short -v ./...
+bench: testdeps
+	CGO_ENABLED=0 $(GOTEST) -short -bench=. ./...
 clean: 
 	$(GOCLEAN)
 	rm -f integrationtest/testdata/lockfile
