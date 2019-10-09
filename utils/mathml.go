@@ -38,32 +38,25 @@ func ParseMathML(source string) (math *MathML, err error) {
 	}
 
 	// first find the MathML:semantics node
-	semanticsRoot := xmlquery.FindOne(math.root, "//*[local-name()='semantics']")
+	semanticsRoot := findElementByLocalName(math.root, "semantics")
 	if semanticsRoot == nil {
 		return nil, errors.Errorf("No <semantics> element found in %q", math.root.OutputXML(true))
 	}
-	// then the first non-annotation node
-	math.semantics = xmlquery.FindOne(semanticsRoot, "./*[not(local-name()='annotation' or local-name()='annotation-xml')]")
+
+	// find presentation and content
+	var annotation *xmlquery.Node
+	math.semantics, annotation = findPresentationAndContent(semanticsRoot)
+
 	if math.semantics == nil {
 		return nil, errors.Errorf("Did not find any non-<annotation> or non-<annotation-xml> children in %q", math.root.OutputXML(true))
 	}
-
-	// our xpath implementation does not seem to support dynamic attributes, e.g. @*[local-name()='encoding']=
-	/*
-		math.annotation = xmlquery.FindOne(semanticsRoot, ".//*[local-name()='annotation-xml'][*encoding='MathML-Content']/*[1]")
-		if math.annotation == nil {
-			return nil, errors.New("[ParseMathML] <semantics> element did not contain any MathML-Content <annotation-xml>")
-		}
-	*/
-
-	// so we have a workaround
-	annotations := xmlquery.Find(semanticsRoot, ".//*[local-name()='annotation-xml']")
-	annotations = filterByAttributeLocalName(annotations, "encoding", "MathML-Content")
-	if len(annotations) == 0 {
+	if annotation == nil {
 		return nil, errors.New("[ParseMathML] <semantics> element did not contain any MathML-Content <annotation-xml>")
 	}
-	annotation := xmlquery.FindOne(annotations[0], "./*[1]")
-	if len(annotations) == 0 {
+
+	// take its' first child
+	annotation = firstChildElement(annotation)
+	if annotation == nil {
 		return nil, errors.New("[ParseMathML] <annotation-xml> did not contain any children")
 	}
 
@@ -130,27 +123,10 @@ func (math *MathML) updateSemantics(annotation *xmlquery.Node) (err error) {
 		return errors.Errorf("Missing xref attribute in %q", annotation.OutputXML(true))
 	}
 
-	// escape it with "s around it
-	if strings.ContainsRune(xref, '"') {
-		if strings.ContainsRune(xref, '\'') {
-			return errors.Errorf("xref attribute %q of %q contains both single and double quote", xref, annotation.OutputXML(true))
-		}
-		xref = "'" + xref + "'"
-	} else {
-		xref = "\"" + xref + "\""
-	}
-
-	// search for @xml:id first
-	semantics := xmlquery.FindOne(math.root, "//*[@xml:id="+xref+"]")
-
-	// sometimes we have malformed xml, so search for anything named id
-	// TODO: xmlquery should support or(A,B)
+	// find the referenced element or bail out
+	semantics := findElementByID(math.root, xref)
 	if semantics == nil {
-		semantics = xmlquery.FindOne(math.root, "//*[@id="+xref+"]")
-	}
-
-	if semantics == nil {
-		return errors.Errorf("Missing (<semantics>) child with id %s in:\n%s", xref, math.semantics.OutputXML(true))
+		return errors.Errorf("Missing <semantics> child with id %s in:\n%s", xref, math.semantics.OutputXML(true))
 	}
 
 	math.semantics = semantics
