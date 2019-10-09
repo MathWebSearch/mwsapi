@@ -57,7 +57,7 @@ func (he *HarvestElement) UnmarshalXML(d *xml.Decoder, start xml.StartElement) e
 			he.Metadata = v
 		}
 	} else {
-		he.Metadata = struct{}{}
+		he.Metadata = map[string]interface{}{}
 	}
 
 	// iterate over the found math elements
