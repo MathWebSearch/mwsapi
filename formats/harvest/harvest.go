@@ -15,7 +15,7 @@ type HarvestData struct {
 
 // HarvestExpr represents information about a Harvest Expression
 type HarvestExpr struct {
-	ID          string // ID of this expression
-	DataID      string // the ID of the data element belonging to this expression
-	MathElement string // The corresponding math element to this Harvest expression
+	ID     string // ID of this expression
+	DataID string // the ID of the data element belonging to this expression
+	Math   string // The corresponding math element to this Harvest expression
 }

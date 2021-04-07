@@ -6,6 +6,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/MathWebSearch/mwsapi/internal/xmlutil"
 	"github.com/beevik/etree"
 )
 
@@ -57,8 +58,12 @@ func (h *Harvest) unmarshalHarvest(harvest *etree.Element) error {
 
 		// mws:expr element is found
 		if element.NamespaceURI() == MathWebSearchNamespace && harvest.Tag == "expr" {
-
-			continue // TODO: Parse expr element
+			expr, err := unmarshalExprElement(element)
+			if err != nil {
+				return err
+			}
+			h.Expressions = append(h.Expressions, expr)
+			continue
 		}
 
 		return ErrUnmarshalInvalidElement{Got: element.FullTag(), Expected: []string{"mws:data", "mws:expr"}}
@@ -83,7 +88,7 @@ func unmarshalDataElement(data *etree.Element) (d HarvestData, err error) {
 	}
 
 	// read the contained xml!
-	d.Content, err = innerXML(data)
+	d.Content, err = xmlutil.InnerXML(data)
 	return d, err
 }
 
@@ -121,7 +126,7 @@ func unmarshalExprElement(expr *etree.Element) (e HarvestExpr, err error) {
 	}
 
 	// read the contained xml, TODO: Normalize the namespace here!
-	e.MathElement, err = innerXML(expr)
+	e.Math, err = xmlutil.InnerXML(expr)
 	return e, err
 }
 
@@ -169,18 +174,4 @@ type ErrUnmarshalExprConflictingID struct {
 
 func (e ErrUnmarshalExprConflictingID) Error() string {
 	return fmt.Sprintf("Found conflicting 'mws:expr' IDs: %s and %s", e.First, e.Second)
-}
-
-// innerXML returns the inner xml source of element
-func innerXML(element *etree.Element) (string, error) {
-	doc := etree.NewDocument()
-	for _, ct := range element.Child {
-		switch c := ct.(type) {
-		case *etree.Element:
-			doc.AddChild(c.Copy())
-		default:
-			doc.AddChild(c)
-		}
-	}
-	return doc.WriteToString()
 }
